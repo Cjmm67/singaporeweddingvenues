@@ -90,7 +90,7 @@ const VI=({src,alt,className="",style={}})=>{const[e,sE]=useState(!src);const co
 // ═════════════════════════════════════════════════════════════════════════
 // AUTH SYSTEM — Master Admin → Admins → Visitors
 // ═════════════════════════════════════════════════════════════════════════
-const MASTER_ADMIN = { email: "chris.millar@1-group.sg", password: "1Group 2026!", role: "master" };
+const MASTER_ADMIN = { email: "chris.millar@1-group.sg", password: "1Group2026!", role: "master" };
 const DOMAIN = "@1-group.sg";
 
 const getUsers = () => {
