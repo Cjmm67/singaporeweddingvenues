@@ -130,15 +130,28 @@ function SignInPage({ onLogin }) {
         setLoading(false);
         return;
       }
-      // Check registered users
+      // Check registered users in localStorage (same-browser accounts)
       const users = getUsers();
       const user = users.find(u => u.email === cleanEmail);
-      if (!user) { setErr("Account not found. Contact your administrator."); setLoading(false); return; }
-      if (user.password !== pass) { setErr("Incorrect password."); setLoading(false); return; }
-      if (!user.active) { setErr("Account has been deactivated. Contact your administrator."); setLoading(false); return; }
-      const session = { email: cleanEmail, role: user.role, name: user.name };
-      saveSession(session);
-      onLogin(session);
+      if (user) {
+        if (user.password !== pass) { setErr("Incorrect password."); setLoading(false); return; }
+        if (!user.active) { setErr("Account has been deactivated. Contact your administrator."); setLoading(false); return; }
+        const session = { email: cleanEmail, role: user.role, name: user.name };
+        saveSession(session);
+        onLogin(session);
+        setLoading(false);
+        return;
+      }
+      // Any @1-group.sg email with the team password gets visitor access
+      if (pass === MASTER_ADMIN.password) {
+        const name = cleanEmail.split("@")[0].split(".").map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(" ");
+        const session = { email: cleanEmail, role: "visitor", name: name };
+        saveSession(session);
+        onLogin(session);
+        setLoading(false);
+        return;
+      }
+      setErr("Incorrect password. Use the team password provided by your administrator.");
       setLoading(false);
     }, 600);
   };
