@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Heart, MapPin, Users, ChevronRight, ChevronLeft, Star, Sparkles, Calculator, CalendarDays, GitCompareArrows, MessageCircle, X, Menu, ArrowUp, Send, TreePine, Building2, Sunset, Landmark, Waves, UtensilsCrossed, Check, Instagram, Facebook, Mail, Crown, Award } from "lucide-react";
+import { Heart, MapPin, Users, ChevronRight, ChevronLeft, Star, Sparkles, Calculator, CalendarDays, GitCompareArrows, MessageCircle, X, Menu, ArrowUp, Send, TreePine, Building2, Sunset, Landmark, Waves, UtensilsCrossed, Check, Instagram, Facebook, Mail, Crown, Award, Lock, Shield, UserPlus, LogOut, Eye, EyeOff, Trash2, Settings } from "lucide-react";
 
 /* Singapore Wedding Venues — singaporeweddingvenues.net
    Singapore's Premier AI-Powered Wedding Venue Discovery Platform
@@ -84,9 +84,351 @@ const VK=VENUES.map(v=>`${v.name}${v.managed?" [1-Host]":""}: ${v.catLabel}, ${v
 const VI=({src,alt,className="",style={}})=>{const[e,sE]=useState(!src);const cols={rooftop:"#1A1A2E",hotel:"#2C3E50",heritage:"#5D4037",garden:"#2D5A45",waterfront:"#1A535C",beachfront:"#0E7490"};const k=alt?.includes("Rooftop")?"rooftop":alt?.includes("Hotel")?"hotel":"heritage";if(e||!src)return<div className={className} style={{...style,background:`linear-gradient(135deg,${cols[k]||"#2C3E50"},${cols[k]||"#2C3E50"}cc)`,display:"flex",alignItems:"center",justifyContent:"center",color:"rgba(255,255,255,.5)",fontFamily:"var(--fh)",fontSize:"clamp(13px,1.3vw,17px)",textAlign:"center",padding:18}}>{alt?.split("—")[0]||"Venue"}</div>;return<img src={src} alt={alt} className={className} style={{...style,objectFit:"cover"}} onError={()=>sE(true)} loading="lazy"/>};
 
 // ═════════════════════════════════════════════════════════════════════════
-// MAIN APP
+// AUTH SYSTEM — Master Admin → Admins → Visitors
 // ═════════════════════════════════════════════════════════════════════════
-export default function App(){
+const MASTER_ADMIN = { email: "chris@1-group.sg", password: "SWV2026!", role: "master" };
+const DOMAIN = "@1-group.sg";
+
+const getUsers = () => {
+  try { return JSON.parse(localStorage.getItem("swv_users") || "[]"); } catch { return []; }
+};
+const saveUsers = (users) => localStorage.setItem("swv_users", JSON.stringify(users));
+const getSession = () => {
+  try { return JSON.parse(sessionStorage.getItem("swv_session") || "null"); } catch { return null; }
+};
+const saveSession = (s) => s ? sessionStorage.setItem("swv_session", JSON.stringify(s)) : sessionStorage.removeItem("swv_session");
+
+// ── SIGN IN PAGE ─────────────────────────────────────────────────────────
+function SignInPage({ onLogin }) {
+  const [email, setEmail] = useState("");
+  const [pass, setPass] = useState("");
+  const [err, setErr] = useState("");
+  const [showPass, setShowPass] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    setErr("");
+    setLoading(true);
+
+    setTimeout(() => {
+      const cleanEmail = email.trim().toLowerCase();
+      if (!cleanEmail.endsWith(DOMAIN)) {
+        setErr(`Only ${DOMAIN} email addresses are allowed`);
+        setLoading(false);
+        return;
+      }
+      // Check master admin
+      if (cleanEmail === MASTER_ADMIN.email && pass === MASTER_ADMIN.password) {
+        const session = { email: cleanEmail, role: "master", name: "Master Admin" };
+        saveSession(session);
+        onLogin(session);
+        setLoading(false);
+        return;
+      }
+      // Check registered users
+      const users = getUsers();
+      const user = users.find(u => u.email === cleanEmail);
+      if (!user) { setErr("Account not found. Contact your administrator."); setLoading(false); return; }
+      if (user.password !== pass) { setErr("Incorrect password."); setLoading(false); return; }
+      if (!user.active) { setErr("Account has been deactivated. Contact your administrator."); setLoading(false); return; }
+      const session = { email: cleanEmail, role: user.role, name: user.name };
+      saveSession(session);
+      onLogin(session);
+      setLoading(false);
+    }, 600);
+  };
+
+  return (
+    <div style={{ minHeight: "100vh", background: "var(--cr)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, fontFamily: "var(--fb)" }}>
+      {/* Decorative background */}
+      <div style={{ position: "fixed", top: "-20%", right: "-15%", width: "60vw", height: "60vw", background: "radial-gradient(circle, rgba(201,169,110,.06) 0%, transparent 70%)", animation: "morphBlob 25s ease-in-out infinite", pointerEvents: "none" }} />
+      <div style={{ position: "fixed", bottom: "-20%", left: "-15%", width: "50vw", height: "50vw", background: "radial-gradient(circle, rgba(212,165,165,.05) 0%, transparent 70%)", animation: "morphBlob 20s ease-in-out 5s infinite", pointerEvents: "none" }} />
+
+      <div style={{ width: "100%", maxWidth: 420, position: "relative", zIndex: 1 }}>
+        {/* Logo */}
+        <div style={{ textAlign: "center", marginBottom: 40, animation: "heroTextIn .8s ease forwards" }}>
+          <Heart size={36} style={{ color: "var(--ro)", marginBottom: 16 }} fill="var(--ro)" />
+          <h1 style={{ fontFamily: "var(--fh)", fontSize: 28, fontWeight: 400, color: "var(--c)", marginBottom: 6 }}>Singapore Wedding Venues</h1>
+          <p style={{ fontSize: 13, color: "var(--g)", letterSpacing: ".02em" }}>Admin & Team Portal</p>
+        </div>
+
+        {/* Sign In Card */}
+        <div style={{ background: "var(--w)", borderRadius: 20, padding: "36px 32px", boxShadow: "0 20px 60px rgba(0,0,0,.08), 0 0 0 1px rgba(201,169,110,.08)", animation: "cardEnter .6s ease .2s both" }}>
+          <h2 style={{ fontFamily: "var(--fh)", fontSize: 24, fontWeight: 500, marginBottom: 6 }}>Welcome back</h2>
+          <p style={{ fontSize: 13, color: "var(--g)", marginBottom: 28 }}>Sign in with your 1-Group email</p>
+
+          <form onSubmit={handleLogin}>
+            <div style={{ marginBottom: 18 }}>
+              <label style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".06em", textTransform: "uppercase", color: "var(--g)", marginBottom: 6, display: "block" }}>Email Address</label>
+              <div style={{ position: "relative" }}>
+                <Mail size={16} style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "var(--gi)" }} />
+                <input
+                  className="inp"
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="yourname@1-group.sg"
+                  required
+                  style={{ paddingLeft: 42 }}
+                />
+              </div>
+            </div>
+
+            <div style={{ marginBottom: 24 }}>
+              <label style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".06em", textTransform: "uppercase", color: "var(--g)", marginBottom: 6, display: "block" }}>Password</label>
+              <div style={{ position: "relative" }}>
+                <Lock size={16} style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "var(--gi)" }} />
+                <input
+                  className="inp"
+                  type={showPass ? "text" : "password"}
+                  value={pass}
+                  onChange={e => setPass(e.target.value)}
+                  placeholder="Enter your password"
+                  required
+                  style={{ paddingLeft: 42, paddingRight: 42 }}
+                />
+                <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--gi)", padding: 4 }}>
+                  {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </div>
+
+            {err && (
+              <div style={{ background: "var(--rp)", border: "1px solid var(--rl)", borderRadius: 10, padding: "10px 14px", marginBottom: 18, animation: "fU .3s ease" }}>
+                <p style={{ fontSize: 13, color: "var(--rd)" }}>{err}</p>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="bg"
+              disabled={loading}
+              style={{ width: "100%", justifyContent: "center", padding: "14px 24px", fontSize: 15, borderRadius: 12, opacity: loading ? 0.7 : 1 }}
+            >
+              {loading ? (
+                <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,.3)", borderTopColor: "var(--w)", borderRadius: "50%", animation: "spin .6s linear infinite", display: "inline-block" }} />
+                  Signing in…
+                </span>
+              ) : (
+                <><Lock size={15} /> Sign In</>
+              )}
+            </button>
+          </form>
+
+          <div style={{ marginTop: 24, padding: "16px 0 0", borderTop: "1px solid var(--gpa)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
+              <Shield size={14} style={{ color: "var(--go)" }} />
+              <span style={{ fontSize: 12, color: "var(--g)" }}>Secured portal · {DOMAIN} accounts only</span>
+            </div>
+          </div>
+        </div>
+
+        <p style={{ textAlign: "center", fontSize: 11, color: "var(--g)", marginTop: 24 }}>
+          Need access? Contact your administrator or the master admin.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ── ADMIN PANEL ──────────────────────────────────────────────────────────
+function AdminPanel({ session, onClose }) {
+  const [users, setUsers] = useState(getUsers());
+  const [showAdd, setShowAdd] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [newEmail, setNewEmail] = useState("");
+  const [newPass, setNewPass] = useState("");
+  const [newRole, setNewRole] = useState(session.role === "master" ? "admin" : "visitor");
+  const [addErr, setAddErr] = useState("");
+  const [addOk, setAddOk] = useState("");
+
+  const canCreateAdmin = session.role === "master";
+  const canCreateVisitor = session.role === "master" || session.role === "admin";
+  const manageable = session.role === "master" ? users : users.filter(u => u.role === "visitor" && u.createdBy === session.email);
+
+  const handleAdd = (e) => {
+    e.preventDefault();
+    setAddErr(""); setAddOk("");
+    const cleanEmail = newEmail.trim().toLowerCase();
+    if (!cleanEmail.endsWith(DOMAIN)) { setAddErr(`Email must end with ${DOMAIN}`); return; }
+    if (cleanEmail === MASTER_ADMIN.email) { setAddErr("Cannot create account with master admin email"); return; }
+    const existing = users.find(u => u.email === cleanEmail);
+    if (existing) { setAddErr("An account with this email already exists"); return; }
+    if (!newPass || newPass.length < 6) { setAddErr("Password must be at least 6 characters"); return; }
+    if (session.role === "admin" && newRole === "admin") { setAddErr("Only the Master Admin can create admin accounts"); return; }
+
+    const newUser = {
+      email: cleanEmail,
+      name: newName.trim() || cleanEmail.split("@")[0],
+      password: newPass,
+      role: newRole,
+      active: true,
+      createdBy: session.email,
+      createdAt: new Date().toISOString()
+    };
+    const updated = [...users, newUser];
+    setUsers(updated);
+    saveUsers(updated);
+    setNewName(""); setNewEmail(""); setNewPass("");
+    setAddOk(`${newUser.name} (${newRole}) created successfully`);
+    setShowAdd(false);
+    setTimeout(() => setAddOk(""), 3000);
+  };
+
+  const toggleActive = (email) => {
+    const updated = users.map(u => u.email === email ? { ...u, active: !u.active } : u);
+    setUsers(updated);
+    saveUsers(updated);
+  };
+
+  const removeUser = (email) => {
+    if (!confirm(`Remove ${email}? This cannot be undone.`)) return;
+    const updated = users.filter(u => u.email !== email);
+    setUsers(updated);
+    saveUsers(updated);
+  };
+
+  const roleColor = (r) => r === "admin" ? "var(--go)" : "var(--sa)";
+  const roleBg = (r) => r === "admin" ? "var(--gp)" : "rgba(181,196,177,.2)";
+
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+      <div onClick={onClose} style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,.5)", backdropFilter: "blur(6px)" }} />
+      <div style={{ position: "relative", background: "var(--w)", borderRadius: 20, width: "100%", maxWidth: 640, maxHeight: "85vh", overflow: "auto", boxShadow: "var(--sx)", animation: "cardEnter .4s ease" }}>
+        <div style={{ padding: "24px 28px", borderBottom: "1px solid var(--gpa)", display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, background: "var(--w)", zIndex: 1, borderRadius: "20px 20px 0 0" }}>
+          <div>
+            <h2 style={{ fontFamily: "var(--fh)", fontSize: 24, fontWeight: 500, display: "flex", alignItems: "center", gap: 8 }}>
+              <Settings size={20} style={{ color: "var(--go)" }} />
+              User Management
+            </h2>
+            <p style={{ fontSize: 12, color: "var(--g)", marginTop: 2 }}>
+              Signed in as <strong>{session.name}</strong> · {session.role === "master" ? "Master Admin" : session.role === "admin" ? "Admin" : "Visitor"}
+            </p>
+          </div>
+          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", padding: 4 }}><X size={20} /></button>
+        </div>
+
+        <div style={{ padding: "20px 28px 28px" }}>
+          {addOk && <div style={{ background: "rgba(127,183,126,.1)", border: "1px solid rgba(127,183,126,.3)", borderRadius: 10, padding: "10px 14px", marginBottom: 16, animation: "fU .3s ease" }}><p style={{ fontSize: 13, color: "#4a8c49" }}>✓ {addOk}</p></div>}
+
+          {/* Add User */}
+          {canCreateVisitor && (
+            <div style={{ marginBottom: 24 }}>
+              {!showAdd ? (
+                <button onClick={() => setShowAdd(true)} className="bg" style={{ fontSize: 13, padding: "10px 20px" }}><UserPlus size={15} />Add {canCreateAdmin ? "Admin or Visitor" : "Visitor"}</button>
+              ) : (
+                <div style={{ background: "var(--gg)", borderRadius: 14, padding: 22, animation: "fU .3s ease" }}>
+                  <h3 style={{ fontFamily: "var(--fh)", fontSize: 18, fontWeight: 500, marginBottom: 14, display: "flex", alignItems: "center", gap: 6 }}><UserPlus size={16} style={{ color: "var(--go)" }} />Create New Account</h3>
+                  <form onSubmit={handleAdd}>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
+                      <div>
+                        <label style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".05em", textTransform: "uppercase", color: "var(--g)", marginBottom: 4, display: "block" }}>Full Name</label>
+                        <input className="inp" value={newName} onChange={e => setNewName(e.target.value)} placeholder="John Smith" required />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".05em", textTransform: "uppercase", color: "var(--g)", marginBottom: 4, display: "block" }}>Role</label>
+                        <select className="inp" value={newRole} onChange={e => setNewRole(e.target.value)} style={{ cursor: "pointer" }}>
+                          {canCreateAdmin && <option value="admin">Admin</option>}
+                          <option value="visitor">Visitor</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div style={{ marginBottom: 12 }}>
+                      <label style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".05em", textTransform: "uppercase", color: "var(--g)", marginBottom: 4, display: "block" }}>Email Address</label>
+                      <input className="inp" type="email" value={newEmail} onChange={e => setNewEmail(e.target.value)} placeholder={`name${DOMAIN}`} required />
+                    </div>
+                    <div style={{ marginBottom: 16 }}>
+                      <label style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".05em", textTransform: "uppercase", color: "var(--g)", marginBottom: 4, display: "block" }}>Password (min 6 chars)</label>
+                      <input className="inp" type="text" value={newPass} onChange={e => setNewPass(e.target.value)} placeholder="Set a password" required minLength={6} />
+                    </div>
+                    {addErr && <p style={{ fontSize: 13, color: "var(--rd)", marginBottom: 12, background: "var(--rp)", padding: "8px 12px", borderRadius: 8 }}>{addErr}</p>}
+                    <div style={{ display: "flex", gap: 10 }}>
+                      <button type="submit" className="bg" style={{ fontSize: 13, padding: "10px 20px" }}><UserPlus size={14} />Create Account</button>
+                      <button type="button" onClick={() => { setShowAdd(false); setAddErr(""); }} style={{ padding: "10px 20px", borderRadius: 8, border: "1px solid var(--gpa)", background: "var(--w)", fontFamily: "var(--fb)", fontSize: 13, cursor: "pointer" }}>Cancel</button>
+                    </div>
+                  </form>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* User List */}
+          <h3 style={{ fontFamily: "var(--fh)", fontSize: 18, fontWeight: 500, marginBottom: 14 }}>
+            {session.role === "master" ? "All Accounts" : "Your Visitor Accounts"} ({manageable.length})
+          </h3>
+          {manageable.length === 0 ? (
+            <p style={{ fontSize: 14, color: "var(--g)", padding: 20, textAlign: "center", background: "var(--gg)", borderRadius: 10 }}>No accounts created yet.</p>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {manageable.map((u, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", background: "var(--gg)", borderRadius: 10, animation: `fU .3s ease ${i * 50}ms both` }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 2 }}>
+                      <span style={{ fontWeight: 600, fontSize: 14 }}>{u.name}</span>
+                      <span style={{ background: roleBg(u.role), color: roleColor(u.role), fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 999, textTransform: "uppercase", letterSpacing: ".04em" }}>{u.role}</span>
+                      {!u.active && <span style={{ background: "var(--rp)", color: "var(--rd)", fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 999 }}>DISABLED</span>}
+                    </div>
+                    <p style={{ fontSize: 12, color: "var(--g)" }}>{u.email}</p>
+                    <p style={{ fontSize: 11, color: "var(--gi)" }}>Created by {u.createdBy} · {new Date(u.createdAt).toLocaleDateString()}</p>
+                  </div>
+                  <div style={{ display: "flex", gap: 6 }}>
+                    <button onClick={() => toggleActive(u.email)} style={{ background: u.active ? "var(--rp)" : "rgba(127,183,126,.15)", border: "none", borderRadius: 8, padding: "6px 10px", cursor: "pointer", fontSize: 11, fontWeight: 600, color: u.active ? "var(--rd)" : "#4a8c49", fontFamily: "var(--fb)" }}>{u.active ? "Disable" : "Enable"}</button>
+                    {session.role === "master" && <button onClick={() => removeUser(u.email)} style={{ background: "none", border: "1px solid var(--gpa)", borderRadius: 8, padding: "6px 8px", cursor: "pointer", color: "var(--g)" }}><Trash2 size={13} /></button>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ═════════════════════════════════════════════════════════════════════════
+// AUTH WRAPPER (default export)
+// ═════════════════════════════════════════════════════════════════════════
+export default function App() {
+  const [session, setSession] = useState(() => getSession());
+  const [showAdmin, setShowAdmin] = useState(false);
+
+  if (!session) {
+    return (
+      <>
+        <style>{`@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
+        :root{--w:#FFF;--cr:#FFF8F0;--cw:#FDF5EC;--iv:#FFFCF7;--ro:#D4A5A5;--rl:#E8C5C5;--rp:#F5E0E0;--rd:#B88A8A;--go:#C9A96E;--gl:#E0CFA0;--gp:#F0E6CC;--gd:#A8874A;--sa:#B5C4B1;--sl:#D4DED1;--c:#2D2D2D;--cl:#4A4A4A;--g:#8A8A8A;--gi:#C5C5C5;--gpa:#E8E8E8;--gg:#F5F5F5;--fh:'Cormorant Garamond',serif;--fb:'DM Sans',sans-serif;--e:cubic-bezier(.4,0,.2,1)}
+        *{box-sizing:border-box;margin:0;padding:0}
+        @keyframes morphBlob{0%,100%{border-radius:60% 40% 30% 70%/60% 30% 70% 40%}50%{border-radius:50% 60% 30% 60%/30% 60% 70% 40%}}
+        @keyframes heroTextIn{0%{opacity:0;transform:translateY(20px);filter:blur(6px)}100%{opacity:1;transform:translateY(0);filter:blur(0)}}
+        @keyframes cardEnter{from{opacity:0;transform:translateY(40px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+        @keyframes fU{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .inp{border:1px solid #E8E8E8;padding:10px 16px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;transition:border-color .2s,box-shadow .2s;width:100%;outline:none;background:#FFF}
+        .inp:focus{border-color:#C9A96E;box-shadow:0 0 0 3px rgba(201,169,110,.15)}
+        .bg{background:linear-gradient(135deg,#C9A96E,#A8874A);color:#FFF;border:none;padding:12px 28px;border-radius:8px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:14px;letter-spacing:.04em;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:8px}
+        .bg:hover{filter:brightness(1.1);transform:translateY(-1px)}
+        `}</style>
+        <SignInPage onLogin={setSession} />
+      </>
+    );
+  }
+
+  const handleLogout = () => { saveSession(null); setSession(null); };
+
+  return (
+    <>
+      <MainApp session={session} onLogout={handleLogout} onOpenAdmin={() => setShowAdmin(true)} />
+      {showAdmin && <AdminPanel session={session} onClose={() => setShowAdmin(false)} />}
+    </>
+  );
+}
+
+// ═════════════════════════════════════════════════════════════════════════
+// MAIN APP (website content)
+// ═════════════════════════════════════════════════════════════════════════
+function MainApp({ session, onLogout, onOpenAdmin }){
   const[pg,sPg]=useState("home");const[av,sAv]=useState(null);const[mm,sMm]=useState(false);const[mega,sMega]=useState(false);const[sy,sSy]=useState(0);const[ai,sAi]=useState(false);const[st,sSt]=useState(false);
   useEffect(()=>{const h=()=>{sSy(window.scrollY);sSt(window.scrollY>500)};window.addEventListener("scroll",h,{passive:true});return()=>window.removeEventListener("scroll",h)},[]);
   const go=(p,v=null)=>{sPg(p);sAv(v);sMm(false);sMega(false);window.scrollTo({top:0,behavior:"smooth"})};
@@ -113,6 +455,7 @@ export default function App(){
     @keyframes heroTextIn{0%{opacity:0;transform:translateY(20px);filter:blur(6px)}60%{opacity:1;filter:blur(0)}100%{opacity:1;transform:translateY(0);filter:blur(0)}}
     @keyframes cardEnter{from{opacity:0;transform:translateY(40px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
     @keyframes countPop{0%{transform:scale(1)}50%{transform:scale(1.08)}100%{transform:scale(1)}}
+    @keyframes spin{to{transform:rotate(360deg)}}
     @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
     .sk{background:linear-gradient(90deg,var(--gg) 25%,var(--gp) 50%,var(--gg) 75%);background-size:200% 100%;animation:sh 1.5s ease-in-out infinite;border-radius:8px}
     .vc{transition:transform .4s var(--e),box-shadow .4s var(--e);position:relative;overflow:hidden;border-radius:14px;background:var(--iv);cursor:pointer}
@@ -146,12 +489,21 @@ export default function App(){
             {n.p==="venues"&&mega&&<MegaDrop go={go} close={()=>sMega(false)}/>}
           </div>)}
           <button className="bg" onClick={()=>go("ai-tools")} style={{padding:"10px 20px",fontSize:13}}><Sparkles size={14}/>Find My Venue</button>
+          {/* User menu */}
+          <div style={{display:"flex",alignItems:"center",gap:8,marginLeft:4}}>
+            {(session.role==="master"||session.role==="admin")&&<button onClick={onOpenAdmin} style={{background:"none",border:"1px solid var(--gpa)",borderRadius:8,padding:"7px 10px",cursor:"pointer",color:"var(--g)",display:"flex",alignItems:"center",gap:4,fontSize:12,fontFamily:"var(--fb)",transition:"all .2s"}} title="User Management"><Settings size={14}/></button>}
+            <div style={{display:"flex",alignItems:"center",gap:6,padding:"6px 12px",background:"var(--gg)",borderRadius:8}}>
+              <div style={{width:24,height:24,borderRadius:"50%",background:session.role==="master"?"var(--go)":session.role==="admin"?"var(--sa)":"var(--gi)",display:"flex",alignItems:"center",justifyContent:"center"}}><Shield size={11} style={{color:"var(--w)"}}/></div>
+              <span style={{fontSize:11,fontWeight:600,color:"var(--c)",maxWidth:100,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{session.email.split("@")[0]}</span>
+            </div>
+            <button onClick={onLogout} style={{background:"none",border:"none",cursor:"pointer",color:"var(--g)",padding:4,transition:"color .2s"}} title="Sign Out"><LogOut size={16}/></button>
+          </div>
         </div>
         <button onClick={()=>sMm(true)} className="sm" style={{display:"none",background:"none",border:"none",cursor:"pointer"}} aria-label="Menu"><Menu size={24}/></button>
       </div>
     </nav>
 
-    {mm&&<MobMenu items={NI} go={go} close={()=>sMm(false)}/>}
+    {mm&&<MobMenu items={NI} go={go} close={()=>sMm(false)} session={session} onLogout={onLogout} onOpenAdmin={onOpenAdmin}/>}
 
     <main role="main">
       {av?<Detail v={av} go={go}/>:
@@ -184,7 +536,7 @@ function MegaDrop({go,close}){
   </div>);
 }
 
-function MobMenu({items,go,close}){return(<div style={{position:"fixed",inset:0,zIndex:100,display:"flex",justifyContent:"flex-end"}}><div onClick={close} style={{position:"absolute",inset:0,background:"rgba(0,0,0,.4)",backdropFilter:"blur(4px)"}}/><div style={{position:"relative",width:280,background:"var(--w)",padding:"68px 24px 24px",animation:"fI .2s ease",display:"flex",flexDirection:"column",gap:4}}><button onClick={close} style={{position:"absolute",top:18,right:18,background:"none",border:"none",cursor:"pointer"}}><X size={20}/></button>{items.map(n=><button key={n.p} onClick={()=>go(n.p)} style={{background:"none",border:"none",fontFamily:"var(--fh)",fontSize:19,fontWeight:500,color:"var(--c)",padding:"11px 0",textAlign:"left",cursor:"pointer",borderBottom:"1px solid var(--gpa)"}}>{n.l}</button>)}<button className="bg" onClick={()=>go("ai-tools")} style={{marginTop:14,width:"100%",justifyContent:"center"}}><Sparkles size={14}/>Find My Venue</button></div></div>)}
+function MobMenu({items,go,close,session,onLogout,onOpenAdmin}){return(<div style={{position:"fixed",inset:0,zIndex:100,display:"flex",justifyContent:"flex-end"}}><div onClick={close} style={{position:"absolute",inset:0,background:"rgba(0,0,0,.4)",backdropFilter:"blur(4px)"}}/><div style={{position:"relative",width:280,background:"var(--w)",padding:"68px 24px 24px",animation:"fI .2s ease",display:"flex",flexDirection:"column",gap:4}}><button onClick={close} style={{position:"absolute",top:18,right:18,background:"none",border:"none",cursor:"pointer"}}><X size={20}/></button>{items.map(n=><button key={n.p} onClick={()=>go(n.p)} style={{background:"none",border:"none",fontFamily:"var(--fh)",fontSize:19,fontWeight:500,color:"var(--c)",padding:"11px 0",textAlign:"left",cursor:"pointer",borderBottom:"1px solid var(--gpa)"}}>{n.l}</button>)}<button className="bg" onClick={()=>go("ai-tools")} style={{marginTop:14,width:"100%",justifyContent:"center"}}><Sparkles size={14}/>Find My Venue</button><div style={{marginTop:16,paddingTop:16,borderTop:"1px solid var(--gpa)"}}><div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}><div style={{width:28,height:28,borderRadius:"50%",background:session?.role==="master"?"var(--go)":"var(--sa)",display:"flex",alignItems:"center",justifyContent:"center"}}><Shield size={12} style={{color:"var(--w)"}}/></div><div><p style={{fontSize:13,fontWeight:600}}>{session?.email?.split("@")[0]}</p><p style={{fontSize:11,color:"var(--g)"}}>{session?.role==="master"?"Master Admin":session?.role==="admin"?"Admin":"Visitor"}</p></div></div>{(session?.role==="master"||session?.role==="admin")&&<button onClick={()=>{close();onOpenAdmin()}} style={{background:"none",border:"1px solid var(--gpa)",borderRadius:8,padding:"10px 14px",width:"100%",cursor:"pointer",fontSize:13,fontFamily:"var(--fb)",display:"flex",alignItems:"center",gap:6,marginBottom:8}}><Settings size={14}/>User Management</button>}<button onClick={()=>{close();onLogout()}} style={{background:"none",border:"1px solid var(--gpa)",borderRadius:8,padding:"10px 14px",width:"100%",cursor:"pointer",fontSize:13,fontFamily:"var(--fb)",display:"flex",alignItems:"center",gap:6,color:"var(--rd)"}}><LogOut size={14}/>Sign Out</button></div></div></div>)}
 
 // ═════════════════════════════════════════════════════════════════════════
 // HOME
