@@ -432,7 +432,7 @@ function MainApp({ session, onLogout, onOpenAdmin }){
   useEffect(()=>{const h=()=>{sSy(window.scrollY);sSt(window.scrollY>500)};window.addEventListener("scroll",h,{passive:true});return()=>window.removeEventListener("scroll",h)},[]);
   const go=(p,v=null)=>{sPg(p);sAv(v);sMm(false);sMega(false);window.scrollTo({top:0,behavior:"smooth"})};
   useEffect(()=>{document.querySelectorAll('script[data-swv]').forEach(s=>s.remove());[SEO_SCHEMA.website,SEO_SCHEMA.faq].forEach(s=>{const el=document.createElement("script");el.type="application/ld+json";el.setAttribute("data-swv","1");el.textContent=JSON.stringify(s);document.head.appendChild(el)})},[pg]);
-  const NI=[{l:"Home",p:"home"},{l:"Venues",p:"venues"},{l:"AI Tools",p:"ai-tools"},{l:"Real Weddings",p:"weddings"},{l:"Showcases",p:"shows"},{l:"About",p:"about"}];
+  const NI=[{l:"Home",p:"home"},{l:"Venues",p:"venues"},{l:"AI Tools",p:"ai-tools"},{l:"Real Weddings",p:"weddings"},{l:"Blog",p:"blog"},{l:"Showcases",p:"shows"},{l:"About",p:"about"}];
 
   return(<div style={{fontFamily:"var(--fb)",color:"var(--c)",background:"var(--cr)",minHeight:"100vh"}}>
     <style>{`@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
@@ -510,6 +510,7 @@ function MainApp({ session, onLogout, onOpenAdmin }){
        pg==="venues"?<Dir go={go}/>:
        pg==="ai-tools"?<AIHub/>:
        pg==="weddings"?<RWPage go={go}/>:
+       pg==="blog"?<BlogPage/>:
        pg==="shows"?<Shows/>:
        pg==="about"?<Abt/>:<Home go={go}/>}
     </main>
@@ -849,52 +850,128 @@ function BudgetT(){const[t,sT]=useState(6e4);const[g,sG]=useState(150);const[res
   </div>);
 }
 
-function TimeT(){const[c,sC]=useState("ROM Solemnisation");const[r,sR]=useState("Dinner Banquet");const[res,sRes]=useState(null);
-  const timelines={
-    "ROM Solemnisation+Dinner Banquet":[{time:"06:00",event:"Hair & Makeup",notes:"Bride + bridesmaids begin preparation"},{time:"08:30",event:"Gate Crash Games",notes:"Groomsmen challenges at bride's home"},{time:"09:30",event:"Tea Ceremony (Bride's Side)",notes:"Serve tea to bride's parents and elders"},{time:"10:30",event:"Travel to Groom's Home",notes:"Bridal car procession"},{time:"11:00",event:"Tea Ceremony (Groom's Side)",notes:"Serve tea to groom's parents and elders"},{time:"12:00",event:"Lunch Break",notes:"Rest and retouch before evening"},{time:"14:00",event:"Pre-Wedding Photos",notes:"Outdoor shoot at venue or scenic location"},{time:"16:30",event:"Arrive at Venue",notes:"Final preparations and venue walkthrough"},{time:"17:30",event:"ROM Solemnisation Ceremony",notes:"Exchange of vows and rings, signing of documents"},{time:"18:00",event:"Cocktail Reception",notes:"Drinks, canapés, and guest photo wall"},{time:"19:00",event:"Grand March-In",notes:"Couple's entrance with music and spotlight"},{time:"19:15",event:"Yum Seng Toast",notes:"Champagne toast with guests"},{time:"19:30",event:"Dinner Service Begins",notes:"8–10 course Chinese banquet or Western set menu"},{time:"20:30",event:"Table Visits & Photos",notes:"Visit each table for photos with guests"},{time:"21:00",event:"Second March-In & Speeches",notes:"Outfit change, parent speeches, best man/maid of honour"},{time:"21:30",event:"Cake Cutting & Bouquet Toss",notes:"Traditional bouquet and garter toss"},{time:"22:00",event:"After-Party / Send-Off",notes:"Sparkler send-off or continued celebrations"}],
-    "ROM Solemnisation+Lunch Banquet":[{time:"05:30",event:"Hair & Makeup",notes:"Early start for bride preparation"},{time:"07:30",event:"Gate Crash Games",notes:"Fun challenges for the groom's party"},{time:"08:30",event:"Tea Ceremony (Bride's Side)",notes:"Serve tea to bride's family"},{time:"09:30",event:"Tea Ceremony (Groom's Side)",notes:"Serve tea to groom's family"},{time:"10:30",event:"ROM Solemnisation",notes:"Exchange of vows and ring ceremony"},{time:"11:00",event:"Cocktail Reception",notes:"Welcome drinks and guest mingling"},{time:"11:45",event:"Grand March-In",notes:"Couple's entrance to the ballroom"},{time:"12:00",event:"Lunch Service Begins",notes:"8-course banquet or set lunch"},{time:"13:00",event:"Speeches & Yum Seng",notes:"Toasts from parents and friends"},{time:"13:30",event:"Table Visits",notes:"Greet all guests table by table"},{time:"14:00",event:"Cake Cutting & Bouquet Toss",notes:"Traditional celebrations"},{time:"14:30",event:"Send-Off",notes:"Thank guests at the door"}],
-    "ROM Solemnisation+Cocktail":[{time:"06:00",event:"Hair & Makeup",notes:"Bride preparation begins"},{time:"08:30",event:"Gate Crash & Tea Ceremony",notes:"Combined morning traditions"},{time:"11:00",event:"Pre-Wedding Photos",notes:"Outdoor or studio shoot"},{time:"15:00",event:"Arrive at Venue",notes:"Setup and preparation"},{time:"16:00",event:"ROM Solemnisation",notes:"Garden or rooftop ceremony"},{time:"16:30",event:"Cocktail Reception Begins",notes:"Passed canapés, drink stations, live music"},{time:"17:30",event:"Speeches & Toasts",notes:"Intimate addresses from loved ones"},{time:"18:00",event:"Sunset Golden Hour Photos",notes:"Couple photos during golden hour"},{time:"19:00",event:"Dinner Stations Open",notes:"Buffet or live cooking stations"},{time:"20:00",event:"Cake Cutting & Dancing",notes:"First dance and party"},{time:"21:00",event:"Send-Off",notes:"Sparkler exit or farewell"}],
-    "Church Wedding+Dinner Banquet":[{time:"06:00",event:"Hair & Makeup",notes:"Bride and bridesmaids preparation"},{time:"09:00",event:"Gate Crash Games",notes:"Traditional groomsmen challenges"},{time:"10:00",event:"Tea Ceremony",notes:"Both families' tea ceremony"},{time:"12:00",event:"Church Ceremony",notes:"Wedding service with hymns and vows"},{time:"13:30",event:"Lunch & Rest",notes:"Light lunch and afternoon rest"},{time:"15:00",event:"Pre-Banquet Photos",notes:"Couple and family portraits"},{time:"17:30",event:"Arrive at Banquet Venue",notes:"Final walkthrough"},{time:"18:00",event:"Cocktail Reception",notes:"Welcome drinks"},{time:"19:00",event:"Grand March-In",notes:"Couple's entrance"},{time:"19:15",event:"Yum Seng Toast",notes:"Champagne toast"},{time:"19:30",event:"Dinner Service",notes:"Banquet begins"},{time:"21:00",event:"Second March-In & Speeches",notes:"Outfit change, speeches"},{time:"21:30",event:"Cake Cutting & Bouquet Toss",notes:"Traditional celebrations"},{time:"22:00",event:"Send-Off",notes:"End of evening"}],
-    "Garden Ceremony+Dinner Banquet":[{time:"06:00",event:"Hair & Makeup",notes:"Bride preparation"},{time:"08:30",event:"Gate Crash & Tea Ceremony",notes:"Morning traditions"},{time:"11:00",event:"Pre-Wedding Photos",notes:"Scenic outdoor locations"},{time:"16:00",event:"Arrive at Venue",notes:"Garden setup check"},{time:"17:00",event:"Garden Solemnisation",notes:"Outdoor ceremony under gazebo or arch"},{time:"17:30",event:"Cocktail Hour in Garden",notes:"Lawn drinks and canapés"},{time:"18:30",event:"Move Indoors",notes:"Guests transition to reception"},{time:"19:00",event:"Grand March-In",notes:"Couple's entrance"},{time:"19:15",event:"Yum Seng & Dinner",notes:"Toast and banquet service"},{time:"20:30",event:"Speeches & Table Visits",notes:"Parent and friend speeches"},{time:"21:00",event:"Cake Cutting",notes:"Traditional celebrations"},{time:"21:30",event:"After-Party / Send-Off",notes:"Dancing or sparkler exit"}],
+function TimeT(){
+  const[ceremony,setCeremony]=useState("ROM Solemnisation");
+  const[reception,setReception]=useState("Dinner Banquet");
+  const[result,setResult]=useState(null);
+
+  const romDinner=[
+    {time:"06:00",event:"Hair & Makeup",notes:"Bride and bridesmaids begin preparation"},
+    {time:"08:30",event:"Gate Crash Games",notes:"Groomsmen challenges at bride's home"},
+    {time:"09:30",event:"Tea Ceremony (Bride's Side)",notes:"Serve tea to bride's parents and elders"},
+    {time:"10:30",event:"Travel to Groom's Home",notes:"Bridal car procession"},
+    {time:"11:00",event:"Tea Ceremony (Groom's Side)",notes:"Serve tea to groom's parents and elders"},
+    {time:"12:00",event:"Lunch Break",notes:"Rest and retouch before evening"},
+    {time:"14:00",event:"Pre-Wedding Photos",notes:"Outdoor shoot at venue or scenic location"},
+    {time:"16:30",event:"Arrive at Venue",notes:"Final preparations and venue walkthrough"},
+    {time:"17:30",event:"ROM Solemnisation Ceremony",notes:"Exchange of vows and rings"},
+    {time:"18:00",event:"Cocktail Reception",notes:"Drinks and guest photo wall"},
+    {time:"19:00",event:"Grand March-In",notes:"Couple's entrance with music and spotlight"},
+    {time:"19:15",event:"Yum Seng Toast",notes:"Champagne toast with guests"},
+    {time:"19:30",event:"Dinner Service Begins",notes:"8-10 course banquet or Western set menu"},
+    {time:"20:30",event:"Table Visits and Photos",notes:"Visit each table for photos with guests"},
+    {time:"21:00",event:"Second March-In and Speeches",notes:"Outfit change, parent speeches, best man"},
+    {time:"21:30",event:"Cake Cutting and Bouquet Toss",notes:"Traditional bouquet and garter toss"},
+    {time:"22:00",event:"After-Party or Send-Off",notes:"Sparkler send-off or continued celebrations"}
+  ];
+  const romLunch=[
+    {time:"05:30",event:"Hair & Makeup",notes:"Early start for bride preparation"},
+    {time:"07:30",event:"Gate Crash Games",notes:"Fun challenges for the groom's party"},
+    {time:"08:30",event:"Tea Ceremony (Bride's Side)",notes:"Serve tea to bride's family"},
+    {time:"09:30",event:"Tea Ceremony (Groom's Side)",notes:"Serve tea to groom's family"},
+    {time:"10:30",event:"ROM Solemnisation",notes:"Exchange of vows and ring ceremony"},
+    {time:"11:00",event:"Cocktail Reception",notes:"Welcome drinks and guest mingling"},
+    {time:"11:45",event:"Grand March-In",notes:"Couple's entrance to the ballroom"},
+    {time:"12:00",event:"Lunch Service Begins",notes:"8-course banquet or set lunch"},
+    {time:"13:00",event:"Speeches and Yum Seng",notes:"Toasts from parents and friends"},
+    {time:"13:30",event:"Table Visits",notes:"Greet all guests table by table"},
+    {time:"14:00",event:"Cake Cutting and Bouquet Toss",notes:"Traditional celebrations"},
+    {time:"14:30",event:"Send-Off",notes:"Thank guests at the door"}
+  ];
+  const romCocktail=[
+    {time:"06:00",event:"Hair & Makeup",notes:"Bride preparation begins"},
+    {time:"08:30",event:"Gate Crash and Tea Ceremony",notes:"Combined morning traditions"},
+    {time:"11:00",event:"Pre-Wedding Photos",notes:"Outdoor or studio shoot"},
+    {time:"15:00",event:"Arrive at Venue",notes:"Setup and preparation"},
+    {time:"16:00",event:"ROM Solemnisation",notes:"Garden or rooftop ceremony"},
+    {time:"16:30",event:"Cocktail Reception Begins",notes:"Passed canapes, drink stations, live music"},
+    {time:"17:30",event:"Speeches and Toasts",notes:"Intimate addresses from loved ones"},
+    {time:"18:00",event:"Sunset Golden Hour Photos",notes:"Couple photos during golden hour"},
+    {time:"19:00",event:"Dinner Stations Open",notes:"Buffet or live cooking stations"},
+    {time:"20:00",event:"Cake Cutting and Dancing",notes:"First dance and party"},
+    {time:"21:00",event:"Send-Off",notes:"Sparkler exit or farewell"}
+  ];
+
+  const getTimeline=()=>{
+    if(ceremony==="Church Wedding") return romDinner.map(e=>e.event==="ROM Solemnisation Ceremony"?{...e,time:"12:00",event:"Church Ceremony",notes:"Wedding service with hymns and vows"}:e);
+    if(ceremony==="Garden Ceremony") return romDinner.map(e=>e.event==="ROM Solemnisation Ceremony"?{...e,time:"17:00",event:"Garden Solemnisation",notes:"Outdoor ceremony under gazebo or arch"}:e);
+    if(reception==="Lunch Banquet") return romLunch;
+    if(reception==="Cocktail") return romCocktail;
+    return romDinner;
   };
-  const key=c+"+"+r;const tl=timelines[key]||timelines["ROM Solemnisation+Dinner Banquet"];
-  const run=()=>sRes({timeline:tl,tips:["Build in 30-minute buffers between key events — Singapore traffic and weather are unpredictable.","Brief your photographer on the timeline so they can plan lighting for each location.","Have a backup indoor option for any outdoor ceremony — tropical rain can appear without warning."]});
+
+  const handleGenerate=()=>{
+    try{
+      const tl=getTimeline();
+      setResult({timeline:tl,tips:["Build in 30-minute buffers between key events.","Brief your photographer on the timeline so they can plan lighting.","Have a backup indoor option for any outdoor ceremony."]});
+    }catch(err){console.error("Timeline error:",err);setResult({timeline:romDinner,tips:["Error generating custom timeline. Showing default ROM + Dinner timeline."]})}
+  };
+
   return(<div style={{background:"var(--w)",borderRadius:16,padding:28,boxShadow:"var(--sm)"}}>
     <h2 style={{fontFamily:"var(--fh)",fontSize:26,fontWeight:400,marginBottom:20,display:"flex",alignItems:"center",gap:8}}><CalendarDays size={20} style={{color:"var(--go)"}}/>Timeline Generator</h2>
     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:20}}>
-      <div><label style={{fontSize:11,fontWeight:600,letterSpacing:".05em",textTransform:"uppercase",color:"var(--g)",display:"block",marginBottom:6}}>Ceremony</label><select className="inp" value={c} onChange={e=>sC(e.target.value)}><option>ROM Solemnisation</option><option>Church Wedding</option><option>Garden Ceremony</option></select></div>
-      <div><label style={{fontSize:11,fontWeight:600,letterSpacing:".05em",textTransform:"uppercase",color:"var(--g)",display:"block",marginBottom:6}}>Reception</label><select className="inp" value={r} onChange={e=>sR(e.target.value)}><option>Dinner Banquet</option><option>Lunch Banquet</option><option>Cocktail</option></select></div>
+      <div><label style={{fontSize:11,fontWeight:600,letterSpacing:".05em",textTransform:"uppercase",color:"var(--g)",display:"block",marginBottom:6}}>Ceremony</label><select className="inp" value={ceremony} onChange={e=>setCeremony(e.target.value)}><option>ROM Solemnisation</option><option>Church Wedding</option><option>Garden Ceremony</option></select></div>
+      <div><label style={{fontSize:11,fontWeight:600,letterSpacing:".05em",textTransform:"uppercase",color:"var(--g)",display:"block",marginBottom:6}}>Reception</label><select className="inp" value={reception} onChange={e=>setReception(e.target.value)}><option>Dinner Banquet</option><option>Lunch Banquet</option><option>Cocktail</option></select></div>
     </div>
-    <button className="bg" onClick={run} style={{fontSize:15,padding:"13px 28px"}}><CalendarDays size={14}/>Generate Timeline</button>
-    {res&&<div style={{marginTop:22}}>
-      <div style={{paddingLeft:20,borderLeft:"2px solid var(--gl)"}}>{res.timeline.map((e,i)=><div key={i} style={{marginBottom:14,paddingLeft:16,position:"relative",animation:`fU .3s ease ${i*40}ms both`}}><div style={{position:"absolute",left:-27,top:3,width:10,height:10,borderRadius:"50%",background:"var(--go)",border:"2px solid var(--w)"}}/><div style={{display:"flex",gap:10,alignItems:"baseline"}}><span style={{fontWeight:700,fontSize:14,color:"var(--gd)",minWidth:44}}>{e.time}</span><div><p style={{fontWeight:600,fontSize:14}}>{e.event}</p><p style={{fontSize:12,color:"var(--cl)"}}>{e.notes}</p></div></div></div>)}</div>
-      {res.tips&&<div style={{background:"linear-gradient(135deg,var(--gp),var(--cw))",borderRadius:12,padding:16,marginTop:16}}><p style={{fontSize:13,fontWeight:600,color:"var(--gd)",marginBottom:6}}>💡 Planning Tips</p>{res.tips.map((t,i)=><p key={i} style={{fontSize:13,color:"var(--cl)",lineHeight:1.5,marginBottom:4}}>• {t}</p>)}</div>}
+    <button className="bg" onClick={handleGenerate} style={{fontSize:15,padding:"13px 28px"}}><CalendarDays size={14}/>Generate Timeline</button>
+    {result!==null&&<div style={{marginTop:22}}>
+      <div style={{paddingLeft:20,borderLeft:"2px solid var(--gl)"}}>{result.timeline.map((item,idx)=><div key={idx} style={{marginBottom:14,paddingLeft:16,position:"relative",animation:"fU .3s ease both",animationDelay:idx*40+"ms"}}><div style={{position:"absolute",left:-27,top:3,width:10,height:10,borderRadius:"50%",background:"var(--go)",border:"2px solid var(--w)"}}/><div style={{display:"flex",gap:10,alignItems:"baseline"}}><span style={{fontWeight:700,fontSize:14,color:"var(--gd)",minWidth:44}}>{item.time}</span><div><p style={{fontWeight:600,fontSize:14}}>{item.event}</p><p style={{fontSize:12,color:"var(--cl)"}}>{item.notes}</p></div></div></div>)}</div>
+      <div style={{background:"linear-gradient(135deg,var(--gp),var(--cw))",borderRadius:12,padding:16,marginTop:16}}><p style={{fontSize:13,fontWeight:600,color:"var(--gd)",marginBottom:6}}>Planning Tips</p>{result.tips.map((tip,idx)=><p key={idx} style={{fontSize:13,color:"var(--cl)",lineHeight:1.5,marginBottom:4}}>&#8226; {tip}</p>)}</div>
     </div>}
   </div>);
 }
 
-function CompT(){const[sel,sSel]=useState([]);const[res,sRes]=useState(null);
-  const tog=id=>sSel(s=>s.includes(id)?s.filter(x=>x!==id):s.length<3?[...s,id]:s);
-  const run=()=>{if(sel.length<2)return;
-    const scored=sel.map(id=>{const v=VENUES.find(x=>x.id===id);
-      const capScore=Math.min(10,Math.round(v.capacity.s/100));
-      const valScore=v.price.unit==="guest"?Math.round(10-(v.price.min-100)/20):Math.round(10-(v.price.min-1200)/250);
-      const cuisineScore=Math.min(10,v.cuisine.length*3+4);
-      const ambianceScore=Math.round(v.rating*2);
-      const accessScore=["Orchard","City Hall","Marina Bay","Raffles Place","Bugis","Tanglin","Clarke Quay","Marina Centre"].includes(v.area)?9:v.area==="Sentosa"?6:7;
-      const uniqueScore=v.managed?9:["heritage","garden","waterfront","beachfront"].includes(v.cat)?8:v.cat==="rooftop"?9:6;
-      return{venue:v.name,scores:{capacity:Math.max(3,Math.min(10,capScore)),value:Math.max(3,Math.min(10,valScore)),cuisine:Math.max(4,Math.min(10,cuisineScore)),ambiance:Math.max(5,Math.min(10,ambianceScore)),accessibility:accessScore,uniqueness:uniqueScore},
-        bestFor:v.bestFor[0],standout:v.managed?`Managed by 1-Host with dedicated wedding coordination`:v.capacity.s>=500?`Grand scale — accommodates up to ${v.capacity.s} seated guests`:v.solemn?`Licensed for on-site ROM solemnisation`:`${v.catLabel} setting`};
-    });
-    const winner=scored.reduce((a,b)=>{const aTotal=Object.values(a.scores).reduce((s,v)=>s+v,0);const bTotal=Object.values(b.scores).reduce((s,v)=>s+v,0);return aTotal>=bTotal?a:b});
-    sRes({comparison:scored,verdict:`${winner.venue} edges ahead overall, but the best choice depends on your priorities. Visit all shortlisted venues in person before deciding — photos never tell the full story.`});
+function CompT(){
+  const[selected,setSelected]=useState([]);
+  const[result,setResult]=useState(null);
+
+  const toggleVenue=(vid)=>setSelected(prev=>prev.includes(vid)?prev.filter(x=>x!==vid):prev.length<3?[...prev,vid]:prev);
+
+  const handleCompare=()=>{
+    if(selected.length<2)return;
+    try{
+      const compared=selected.map(vid=>{
+        const venue=VENUES.find(x=>x.id===vid);
+        if(!venue)return null;
+        const cap=Math.max(3,Math.min(10,Math.round(venue.capacity.s/80)));
+        const priceMin=venue.price.min||1500;
+        const val=venue.price.unit==="guest"?Math.max(3,Math.min(10,Math.round(10-(priceMin/200)))):Math.max(3,Math.min(10,Math.round(10-(priceMin-1200)/300)));
+        const cui=Math.max(4,Math.min(10,(venue.cuisine||[]).length*2+4));
+        const amb=Math.max(5,Math.min(10,Math.round((venue.rating||4.5)*2)));
+        const central=["Orchard","City Hall","Marina Bay","Raffles Place","Bugis","Tanglin","Clarke Quay","Marina Centre"];
+        const acc=central.includes(venue.area)?9:venue.area==="Sentosa"?6:7;
+        const uniq=venue.managed?9:["heritage","garden","waterfront","beachfront","rooftop"].includes(venue.cat)?8:6;
+        return{
+          venue:venue.name,
+          scores:{capacity:cap,value:val,cuisine:cui,ambiance:amb,accessibility:acc,uniqueness:uniq},
+          bestFor:(venue.bestFor&&venue.bestFor[0])||"Unique celebration",
+          standout:venue.managed?"Managed by 1-Host with dedicated wedding coordination":venue.capacity.s>=500?"Grand scale for large celebrations":"Beautiful "+venue.catLabel+" setting"
+        };
+      }).filter(Boolean);
+
+      let winnerName="";let winnerTotal=0;
+      compared.forEach(item=>{const total=Object.values(item.scores).reduce((sum,val)=>sum+val,0);if(total>winnerTotal){winnerTotal=total;winnerName=item.venue;}});
+
+      setResult({comparison:compared,verdict:winnerName+" edges ahead overall, but the best choice depends on your priorities. Visit all shortlisted venues in person before deciding."});
+    }catch(err){console.error("Compare error:",err);}
   };
+
   return(<div style={{background:"var(--w)",borderRadius:16,padding:28,boxShadow:"var(--sm)"}}>
     <h2 style={{fontFamily:"var(--fh)",fontSize:26,fontWeight:400,marginBottom:14,display:"flex",alignItems:"center",gap:8}}><GitCompareArrows size={20} style={{color:"var(--go)"}}/>Venue Comparison</h2>
-    <p style={{fontSize:13,color:"var(--g)",marginBottom:16}}>Select 2–3 venues to compare side by side.</p>
-    <div style={{display:"flex",flexWrap:"wrap",gap:6,marginBottom:20,maxHeight:150,overflowY:"auto"}}>{VENUES.map(v=><button key={v.id} className={`cp ${sel.includes(v.id)?"a":""}`} onClick={()=>tog(v.id)} style={{fontSize:12,padding:"5px 12px"}}>{v.name}</button>)}</div>
-    <button className="bg" onClick={run} disabled={sel.length<2} style={{fontSize:15,padding:"13px 28px"}}><GitCompareArrows size={14}/>Compare {sel.length} Venues</button>
-    {res&&<div style={{marginTop:22}}><div style={{display:"grid",gridTemplateColumns:`repeat(${res.comparison.length},1fr)`,gap:14}}>{res.comparison.map((c,i)=><div key={i} style={{background:"var(--iv)",borderRadius:14,padding:20,animation:`cardEnter .5s ease ${i*120}ms both`,border:"1px solid var(--gpa)"}}><h3 style={{fontFamily:"var(--fh)",fontSize:18,fontWeight:500,marginBottom:12}}>{c.venue}</h3>{Object.entries(c.scores).map(([k,val])=><div key={k} style={{marginBottom:8}}><div style={{display:"flex",justifyContent:"space-between",fontSize:12,marginBottom:2}}><span style={{textTransform:"capitalize"}}>{k}</span><span style={{fontWeight:600,color:"var(--gd)"}}>{val}/10</span></div><div style={{height:5,background:"var(--gg)",borderRadius:3}}><div style={{height:"100%",background:"var(--go)",borderRadius:3,width:`${val*10}%`,transition:"width .6s ease"}}/></div></div>)}<p style={{fontSize:12,color:"var(--cl)",marginTop:10,paddingTop:10,borderTop:"1px solid var(--gpa)"}}>🎯 {c.bestFor}</p><p style={{fontSize:11,color:"var(--g)",marginTop:4}}>✦ {c.standout}</p></div>)}</div>{res.verdict&&<div style={{background:"linear-gradient(135deg,var(--gp),var(--cw))",borderRadius:12,padding:16,marginTop:14}}><p style={{fontSize:14,lineHeight:1.5}}>🏆 {res.verdict}</p></div>}</div>}
+    <p style={{fontSize:13,color:"var(--g)",marginBottom:16}}>Select 2-3 venues to compare side by side.</p>
+    <div style={{display:"flex",flexWrap:"wrap",gap:6,marginBottom:20,maxHeight:150,overflowY:"auto"}}>{VENUES.map(venue=><button key={venue.id} className={"cp"+(selected.includes(venue.id)?" a":"")} onClick={()=>toggleVenue(venue.id)} style={{fontSize:12,padding:"5px 12px"}}>{venue.name}</button>)}</div>
+    <button className="bg" onClick={handleCompare} disabled={selected.length<2} style={{fontSize:15,padding:"13px 28px",opacity:selected.length<2?.5:1}}><GitCompareArrows size={14}/>Compare {selected.length} Venues</button>
+    {result!==null&&result.comparison&&<div style={{marginTop:22}}><div style={{display:"grid",gridTemplateColumns:"repeat("+result.comparison.length+",1fr)",gap:14}}>{result.comparison.map((item,idx)=><div key={idx} style={{background:"var(--iv)",borderRadius:14,padding:20,animation:"cardEnter .5s ease both",animationDelay:idx*120+"ms",border:"1px solid var(--gpa)"}}><h3 style={{fontFamily:"var(--fh)",fontSize:18,fontWeight:500,marginBottom:12}}>{item.venue}</h3>{Object.entries(item.scores).map(function(entry){var key=entry[0];var val=entry[1];return <div key={key} style={{marginBottom:8}}><div style={{display:"flex",justifyContent:"space-between",fontSize:12,marginBottom:2}}><span style={{textTransform:"capitalize"}}>{key}</span><span style={{fontWeight:600,color:"var(--gd)"}}>{val}/10</span></div><div style={{height:5,background:"var(--gg)",borderRadius:3}}><div style={{height:"100%",background:"var(--go)",borderRadius:3,width:val*10+"%",transition:"width .6s ease"}}/></div></div>})}<p style={{fontSize:12,color:"var(--cl)",marginTop:10,paddingTop:10,borderTop:"1px solid var(--gpa)"}}>Target: {item.bestFor}</p><p style={{fontSize:11,color:"var(--g)",marginTop:4}}>{item.standout}</p></div>)}</div>{result.verdict&&<div style={{background:"linear-gradient(135deg,var(--gp),var(--cw))",borderRadius:12,padding:16,marginTop:14}}><p style={{fontSize:14,lineHeight:1.5}}>Winner: {result.verdict}</p></div>}</div>}
   </div>);
 }
 
@@ -920,6 +997,62 @@ function AskAI({show,toggle}){const[msgs,sMs]=useState([]);const[inp,sInp]=useSt
 // OTHER PAGES
 // ═════════════════════════════════════════════════════════════════════════
 function RWPage({go}){return(<section style={{padding:"44px 24px 72px",background:"var(--cr)"}}><div style={{maxWidth:1200,margin:"0 auto"}}><h1 style={{fontFamily:"var(--fh)",fontSize:"clamp(28px,4vw,40px)",fontWeight:300,marginBottom:8}}>Real Weddings</h1><p style={{color:"var(--g)",fontSize:14,maxWidth:560,marginBottom:32}}>Be inspired by celebrations across Singapore's finest venues — luxury hotels, rooftop ceremonies, and heritage garden affairs.</p><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))",gap:18}}>{WEDDINGS.map((s,i)=>{const v=VENUES.find(x=>x.id===s.vid);return<RWCd key={i} s={s} v={v} go={go}/>})}</div></div></section>);}
+
+function BlogPage(){
+  const posts=[
+    {title:"Celestial Unions: Chinese Zodiac Compatibility 2026",excerpt:"Wedding planning in Singapore is becoming less about rules and more about resonance. A modern guide to Chinese zodiac compatibility, lucky colours, and wedding styling in the Year of the Fire Horse.",img:"https://www.1-host.sg/wp-content/uploads/2026/02/Chinese-restaurant-wedding-singapore.jpg",url:"https://www.1-host.sg/chinese_zodiac_compatibility_2026/",date:"March 2026",tag:"Planning"},
+    {title:"From First Visit to Final Vows: How a Singapore Wedding Planner Brings It All Together",excerpt:"After securing a venue, a Singapore wedding planner guides couples through planning, vendor curation, banquet coordination, and flawless execution. A complete journey with 1-Host.",img:"https://www.1-host.sg/wp-content/uploads/2026/03/Untitled-design.jpg",url:"https://www.1-host.sg/first-vist-to-final-vows-singapore-wedding-planner/",date:"March 2026",tag:"Planning"},
+    {title:"Beyond Ballrooms: Wedding Venues in Singapore That Redefine Celebrations",excerpt:"In 2026, couples are moving away from predictable formats and towards experiences that feel personal, immersive, and deeply meaningful. A new chapter in Singapore wedding planning.",img:"https://www.1-host.sg/wp-content/uploads/2026/02/garden-solemnisation-singapore.jpg",url:"https://www.1-host.sg/beyond_ballrooms_wedding_venues_in-_singapore/",date:"February 2026",tag:"Venues"},
+    {title:"Paws and Promises: Pet Friendly Wedding Venues in Singapore",excerpt:"You know the look. You pick up your keys, and suddenly your dog is sitting up, tail wagging, eyes wide with hope. Why pet friendly weddings are shaping Singapore wedding planning in 2026.",img:"https://www.1-host.sg/wp-content/uploads/2026/02/Untitled-design-4.jpg",url:"https://www.1-host.sg/paws-and-promises-pet-friendly-wedding-venues-in-singapore/",date:"February 2026",tag:"Venues"},
+    {title:"Newly Engaged in 2026? How Singapore Couples Are Kickstarting Their Wedding Planning",excerpt:"Newly engaged couples in 2026 are not rushing to book everything. They are rushing to book the right things. A transformational planning playbook for the modern Singapore couple.",img:"https://www.1-host.sg/wp-content/uploads/2026/03/blog-banner1.jpg",url:"https://www.1-host.sg/how-singapore-couples-are-planning-weddings/",date:"March 2026",tag:"Planning"},
+    {title:"What Does a Wedding Planner Actually Do? A Singapore Couple's Guide",excerpt:"Do we really need a wedding planner? And what exactly does a wedding planner do that we cannot do ourselves? A complete guide by 1-Host, Singapore wedding planners.",img:"https://www.1-host.sg/wp-content/uploads/2026/03/blog-banner2.jpg",url:"https://www.1-host.sg/a-complete-guide-by-1-host-singapore-wedding-planners/",date:"March 2026",tag:"Planning"},
+    {title:"Next Gen Bridal Glam Redefined!",excerpt:"For 2025 and beyond, bridal makeup trends are all about enhancing natural beauty while adding a modern touch. Natural radiance, glowing hydrated skin, and fresh dewy finishes.",img:"https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?w=800&q=80",url:"https://www.1-host.sg/next-gen-bridal-glam-redefined/",date:"January 2025",tag:"Style"},
+    {title:"Why 1-Host Venues Are Built to Weather-Proof Your Big Day",excerpt:"Rain or shine, we have got you covered. Singapore's weather has a flair for the dramatic. One moment, clear skies. The next? A surprise downpour just before your solemnisation.",img:"https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800&q=80",url:"https://www.1-host.sg/why-1-host-venues-are-built-to-weather-proof-your-big-day/",date:"December 2024",tag:"Venues"},
+    {title:"Food & Drink Trends for 2025 Weddings",excerpt:"Wedding food and drink trends are evolving to reflect more personalised, sustainable, and interactive experiences. From brunch weddings to live cooking stations and signature cocktails.",img:"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80",url:"https://www.1-host.sg/food-drink-trends-for-2025-weddings/",date:"November 2024",tag:"Food"},
+    {title:"Why Rooftop Weddings Remain The Most Loved Choice For Couples",excerpt:"Bringing you closer to the sky, offering unmatched views and a one-of-a-kind backdrop for your big day. The versatility and romance of rooftop wedding celebrations.",img:"https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=800&q=80",url:"https://www.1-host.sg/why-rooftop-weddings-remain-the-most-loved-choice-for-couples/",date:"October 2024",tag:"Venues"},
+  ];
+  const[filter,setFilter]=useState("All");
+  const tags=["All","Planning","Venues","Style","Food"];
+  const filtered=filter==="All"?posts:posts.filter(p=>p.tag===filter);
+
+  return(<section style={{padding:"48px 24px 80px",background:"var(--cr)"}}>
+    <div style={{maxWidth:1200,margin:"0 auto"}}>
+      <header style={{marginBottom:36}}>
+        <h1 style={{fontFamily:"var(--fh)",fontSize:"clamp(28px,4vw,42px)",fontWeight:300,marginBottom:10}}>Wedding Blog</h1>
+        <p style={{color:"var(--g)",fontSize:14,maxWidth:580}}>Expert advice, venue guides, and inspiration for planning your Singapore wedding. From zodiac compatibility to bridal trends, food innovations, and venue spotlights.</p>
+      </header>
+      <div style={{display:"flex",gap:8,marginBottom:28,flexWrap:"wrap"}}>{tags.map(t=><button key={t} className={"cp"+(filter===t?" a":"")} onClick={()=>setFilter(t)}>{t}</button>)}</div>
+
+      {/* Featured post - first one large */}
+      {filtered.length>0&&<article style={{display:"grid",gridTemplateColumns:"1.2fr 1fr",gap:0,borderRadius:16,overflow:"hidden",background:"var(--w)",boxShadow:"var(--sm)",marginBottom:28,cursor:"pointer",animation:"cardEnter .6s ease"}} onClick={()=>window.open(filtered[0].url,"_blank")}>
+        <div style={{minHeight:320}}><VI src={filtered[0].img} alt={filtered[0].title} style={{width:"100%",height:"100%"}}/></div>
+        <div style={{padding:"36px 32px",display:"flex",flexDirection:"column",justifyContent:"center"}}>
+          <div style={{display:"flex",gap:8,marginBottom:12}}><span style={{background:"var(--gp)",color:"var(--gd)",fontSize:11,fontWeight:600,padding:"3px 10px",borderRadius:999,letterSpacing:".04em"}}>{filtered[0].tag}</span><span style={{fontSize:12,color:"var(--g)"}}>{filtered[0].date}</span></div>
+          <h2 style={{fontFamily:"var(--fh)",fontSize:"clamp(22px,2.5vw,30px)",fontWeight:500,lineHeight:1.25,marginBottom:14}}>{filtered[0].title}</h2>
+          <p style={{fontSize:14,color:"var(--cl)",lineHeight:1.7,marginBottom:18}}>{filtered[0].excerpt}</p>
+          <span style={{fontSize:13,fontWeight:600,color:"var(--gd)",display:"flex",alignItems:"center",gap:4}}>Read Article <ChevronRight size={14}/></span>
+        </div>
+      </article>}
+
+      {/* Grid of remaining posts */}
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(320px,1fr))",gap:20}}>
+        {filtered.slice(1).map((post,idx)=><BlogCard key={idx} post={post} idx={idx}/>)}
+      </div>
+    </div>
+  </section>);
+}
+
+function BlogCard({post,idx}){const[ref,vis]=useSR();return(
+  <article ref={ref} key={idx} style={{borderRadius:14,overflow:"hidden",background:"var(--w)",boxShadow:"var(--ss)",cursor:"pointer",opacity:vis?1:0,transform:vis?"translateY(0) scale(1)":"translateY(30px) scale(.97)",transition:"all .6s var(--e) "+(idx*80)+"ms"}} onClick={()=>window.open(post.url,"_blank")} className="vc">
+    <div style={{paddingTop:"56.25%",position:"relative",overflow:"hidden"}}><VI src={post.img} alt={post.title} className="vi" style={{position:"absolute",inset:0,width:"100%",height:"100%"}}/><span style={{position:"absolute",top:10,left:10,background:"rgba(45,45,45,.85)",backdropFilter:"blur(4px)",color:"var(--w)",fontSize:10,fontWeight:600,letterSpacing:".05em",textTransform:"uppercase",padding:"3px 10px",borderRadius:999}}>{post.tag}</span></div>
+    <div style={{padding:"16px 18px 20px"}}>
+      <p style={{fontSize:11,color:"var(--g)",marginBottom:6}}>{post.date}</p>
+      <h3 style={{fontFamily:"var(--fh)",fontSize:19,fontWeight:500,lineHeight:1.3,marginBottom:8}}>{post.title}</h3>
+      <p style={{fontSize:13,color:"var(--cl)",lineHeight:1.6,display:"-webkit-box",WebkitLineClamp:3,WebkitBoxOrient:"vertical",overflow:"hidden"}}>{post.excerpt}</p>
+      <p style={{fontSize:13,fontWeight:600,color:"var(--gd)",marginTop:10,display:"flex",alignItems:"center",gap:4}}>Read More <ChevronRight size={13}/></p>
+    </div>
+  </article>
+);}
 
 function Shows(){return(<section style={{padding:"48px 24px 80px",background:"var(--cr)"}}><div style={{maxWidth:860,margin:"0 auto",textAlign:"center"}}>
   <h1 style={{fontFamily:"var(--fh)",fontSize:"clamp(28px,4vw,40px)",fontWeight:300,marginBottom:12}}>Wedding Showcases</h1>
