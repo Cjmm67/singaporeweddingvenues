@@ -53,14 +53,22 @@ const REVIEWS=[
 ];
 
 const WEDDINGS=[
-  {couple:"Rachel & Edwin",venue:"Monti",guests:120,type:"Waterfront Italian dinner",quote:"The Marina Bay sunset during our solemnisation was the most magical moment of our lives.",photo:"@pixioo",vid:"monti",coupleImg:"https://images.unsplash.com/photo-1519741497674-611481863552?w=800&q=80"},
-  {couple:"Priya & Arjun",venue:"1-Arden",guests:80,type:"Sunset sky garden",quote:"Being surrounded by the food forest 51 floors above felt like a dream.",photo:"@fellowfolks",vid:"1-arden",coupleImg:"https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=800&q=80"},
-  {couple:"Wei Ling & Jun Hao",venue:"The Alkaff Mansion",guests:150,type:"Heritage garden lunch",quote:"The heritage mansion made our tea ceremony feel so connected to tradition.",photo:"@iluminen",vid:"alkaff-mansion",coupleImg:"https://images.unsplash.com/photo-1606216794079-73f85bbd57d5?w=800&q=80"},
-  {couple:"Sarah & David",venue:"1-Alfaro",guests:100,type:"Rooftop lighthouse dinner",quote:"Our guests couldn't stop talking about the panoramic views and incredible Italian food.",photo:"@d.t._pictures",vid:"1-alfaro",coupleImg:"https://images.unsplash.com/photo-1591604466107-ec97de577aff?w=800&q=80"},
-  {couple:"Michelle & James",venue:"Raffles Hotel",guests:300,type:"Grand ballroom banquet",quote:"Walking through those historic corridors on our wedding day was unforgettable.",photo:"@blinkcinematic",vid:"raffles-hotel",coupleImg:"https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=800&q=80"},
-  {couple:"Mei Lin & Kai",venue:"Capella Singapore",guests:150,type:"Sentosa garden estate",quote:"Capella gave us a private resort wedding without leaving Singapore.",photo:"@studio1702",vid:"capella",coupleImg:"https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=800&q=80"},
-  {couple:"Nurul & Faris",venue:"1-Atico",guests:60,type:"Orchard skyline ROM",quote:"Intimate solemnisation above Orchard Road — chic and unforgettable.",photo:"@wemerryground",vid:"1-atico",coupleImg:"https://images.unsplash.com/photo-1529636798458-92182e662485?w=800&q=80"},
-  {couple:"Joanne & Marcus",venue:"The Summerhouse",guests:70,type:"Garden estate brunch",quote:"Fairy lights and farm-to-table felt like a European countryside wedding.",photo:"@ikicompany",vid:"the-summerhouse",coupleImg:"https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=800&q=80"}
+  {couple:"Rachel & Edwin",venue:"Monti",guests:120,type:"Waterfront Italian dinner",quote:"The Marina Bay sunset during our solemnisation was the most magical moment of our lives.",photo:"@pixioo",vid:"monti",coupleImg:"https://images.unsplash.com/photo-1537633552985-df8429e8048b?w=900&q=80&fit=crop&crop=faces,center&h=600",
+    story:"Rachel and Edwin always knew they wanted a waterfront celebration. When they first visited Monti at Fullerton Pavilion, the panoramic Marina Bay view sealed the deal. Their solemnisation took place on the iconic dome at golden hour, with the city skyline glowing behind them. The 120 guests enjoyed a five-course Italian dinner curated by the Monti team, featuring handmade pasta and a stunning tiramisu wedding cake. The couple's first dance happened under the stars with Marina Bay Sands glittering in the background."},
+  {couple:"Priya & Arjun",venue:"1-Arden",guests:80,type:"Sunset sky garden",quote:"Being surrounded by the food forest 51 floors above felt like a dream.",photo:"@fellowfolks",vid:"1-arden",coupleImg:"https://images.unsplash.com/photo-1544078751-58fee2d8a03b?w=900&q=80&fit=crop&crop=faces,center&h=600",
+    story:"Priya and Arjun wanted something unforgettable and intimate. At 1-Arden on Level 51 of CapitaSpring, they found it. Their ROM solemnisation was held in the sky garden surrounded by the world's highest urban food forest. As the sun set over the Singapore skyline, 80 guests shared a Coastal Australian dinner by Executive Chef John-Paul Fiechtner. The couple incorporated Indian traditions with a modern twist, including a flower garland exchange in the open-air terrace."},
+  {couple:"Wei Ling & Jun Hao",venue:"The Alkaff Mansion",guests:150,type:"Heritage garden lunch",quote:"The heritage mansion made our tea ceremony feel so connected to tradition.",photo:"@iluminen",vid:"alkaff-mansion",coupleImg:"https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=900&q=80&fit=crop&crop=faces,center&h=600",
+    story:"Wei Ling and Jun Hao chose The Alkaff Mansion for its deep sense of heritage. The century-old hilltop estate surrounded by tropical gardens was the perfect backdrop for their traditional Chinese tea ceremony. 150 guests gathered for a Mediterranean-inspired lunch on the mansion's covered verandah, with ivy-draped walls and heritage architecture creating photos that looked like a European countryside wedding in the heart of Singapore."},
+  {couple:"Sarah & David",venue:"1-Alfaro",guests:100,type:"Rooftop lighthouse dinner",quote:"Our guests couldn't stop talking about the panoramic views and incredible Italian food.",photo:"@d.t._pictures",vid:"1-alfaro",coupleImg:"https://images.unsplash.com/photo-1550005809-91ad75fb315f?w=900&q=80&fit=crop&crop=faces,center&h=600",
+    story:"Sarah and David were among the first couples to celebrate at 1-Alfaro, Singapore's newest rooftop venue at Labrador Tower. The floor-to-ceiling glass walls offered breathtaking views of the city and sea. Their 100 guests enjoyed authentic Emilia-Romagna cuisine from the MONTI team, featuring the venue's signature farm-to-table concept. The couple's vows were exchanged as the sun painted the sky in shades of gold and pink."},
+  {couple:"Michelle & James",venue:"Raffles Hotel",guests:300,type:"Grand ballroom banquet",quote:"Walking through those historic corridors on our wedding day was unforgettable.",photo:"@blinkcinematic",vid:"raffles-hotel",coupleImg:"https://images.unsplash.com/photo-1545232979-8bf68ee9b1af?w=900&q=80&fit=crop&crop=faces,center&h=600",
+    story:"Michelle and James wanted a grand celebration that honoured both families' traditions. The Jubilee Ballroom at Raffles Hotel, with its cream-and-gold interiors and crystal chandeliers, was everything they envisioned. 300 guests enjoyed a 10-course Chinese banquet, and the couple's gate crash games in the morning had everyone in stitches. Their first look on the historic Raffles lawn, beneath tropical palms, remains their favourite photo."},
+  {couple:"Mei Lin & Kai",venue:"Capella Singapore",guests:150,type:"Sentosa garden estate",quote:"Capella gave us a private resort wedding without leaving Singapore.",photo:"@studio1702",vid:"capella",coupleImg:"https://images.unsplash.com/photo-1532712938310-34cb3982ef74?w=900&q=80&fit=crop&crop=faces,center&h=600",
+    story:"Mei Lin and Kai dreamed of a resort wedding but wanted to stay close to family. Capella Singapore on Sentosa Island delivered both. Designed by Sir Norman Foster amid 30 acres of rainforest, their ceremony on the verdant lawn felt like a private estate celebration. 150 guests enjoyed cocktails by cascading water features before a Western-Chinese fusion dinner in the colonial-era ballroom."},
+  {couple:"Nurul & Faris",venue:"1-Atico",guests:60,type:"Orchard skyline ROM",quote:"Intimate solemnisation above Orchard Road — chic and unforgettable.",photo:"@wemerryground",vid:"1-atico",coupleImg:"https://images.unsplash.com/photo-1507504031003-b417219a0fde?w=900&q=80&fit=crop&crop=faces,center&h=600",
+    story:"Nurul and Faris kept it intimate and modern. Perched atop ION Orchard, 1-Atico provided a stunning skyline backdrop for their ROM solemnisation with just 60 of their closest family and friends. The couple chose a contemporary nikah ceremony followed by a modern European dinner. The panoramic city views at night, with Orchard Road's lights twinkling below, made for magical reception photos."},
+  {couple:"Joanne & Marcus",venue:"The Summerhouse",guests:70,type:"Garden estate brunch",quote:"Fairy lights and farm-to-table felt like a European countryside wedding.",photo:"@ikicompany",vid:"the-summerhouse",coupleImg:"https://images.unsplash.com/photo-1604017011826-d3b4c23f8914?w=900&q=80&fit=crop&crop=faces,center&h=600",
+    story:"Joanne and Marcus wanted a relaxed, nature-filled celebration. The Summerhouse's European-style garden estate in Seletar was their dream venue. Fairy lights strung between the trees, a magical gazebo ceremony, and a farm-to-table brunch menu featuring produce from the venue's own edible garden created the intimate countryside wedding they had always imagined — just 70 guests, great food, and pure joy."}
 ];
 
 const HERO_SLIDES=[
@@ -428,9 +436,9 @@ export default function App() {
 // MAIN APP (website content)
 // ═════════════════════════════════════════════════════════════════════════
 function MainApp({ session, onLogout, onOpenAdmin }){
-  const[pg,sPg]=useState("home");const[av,sAv]=useState(null);const[mm,sMm]=useState(false);const[mega,sMega]=useState(false);const[sy,sSy]=useState(0);const[ai,sAi]=useState(false);const[st,sSt]=useState(false);
+  const[pg,sPg]=useState("home");const[av,sAv]=useState(null);const[aw,sAw]=useState(null);const[mm,sMm]=useState(false);const[mega,sMega]=useState(false);const[sy,sSy]=useState(0);const[ai,sAi]=useState(false);const[st,sSt]=useState(false);
   useEffect(()=>{const h=()=>{sSy(window.scrollY);sSt(window.scrollY>500)};window.addEventListener("scroll",h,{passive:true});return()=>window.removeEventListener("scroll",h)},[]);
-  const go=(p,v=null)=>{sPg(p);sAv(v);sMm(false);sMega(false);window.scrollTo({top:0,behavior:"smooth"})};
+  const go=(p,v=null)=>{if(p==="wedding-story"){sPg("wedding-story");sAw(v);sAv(null)}else{sPg(p);sAv(v);sAw(null)}sMm(false);sMega(false);window.scrollTo({top:0,behavior:"smooth"})};
   useEffect(()=>{document.querySelectorAll('script[data-swv]').forEach(s=>s.remove());[SEO_SCHEMA.website,SEO_SCHEMA.faq].forEach(s=>{const el=document.createElement("script");el.type="application/ld+json";el.setAttribute("data-swv","1");el.textContent=JSON.stringify(s);document.head.appendChild(el)})},[pg]);
   const NI=[{l:"Home",p:"home"},{l:"Venues",p:"venues"},{l:"AI Tools",p:"ai-tools"},{l:"Real Weddings",p:"weddings"},{l:"Blog",p:"blog"},{l:"Showcases",p:"shows"},{l:"About",p:"about"}];
 
@@ -506,6 +514,7 @@ function MainApp({ session, onLogout, onOpenAdmin }){
 
     <main role="main">
       {av?<Detail v={av} go={go}/>:
+       aw?<WeddingStory s={aw} go={go}/>:
        pg==="home"?<Home go={go}/>:
        pg==="venues"?<Dir go={go}/>:
        pg==="ai-tools"?<AIHub/>:
@@ -637,13 +646,13 @@ function VCd({v,i=0,onClick}){const[r,vis]=useSR();return(
 );}
 
 function RWCd({s,v,go}){const[r,vis]=useSR();return(
-  <article ref={r} style={{borderRadius:14,overflow:"hidden",background:"var(--w)",boxShadow:"var(--ss)",cursor:"pointer",opacity:vis?1:0,transform:vis?"translateY(0) scale(1)":"translateY(25px) scale(.97)",transition:"all .6s var(--e)"}} onClick={()=>v&&go("venues",v)}>
-    <div style={{paddingTop:"56.25%",position:"relative",overflow:"hidden"}}><VI src={s.coupleImg} alt={`${s.couple} wedding at ${s.venue} Singapore`} className="vi" style={{position:"absolute",inset:0,width:"100%",height:"100%"}}/></div>
+  <article ref={r} className="vc" style={{borderRadius:14,overflow:"hidden",background:"var(--w)",boxShadow:"var(--ss)",cursor:"pointer",opacity:vis?1:0,transform:vis?"translateY(0) scale(1)":"translateY(25px) scale(.97)",transition:"all .6s var(--e)"}} onClick={()=>go("wedding-story",s)}>
+    <div style={{paddingTop:"56.25%",position:"relative",overflow:"hidden"}}><img src={s.coupleImg} alt={s.couple+" wedding at "+s.venue} className="vi" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",objectPosition:"center 25%"}} loading="lazy"/></div>
     <div style={{padding:"16px 18px 20px"}}>
       <h3 style={{fontFamily:"var(--fh)",fontSize:20,fontWeight:500,marginBottom:4}}>{s.couple}</h3>
       <p style={{fontSize:12,color:"var(--gd)",fontWeight:600,marginBottom:4}}>{s.venue} · {s.guests} guests · {s.type}</p>
       <p style={{fontSize:13,color:"var(--cl)",fontStyle:"italic",lineHeight:1.6,marginBottom:8}}>"{s.quote}"</p>
-      <p style={{fontSize:11,color:"var(--g)"}}>Photography: {s.photo}</p>
+      <p style={{fontSize:13,fontWeight:600,color:"var(--gd)",display:"flex",alignItems:"center",gap:4}}>Read Their Story <ChevronRight size={13}/></p>
     </div>
   </article>
 );}
@@ -696,7 +705,7 @@ function Dir({go}){const[cat,sCat]=useState("all");const[sort,sSort]=useState("f
 // ═════════════════════════════════════════════════════════════════════════
 // DETAIL
 // ═════════════════════════════════════════════════════════════════════════
-function Detail({v,go}){const sim=VENUES.filter(x=>x.cat===v.cat&&x.id!==v.id).slice(0,3);return(
+function Detail({v,go}){const managedSameCat=VENUES.filter(x=>x.managed&&x.cat===v.cat&&x.id!==v.id);const managedOther=VENUES.filter(x=>x.managed&&x.id!==v.id&&!managedSameCat.includes(x));const sim=managedSameCat.length>=3?managedSameCat.slice(0,3):[...managedSameCat,...managedOther].slice(0,3);return(
   <article style={{background:"var(--cr)"}} itemScope itemType="https://schema.org/EventVenue">
     <div style={{maxWidth:1200,margin:"0 auto",padding:"18px 24px 72px"}}>
       <button onClick={()=>go("venues")} className="nl" style={{marginBottom:14,fontSize:13}}><ChevronLeft size={13} style={{display:"inline",verticalAlign:"middle"}}/> All Venues</button>
@@ -996,6 +1005,72 @@ function AskAI({show,toggle}){const[msgs,sMs]=useState([]);const[inp,sInp]=useSt
 // ═════════════════════════════════════════════════════════════════════════
 // OTHER PAGES
 // ═════════════════════════════════════════════════════════════════════════
+function WeddingStory({s,go}){
+  const venue=VENUES.find(x=>x.id===s.vid);
+  const otherWeddings=WEDDINGS.filter(w=>w.couple!==s.couple).slice(0,3);
+  return(
+    <article style={{background:"var(--cr)"}}>
+      <div style={{maxWidth:900,margin:"0 auto",padding:"20px 24px 80px"}}>
+        <button onClick={()=>go("weddings")} className="nl" style={{marginBottom:20,fontSize:13}}><ChevronLeft size={14} style={{display:"inline",verticalAlign:"middle"}}/> All Real Weddings</button>
+
+        {/* Hero image */}
+        <div style={{borderRadius:16,overflow:"hidden",height:"clamp(300px,50vh,500px)",position:"relative",marginBottom:32}}>
+          <img src={s.coupleImg} alt={s.couple+" wedding at "+s.venue} style={{width:"100%",height:"100%",objectFit:"cover",objectPosition:"center 25%"}}/>
+          <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg,transparent 40%,rgba(45,45,45,.7) 100%)"}}/>
+          <div style={{position:"absolute",bottom:28,left:28,right:28,color:"var(--w)"}}>
+            <h1 style={{fontFamily:"var(--fh)",fontSize:"clamp(30px,5vw,48px)",fontWeight:400,marginBottom:6,animation:"heroTextIn .8s ease forwards"}}>{s.couple}</h1>
+            <p style={{fontSize:15,opacity:.9,animation:"fU .6s ease .2s both"}}>{s.venue} · {s.guests} Guests · {s.type}</p>
+          </div>
+        </div>
+
+        {/* Story content */}
+        <div style={{display:"grid",gridTemplateColumns:"1fr 280px",gap:32,alignItems:"start"}}>
+          <div>
+            <blockquote style={{fontFamily:"var(--fh)",fontSize:"clamp(20px,2.5vw,28px)",fontWeight:400,fontStyle:"italic",lineHeight:1.5,color:"var(--cl)",marginBottom:32,paddingLeft:20,borderLeft:"3px solid var(--go)",animation:"fU .5s ease .3s both"}}>"{s.quote}"</blockquote>
+
+            <h2 style={{fontFamily:"var(--fh)",fontSize:24,fontWeight:500,marginBottom:16}}>Their Story</h2>
+            <p style={{fontSize:15,lineHeight:1.9,color:"var(--cl)",marginBottom:28}}>{s.story}</p>
+
+            <div style={{background:"var(--w)",borderRadius:14,padding:24,boxShadow:"var(--ss)",marginBottom:28}}>
+              <h3 style={{fontFamily:"var(--fh)",fontSize:20,fontWeight:500,marginBottom:14}}>Wedding Details</h3>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+                {[
+                  {label:"Venue",val:s.venue},
+                  {label:"Guests",val:s.guests+" guests"},
+                  {label:"Celebration Style",val:s.type},
+                  {label:"Photography",val:s.photo}
+                ].map((d,i)=><div key={i}><p style={{fontSize:10,fontWeight:600,letterSpacing:".06em",textTransform:"uppercase",color:"var(--g)",marginBottom:2}}>{d.label}</p><p style={{fontSize:14,fontWeight:500}}>{d.val}</p></div>)}
+              </div>
+            </div>
+
+            {venue&&<div style={{background:"var(--w)",borderRadius:14,overflow:"hidden",boxShadow:"var(--ss)",cursor:"pointer"}} onClick={()=>go("venues",venue)}>
+              <div style={{height:180,overflow:"hidden"}}><VI src={venue.hero||venue.img} alt={venue.name} style={{width:"100%",height:"100%"}}/></div>
+              <div style={{padding:"16px 20px"}}>
+                <p style={{fontSize:11,fontWeight:600,letterSpacing:".05em",textTransform:"uppercase",color:"var(--gd)",marginBottom:4}}>The Venue</p>
+                <h3 style={{fontFamily:"var(--fh)",fontSize:22,fontWeight:500,marginBottom:4}}>{venue.name}</h3>
+                <p style={{fontSize:13,color:"var(--cl)",lineHeight:1.5,marginBottom:10}}>{venue.tagline} · {venue.area}</p>
+                <span style={{fontSize:13,fontWeight:600,color:"var(--gd)",display:"flex",alignItems:"center",gap:4}}>View Venue Details <ChevronRight size={13}/></span>
+              </div>
+            </div>}
+          </div>
+
+          <aside style={{position:"sticky",top:88}}>
+            <div style={{background:"var(--w)",borderRadius:14,padding:20,boxShadow:"var(--ss)",marginBottom:16}}>
+              <h3 style={{fontFamily:"var(--fh)",fontSize:18,fontWeight:500,marginBottom:14}}>More Real Weddings</h3>
+              {otherWeddings.map((w,i)=><div key={i} style={{display:"flex",gap:10,marginBottom:12,cursor:"pointer",padding:8,borderRadius:8,transition:"background .2s"}} onClick={()=>go("wedding-story",w)} onMouseOver={e=>e.currentTarget.style.background="var(--gg)"} onMouseOut={e=>e.currentTarget.style.background="transparent"}>
+                <img src={w.coupleImg} alt={w.couple} style={{width:52,height:52,borderRadius:8,objectFit:"cover",objectPosition:"center 25%",flexShrink:0}}/>
+                <div><p style={{fontWeight:600,fontSize:13}}>{w.couple}</p><p style={{fontSize:11,color:"var(--g)"}}>{w.venue} · {w.guests} guests</p></div>
+              </div>)}
+              <button onClick={()=>go("weddings")} className="nl" style={{fontSize:13,color:"var(--gd)",marginTop:4}}>View All Stories <ChevronRight size={13} style={{display:"inline",verticalAlign:"middle"}}/></button>
+            </div>
+            <button onClick={()=>go("ai-tools")} className="bg" style={{width:"100%",justifyContent:"center",fontSize:13}}><Sparkles size={14}/>Find Your Venue</button>
+          </aside>
+        </div>
+      </div>
+    </article>
+  );
+}
+
 function RWPage({go}){return(<section style={{padding:"44px 24px 72px",background:"var(--cr)"}}><div style={{maxWidth:1200,margin:"0 auto"}}><h1 style={{fontFamily:"var(--fh)",fontSize:"clamp(28px,4vw,40px)",fontWeight:300,marginBottom:8}}>Real Weddings</h1><p style={{color:"var(--g)",fontSize:14,maxWidth:560,marginBottom:32}}>Be inspired by celebrations across Singapore's finest venues — luxury hotels, rooftop ceremonies, and heritage garden affairs.</p><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))",gap:18}}>{WEDDINGS.map((s,i)=>{const v=VENUES.find(x=>x.id===s.vid);return<RWCd key={i} s={s} v={v} go={go}/>})}</div></div></section>);}
 
 function BlogPage(){
