@@ -91,7 +91,7 @@ export default function App(){
   useEffect(()=>{const h=()=>{sSy(window.scrollY);sSt(window.scrollY>500)};window.addEventListener("scroll",h,{passive:true});return()=>window.removeEventListener("scroll",h)},[]);
   const go=(p,v=null)=>{sPg(p);sAv(v);sMm(false);sMega(false);window.scrollTo({top:0,behavior:"smooth"})};
   useEffect(()=>{document.querySelectorAll('script[data-swv]').forEach(s=>s.remove());[SEO_SCHEMA.website,SEO_SCHEMA.faq].forEach(s=>{const el=document.createElement("script");el.type="application/ld+json";el.setAttribute("data-swv","1");el.textContent=JSON.stringify(s);document.head.appendChild(el)})},[pg]);
-  const NI=[{l:"Home",p:"home"},{l:"Venues",p:"venues"},{l:"AI Tools",p:"ai-tools"},{l:"Real Weddings",p:"weddings"},{l:"Showcases",p:"shows"},{l:"About",p:"about"}];
+  const NI=[{l:"Home",p:"home"},{l:"Venues",p:"venues"},{l:"AI Tools",p:"ai-tools"},{l:"Real Weddings",p:"weddings"},{l:"About",p:"about"}];
 
   return(<div style={{fontFamily:"var(--fb)",color:"var(--c)",background:"var(--cr)",minHeight:"100vh"}}>
     <style>{`@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
@@ -99,17 +99,27 @@ export default function App(){
     *{box-sizing:border-box;margin:0;padding:0}
     @keyframes fU{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
     @keyframes fI{from{opacity:0}to{opacity:1}}
-    @keyframes bI{from{opacity:0;filter:blur(8px);transform:translateY(8px)}to{opacity:1;filter:blur(0);transform:translateY(0)}}
-    @keyframes kB{0%{transform:scale(1)}100%{transform:scale(1.08)}}
+    @keyframes bI{from{opacity:0;filter:blur(10px);transform:translateY(12px) scale(.97)}to{opacity:1;filter:blur(0);transform:translateY(0) scale(1)}}
+    @keyframes kB{0%{transform:scale(1)}100%{transform:scale(1.12)}}
     @keyframes sh{0%{background-position:-200% 0}100%{background-position:200% 0}}
-    @keyframes fl{0%,100%{transform:translateY(0);opacity:.3}50%{transform:translateY(-28px);opacity:.5}}
-    @keyframes pu{0%,100%{box-shadow:0 0 0 0 rgba(201,169,110,.4)}50%{box-shadow:0 0 0 10px rgba(201,169,110,0)}}
+    @keyframes fl{0%,100%{transform:translateY(0) translateX(0);opacity:.2}25%{transform:translateY(-18px) translateX(8px);opacity:.45}50%{transform:translateY(-35px) translateX(-6px);opacity:.3}75%{transform:translateY(-15px) translateX(12px);opacity:.4}}
+    @keyframes pu{0%,100%{box-shadow:0 0 0 0 rgba(201,169,110,.4)}50%{box-shadow:0 0 0 12px rgba(201,169,110,0)}}
+    @keyframes slideInL{from{opacity:0;transform:translateX(-40px)}to{opacity:1;transform:translateX(0)}}
+    @keyframes slideInR{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+    @keyframes morphBlob{0%,100%{border-radius:60% 40% 30% 70%/60% 30% 70% 40%}25%{border-radius:30% 60% 70% 40%/50% 60% 30% 60%}50%{border-radius:50% 60% 30% 60%/30% 60% 70% 40%}75%{border-radius:60% 40% 60% 30%/70% 30% 50% 60%}}
+    @keyframes gradShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+    @keyframes textGlow{0%,100%{text-shadow:0 0 0 transparent}50%{text-shadow:0 0 30px rgba(201,169,110,.15)}}
+    @keyframes revealLine{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+    @keyframes heroTextIn{0%{opacity:0;transform:translateY(20px);filter:blur(6px)}60%{opacity:1;filter:blur(0)}100%{opacity:1;transform:translateY(0);filter:blur(0)}}
+    @keyframes cardEnter{from{opacity:0;transform:translateY(40px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+    @keyframes countPop{0%{transform:scale(1)}50%{transform:scale(1.08)}100%{transform:scale(1)}}
     @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
     .sk{background:linear-gradient(90deg,var(--gg) 25%,var(--gp) 50%,var(--gg) 75%);background-size:200% 100%;animation:sh 1.5s ease-in-out infinite;border-radius:8px}
-    .vc{transition:transform .35s var(--e),box-shadow .35s var(--e);position:relative;overflow:hidden;border-radius:12px;background:var(--iv);cursor:pointer}
-    .vc:hover{transform:translateY(-8px);box-shadow:var(--sx)}
-    .vc .vi{transition:transform .6s var(--e)}.vc:hover .vi{transform:scale(1.05)}
-    .vc::after{content:'';position:absolute;bottom:0;left:0;width:100%;height:2px;background:linear-gradient(90deg,transparent,var(--go),transparent);transform:translateX(-100%);transition:transform .6s var(--e)}.vc:hover::after{transform:translateX(100%)}
+    .vc{transition:transform .4s var(--e),box-shadow .4s var(--e);position:relative;overflow:hidden;border-radius:14px;background:var(--iv);cursor:pointer}
+    .vc:hover{transform:translateY(-10px) scale(1.01);box-shadow:0 20px 60px rgba(0,0,0,.12),0 0 0 1px rgba(201,169,110,.15)}
+    .vc .vi{transition:transform .7s var(--e)}.vc:hover .vi{transform:scale(1.08)}
+    .vc::after{content:'';position:absolute;bottom:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,transparent,var(--go),transparent);transform:translateX(-100%);transition:transform .7s var(--e)}.vc:hover::after{transform:translateX(100%)}
+    .vc::before{content:'';position:absolute;top:0;left:0;right:0;height:100%;background:linear-gradient(180deg,transparent 60%,rgba(201,169,110,.04) 100%);opacity:0;transition:opacity .4s;z-index:1;pointer-events:none}.vc:hover::before{opacity:1}
     .bg{background:linear-gradient(135deg,var(--go),var(--gd));color:var(--w);border:none;padding:12px 28px;border-radius:8px;font-family:var(--fb);font-weight:600;font-size:14px;letter-spacing:.04em;cursor:pointer;transition:all .2s var(--e);display:inline-flex;align-items:center;gap:8px;text-decoration:none}
     .bg:hover{filter:brightness(1.1);transform:translateY(-1px);box-shadow:var(--sg)}.bg:active{transform:translateY(0)}
     .nl{position:relative;color:var(--c);text-decoration:none;font-size:14px;font-weight:500;letter-spacing:.03em;padding:8px 0;cursor:pointer;background:none;border:none;font-family:var(--fb)}
@@ -149,7 +159,6 @@ export default function App(){
        pg==="venues"?<Dir go={go}/>:
        pg==="ai-tools"?<AIHub/>:
        pg==="weddings"?<RWPage go={go}/>:
-       pg==="shows"?<Shows/>:
        pg==="about"?<Abt/>:<Home go={go}/>}
     </main>
 
@@ -186,15 +195,18 @@ function Home({go}){
   useEffect(()=>{sPr(0);const t=setTimeout(()=>sPr(100),50);return()=>clearTimeout(t)},[sl]);
   return(<>
     {/* HERO */}
-    <section style={{position:"relative",height:"70vh",minHeight:440,overflow:"hidden"}} role="banner" aria-label="Featured Singapore wedding venues">
-      {HERO_SLIDES.map((s,i)=>{const v=VENUES.find(x=>x.id===s.vid);return(<div key={i} style={{position:"absolute",inset:0,opacity:sl===i?1:0,transition:"opacity .8s ease"}}><div style={{position:"absolute",inset:0,animation:sl===i?"kB 12s ease-in-out forwards":"none"}}><VI src={v?.hero||v?.img} alt={`${v?.name||"Singapore"} — ${v?.catLabel||"Wedding Venue"} Singapore`} style={{width:"100%",height:"100%"}}/></div><div style={{position:"absolute",inset:0,background:"linear-gradient(180deg,rgba(45,45,45,.12) 0%,rgba(45,45,45,.65) 100%)"}}/></div>)})}
-      <div style={{position:"absolute",inset:0,overflow:"hidden",pointerEvents:"none",zIndex:2}}>{Array.from({length:10},(_,i)=><div key={i} style={{position:"absolute",left:`${(i*10.3)%100}%`,top:`${(i*14.7)%100}%`,width:Math.random()*5+3,height:Math.random()*5+3,borderRadius:"50%",background:"rgba(201,169,110,.35)",animation:`fl ${6+i}s ease-in-out ${i*.5}s infinite`,opacity:.1+Math.random()*.08}}/>)}</div>
+    <section style={{position:"relative",height:"75vh",minHeight:500,overflow:"hidden"}} role="banner" aria-label="Featured Singapore wedding venues">
+      {HERO_SLIDES.map((s,i)=>{const v=VENUES.find(x=>x.id===s.vid);return(<div key={i} style={{position:"absolute",inset:0,opacity:sl===i?1:0,transition:"opacity 1s ease"}}><div style={{position:"absolute",inset:0,animation:sl===i?"kB 14s ease-in-out forwards":"none"}}><VI src={v?.hero||v?.img} alt={`${v?.name||"Singapore"} — ${v?.catLabel||"Wedding Venue"} Singapore`} style={{width:"100%",height:"100%"}}/></div><div style={{position:"absolute",inset:0,background:"linear-gradient(180deg,rgba(45,45,45,.08) 0%,rgba(45,45,45,.55) 60%,rgba(45,45,45,.8) 100%)"}}/></div>)})}
+      {/* Decorative morphing blob */}
+      <div style={{position:"absolute",top:"-20%",right:"-10%",width:"50vw",height:"50vw",background:"radial-gradient(circle,rgba(201,169,110,.08) 0%,transparent 70%)",animation:"morphBlob 20s ease-in-out infinite",zIndex:1,pointerEvents:"none"}}/>
+      {/* Floating particles */}
+      <div style={{position:"absolute",inset:0,overflow:"hidden",pointerEvents:"none",zIndex:2}}>{Array.from({length:15},(_,i)=><div key={i} style={{position:"absolute",left:`${(i*7.1+3)%100}%`,top:`${(i*11.3+5)%100}%`,width:Math.random()*7+3,height:Math.random()*7+3,borderRadius:"50%",background:`rgba(201,169,110,${.2+Math.random()*.2})`,animation:`fl ${8+Math.random()*6}s ease-in-out ${i*.4}s infinite`,filter:"blur(1px)"}}/>)}</div>
       <div style={{position:"absolute",inset:0,zIndex:3,display:"flex",flexDirection:"column",justifyContent:"center",padding:"0 clamp(24px,8vw,120px)"}}>
-        <h1 style={{fontFamily:"var(--fh)",fontSize:"clamp(28px,5vw,52px)",fontWeight:300,color:"var(--w)",lineHeight:1.15,letterSpacing:"-.02em",maxWidth:560,animation:"bI .8s ease forwards",whiteSpace:"pre-line"}}>{HERO_SLIDES[sl].h}</h1>
-        <p style={{fontFamily:"var(--fb)",fontSize:"clamp(13px,1.4vw,16px)",color:"rgba(255,255,255,.85)",marginTop:12,maxWidth:460,animation:"fU .6s ease .3s both"}}>{HERO_SLIDES[sl].sub}</p>
-        <div style={{display:"flex",gap:10,marginTop:22,animation:"fU .6s ease .5s both",flexWrap:"wrap"}}>
-          <button className="bg" onClick={()=>go("ai-tools")}><Sparkles size={14}/>Find My Venue</button>
-          <button onClick={()=>go("venues")} style={{background:"rgba(255,255,255,.12)",border:"1px solid rgba(255,255,255,.3)",color:"var(--w)",padding:"12px 20px",borderRadius:8,fontFamily:"var(--fb)",fontWeight:500,fontSize:14,cursor:"pointer",backdropFilter:"blur(8px)"}}>Browse {VENUES.length} Venues</button>
+        <h1 key={`h-${sl}`} style={{fontFamily:"var(--fh)",fontSize:"clamp(32px,5.5vw,58px)",fontWeight:300,color:"var(--w)",lineHeight:1.1,letterSpacing:"-.02em",maxWidth:580,animation:"heroTextIn .9s ease forwards",whiteSpace:"pre-line"}}>{HERO_SLIDES[sl].h}</h1>
+        <p key={`p-${sl}`} style={{fontFamily:"var(--fb)",fontSize:"clamp(14px,1.5vw,17px)",color:"rgba(255,255,255,.88)",marginTop:16,maxWidth:480,animation:"fU .7s ease .35s both"}}>{HERO_SLIDES[sl].sub}</p>
+        <div style={{display:"flex",gap:12,marginTop:28,animation:"fU .7s ease .55s both",flexWrap:"wrap"}}>
+          <button className="bg" onClick={()=>go("ai-tools")} style={{padding:"14px 28px",fontSize:15}}><Sparkles size={15}/>Find My Venue</button>
+          <button onClick={()=>go("venues")} style={{background:"rgba(255,255,255,.1)",border:"1px solid rgba(255,255,255,.3)",color:"var(--w)",padding:"14px 24px",borderRadius:8,fontFamily:"var(--fb)",fontWeight:500,fontSize:14,cursor:"pointer",backdropFilter:"blur(10px)",transition:"all .3s"}}>Browse {VENUES.length} Venues</button>
         </div>
       </div>
       <div style={{position:"absolute",bottom:0,left:0,right:0,zIndex:4}}>
@@ -255,7 +267,7 @@ function Home({go}){
     <StatStrip/><TestCarousel/>
 
     {/* NEWSLETTER */}
-    <section style={{padding:"52px 24px",background:"linear-gradient(135deg,var(--cw),var(--rp))"}}>
+    <section style={{padding:"56px 24px",background:"linear-gradient(135deg,var(--cw),var(--rp),var(--gp),var(--cw))",backgroundSize:"300% 300%",animation:"gradShift 8s ease infinite"}}>
       <div style={{maxWidth:500,margin:"0 auto",textAlign:"center"}}>
         <h2 style={{fontFamily:"var(--fh)",fontSize:28,fontWeight:400,marginBottom:8}}>Stay Inspired</h2>
         <p style={{color:"var(--g)",fontSize:14,marginBottom:18}}>Weekly venue spotlights, wedding trends, and exclusive promotions.</p>
@@ -267,9 +279,9 @@ function Home({go}){
 
 // ── VENUE CARD ───────────────────────────────────────────────────────────
 function VCd({v,i=0,onClick}){const[r,vis]=useSR();return(
-  <article ref={r} className="vc" onClick={onClick} style={{opacity:vis?1:0,transform:vis?"translateY(0)":"translateY(22px)",transition:`all .5s var(--e) ${i*65}ms`,boxShadow:"var(--ss)"}} itemScope itemType="https://schema.org/EventVenue">
-    <div style={{position:"relative",paddingTop:"66%",overflow:"hidden"}}>
-      <VI src={v.img} alt={`${v.name} — ${v.catLabel} wedding venue in ${v.area}, Singapore`} className="vi" style={{position:"absolute",inset:0,width:"100%",height:"100%"}}/>
+  <article ref={r} className="vc" onClick={onClick} style={{opacity:vis?1:0,transform:vis?"translateY(0) scale(1)":"translateY(35px) scale(.96)",transition:`all .6s var(--e) ${i*80}ms`,boxShadow:"var(--ss)"}} itemScope itemType="https://schema.org/EventVenue">
+    <div style={{position:"relative",paddingTop:"56.25%",overflow:"hidden"}}>
+      <VI src={v.hero||v.img} alt={`${v.name} — ${v.catLabel} wedding venue in ${v.area}, Singapore`} className="vi" style={{position:"absolute",inset:0,width:"100%",height:"100%"}}/>
       <span style={{position:"absolute",top:9,left:9,background:"rgba(45,45,45,.8)",backdropFilter:"blur(4px)",color:"var(--w)",fontSize:10,fontWeight:600,letterSpacing:".05em",textTransform:"uppercase",padding:"3px 9px",borderRadius:999}}>{v.cat==="hotel"?"Hotel":v.catLabel.split("·")[0].trim()}</span>
       {v.managed&&<span style={{position:"absolute",top:9,right:9}} className="mb"><Crown size={8}/>1-Host</span>}
       {v.isNew&&<span style={{position:"absolute",top:v.managed?32:9,right:9,background:"var(--go)",color:"var(--w)",fontSize:9,fontWeight:700,padding:"2px 7px",borderRadius:999}}>NEW</span>}
@@ -286,8 +298,8 @@ function VCd({v,i=0,onClick}){const[r,vis]=useSR();return(
 );}
 
 function RWCd({s,v,go}){const[r,vis]=useSR();return(
-  <article ref={r} style={{borderRadius:12,overflow:"hidden",background:"var(--w)",boxShadow:"var(--ss)",cursor:"pointer",opacity:vis?1:0,transform:vis?"translateY(0)":"translateY(16px)",transition:"all .5s var(--e)"}} onClick={()=>v&&go("venues",v)}>
-    <div style={{height:180,overflow:"hidden"}}><VI src={v?.img||v?.hero} alt={`${s.couple} real wedding at ${s.venue} Singapore`} style={{width:"100%",height:"100%"}}/></div>
+  <article ref={r} style={{borderRadius:14,overflow:"hidden",background:"var(--w)",boxShadow:"var(--ss)",cursor:"pointer",opacity:vis?1:0,transform:vis?"translateY(0) scale(1)":"translateY(25px) scale(.97)",transition:"all .6s var(--e)"}} onClick={()=>v&&go("venues",v)}>
+    <div style={{paddingTop:"56.25%",position:"relative",overflow:"hidden"}}><VI src={v?.hero||v?.img} alt={`${s.couple} real wedding at ${s.venue} Singapore`} className="vi" style={{position:"absolute",inset:0,width:"100%",height:"100%"}}/></div>
     <div style={{padding:16}}>
       <h3 style={{fontFamily:"var(--fh)",fontSize:19,fontWeight:500,marginBottom:3}}>{s.couple}</h3>
       <p style={{fontSize:12,color:"var(--gd)",fontWeight:600,marginBottom:5}}>{s.venue} · {s.guests} guests{v?.managed&&<span className="mb" style={{marginLeft:5,fontSize:8}}><Crown size={7}/>1-Host</span>}</p>
@@ -411,19 +423,26 @@ function AIHub(){const[ac,sAc]=useState(null);const tools=[{id:"match",ic:Sparkl
 );}
 
 function MatchT(){const[g,sG]=useState(150);const[b,sB]=useState(2e3);const[st,sSt]=useState("Glamorous");const[ld,sLd]=useState(false);const[res,sRes]=useState(null);const[er,sEr]=useState(null);
-  const run=async()=>{sLd(true);sEr(null);sRes(null);try{const text=await callAI(`Expert Singapore wedding venue consultant. ${VENUES.length} venues:\n${VK}\nRecommend TOP 3. ONLY valid JSON: {"recommendations":[{"name":"...","matchScore":85,"reasons":["..."],"consideration":"...","priceRange":"...","capacity":"..."}],"tip":"..."}`,`${g} guests, ~$${b}++ per table, style: ${st}.`);sRes(pJ(text))}catch{sEr("Try again.")}sLd(false)};
-  return(<div style={{background:"var(--w)",borderRadius:14,padding:26,boxShadow:"var(--sm)"}}>
-    <h2 style={{fontFamily:"var(--fh)",fontSize:24,fontWeight:400,marginBottom:18,display:"flex",alignItems:"center",gap:8}}><Sparkles size={18} style={{color:"var(--go)"}}/>AI Venue Matchmaker</h2>
-    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:18}}>
-      <div><label style={{fontSize:11,fontWeight:600,letterSpacing:".05em",textTransform:"uppercase",color:"var(--g)",marginBottom:5,display:"block"}}>Guests: {g}</label><input type="range" min={20} max={800} step={10} value={g} onChange={e=>sG(+e.target.value)} style={{width:"100%",accentColor:"var(--go)"}}/></div>
-      <div><label style={{fontSize:11,fontWeight:600,letterSpacing:".05em",textTransform:"uppercase",color:"var(--g)",marginBottom:5,display:"block"}}>Budget: ~${b}++/table</label><input type="range" min={1200} max={3500} step={100} value={b} onChange={e=>sB(+e.target.value)} style={{width:"100%",accentColor:"var(--go)"}}/></div>
+  const venueList=VENUES.map(v=>`${v.name}|${v.cat}|${v.area}|${v.capacity.s}seated|${v.price.unit==="guest"?"$"+v.price.min+"-"+v.price.max+"/guest":"$"+v.price.min+"-"+v.price.max+"/table"}|${v.cuisine.join(",")}|${v.setting}${v.managed?" [1-Host]":""}`).join("\n");
+  const run=async()=>{sLd(true);sEr(null);sRes(null);try{
+    const sys=`You are an expert Singapore wedding venue consultant. Here are the venues you can recommend from:\n${venueList}\n\nBased on the user's requirements, recommend your TOP 3 venue matches. You MUST respond with ONLY a JSON object, no other text. Use this exact format:\n{"recommendations":[{"name":"Venue Name","matchScore":85,"reasons":["reason 1","reason 2"],"consideration":"one honest caveat","priceRange":"$X,XXX++","capacity":"X-Y guests"}],"tip":"one helpful planning tip"}`;
+    const msg=`I'm planning a Singapore wedding for ${g} guests. My budget is approximately $${b}++ per table of 10. I want a ${st.toLowerCase()} style celebration. What are your top venue recommendations?`;
+    const text=await callAI(sys,msg);
+    const parsed=pJ(text);
+    if(parsed.recommendations){sRes(parsed)}else if(parsed.raw){sRes(parsed)}else{sEr("Unexpected response. Please try again.")}
+  }catch(e){console.error(e);sEr("Could not reach the AI service. Please try again in a moment.")}sLd(false)};
+  return(<div style={{background:"var(--w)",borderRadius:16,padding:28,boxShadow:"var(--sm)"}}>
+    <h2 style={{fontFamily:"var(--fh)",fontSize:26,fontWeight:400,marginBottom:20,display:"flex",alignItems:"center",gap:8}}><Sparkles size={20} style={{color:"var(--go)"}}/>AI Venue Matchmaker</h2>
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:20}}>
+      <div><label style={{fontSize:11,fontWeight:600,letterSpacing:".05em",textTransform:"uppercase",color:"var(--g)",marginBottom:6,display:"block"}}>Guests: {g}</label><input type="range" min={20} max={800} step={10} value={g} onChange={e=>sG(+e.target.value)} style={{width:"100%",accentColor:"var(--go)"}}/></div>
+      <div><label style={{fontSize:11,fontWeight:600,letterSpacing:".05em",textTransform:"uppercase",color:"var(--g)",marginBottom:6,display:"block"}}>Budget: ~${b}++/table</label><input type="range" min={1200} max={3500} step={100} value={b} onChange={e=>sB(+e.target.value)} style={{width:"100%",accentColor:"var(--go)"}}/></div>
     </div>
-    <div style={{marginBottom:18}}><label style={{fontSize:11,fontWeight:600,letterSpacing:".05em",textTransform:"uppercase",color:"var(--g)",marginBottom:5,display:"block"}}>Style</label><div style={{display:"flex",flexWrap:"wrap",gap:5}}>{["Glamorous","Intimate","Garden","Sky-High","Waterfront","Heritage","Grand Hotel","Rustic"].map(s=><button key={s} className={`cp ${st===s?"a":""}`} onClick={()=>sSt(s)} style={{fontSize:12,padding:"5px 12px"}}>{s}</button>)}</div></div>
-    <button className="bg" onClick={run} disabled={ld}><Sparkles size={13}/>{ld?"Finding match…":"Match Me"}</button>
-    {ld&&<div style={{marginTop:18}}>{[1,2,3].map(i=><div key={i} className="sk" style={{height:100,marginBottom:8}}/>)}</div>}
-    {er&&<p style={{marginTop:12,color:"var(--rd)",fontSize:13}}>{er}</p>}
-    {res&&!res.raw&&res.recommendations&&<div style={{marginTop:22}}>{res.recommendations.map((r,i)=><div key={i} style={{background:"var(--iv)",borderRadius:12,padding:16,marginBottom:10,animation:`fU .5s ease ${i*120}ms both`,border:"1px solid var(--gpa)"}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:6}}><h3 style={{fontFamily:"var(--fh)",fontSize:18,fontWeight:500}}>{r.name}</h3><span style={{background:"var(--go)",color:"var(--w)",padding:"2px 9px",borderRadius:999,fontSize:12,fontWeight:700}}>{r.matchScore}%</span></div>{r.reasons?.map((x,j)=><p key={j} style={{fontSize:13,color:"var(--cl)"}}>✓ {x}</p>)}{r.consideration&&<p style={{fontSize:12,color:"var(--g)",marginTop:4,fontStyle:"italic"}}>⚠ {r.consideration}</p>}<p style={{fontSize:13,fontWeight:600,color:"var(--gd)",marginTop:5}}>{r.priceRange} · {r.capacity}</p></div>)}{res.tip&&<div style={{background:"var(--gp)",borderRadius:10,padding:12,marginTop:4}}><p style={{fontSize:13}}>💡 {res.tip}</p></div>}</div>}
-    {res?.raw&&<div style={{marginTop:16,background:"var(--iv)",borderRadius:10,padding:16}}><p style={{fontSize:13,whiteSpace:"pre-wrap",lineHeight:1.7}}>{res.raw}</p></div>}
+    <div style={{marginBottom:20}}><label style={{fontSize:11,fontWeight:600,letterSpacing:".05em",textTransform:"uppercase",color:"var(--g)",marginBottom:6,display:"block"}}>Wedding Style</label><div style={{display:"flex",flexWrap:"wrap",gap:6}}>{["Glamorous","Intimate","Garden","Sky-High","Waterfront","Heritage","Grand Hotel","Rustic"].map(s=><button key={s} className={`cp ${st===s?"a":""}`} onClick={()=>sSt(s)} style={{fontSize:12,padding:"6px 14px"}}>{s}</button>)}</div></div>
+    <button className="bg" onClick={run} disabled={ld} style={{fontSize:15,padding:"13px 28px"}}><Sparkles size={14}/>{ld?"Finding your perfect match…":"Match Me to My Venue"}</button>
+    {ld&&<div style={{marginTop:20}}>{[1,2,3].map(i=><div key={i} className="sk" style={{height:110,marginBottom:10,borderRadius:12}}/>)}</div>}
+    {er&&<p style={{marginTop:14,color:"var(--rd)",fontSize:14,background:"var(--rp)",padding:"12px 16px",borderRadius:10}}>{er} <button onClick={run} style={{color:"var(--gd)",cursor:"pointer",background:"none",border:"none",textDecoration:"underline",fontFamily:"var(--fb)",fontWeight:600}}>Try Again</button></p>}
+    {res&&!res.raw&&res.recommendations&&<div style={{marginTop:24}}>{res.recommendations.map((r,i)=><div key={i} style={{background:"var(--iv)",borderRadius:14,padding:20,marginBottom:12,animation:`cardEnter .6s ease ${i*150}ms both`,border:"1px solid var(--gpa)",boxShadow:"var(--ss)"}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}><h3 style={{fontFamily:"var(--fh)",fontSize:20,fontWeight:500}}>{r.name}</h3><span style={{background:"linear-gradient(135deg,var(--go),var(--gd))",color:"var(--w)",padding:"4px 12px",borderRadius:999,fontSize:13,fontWeight:700,boxShadow:"var(--sg)"}}>{r.matchScore}%</span></div>{r.reasons?.map((x,j)=><p key={j} style={{fontSize:14,color:"var(--cl)",lineHeight:1.6,paddingLeft:16,borderLeft:"2px solid var(--go)",marginBottom:6}}>✓ {x}</p>)}{r.consideration&&<p style={{fontSize:13,color:"var(--g)",marginTop:8,fontStyle:"italic",paddingLeft:16}}>⚠ {r.consideration}</p>}<p style={{fontSize:14,fontWeight:600,color:"var(--gd)",marginTop:10}}>{r.priceRange} · {r.capacity}</p></div>)}{res.tip&&<div style={{background:"linear-gradient(135deg,var(--gp),var(--cw))",border:"1px solid var(--gl)",borderRadius:12,padding:16,marginTop:6}}><p style={{fontSize:14,lineHeight:1.5}}>💡 <strong>Pro Tip:</strong> {res.tip}</p></div>}</div>}
+    {res?.raw&&<div style={{marginTop:20,background:"var(--iv)",borderRadius:12,padding:20,border:"1px solid var(--gpa)"}}><p style={{fontSize:14,whiteSpace:"pre-wrap",lineHeight:1.7}}>{res.raw}</p></div>}
   </div>);
 }
 
@@ -492,13 +511,6 @@ function AskAI({show,toggle}){const[msgs,sMs]=useState([]);const[inp,sInp]=useSt
 // OTHER PAGES
 // ═════════════════════════════════════════════════════════════════════════
 function RWPage({go}){return(<section style={{padding:"44px 24px 72px",background:"var(--cr)"}}><div style={{maxWidth:1200,margin:"0 auto"}}><h1 style={{fontFamily:"var(--fh)",fontSize:"clamp(28px,4vw,40px)",fontWeight:300,marginBottom:8}}>Real Weddings</h1><p style={{color:"var(--g)",fontSize:14,maxWidth:560,marginBottom:32}}>Be inspired by celebrations across Singapore's finest venues — luxury hotels, rooftop ceremonies, and heritage garden affairs.</p><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))",gap:18}}>{WEDDINGS.map((s,i)=>{const v=VENUES.find(x=>x.id===s.vid);return<RWCd key={i} s={s} v={v} go={go}/>})}</div></div></section>);}
-
-function Shows(){const evs=[
-  {v:"1-Arden",d:"Sunday, 29 March 2026",t:"12pm–9pm",desc:"Wedding sanctuary 51 floors above the city at CapitaSpring. Live tastings and styled setups.",m:true,f:true,img:VENUES[1].hero},
-  {v:"1-Alfaro",d:"Saturday, 12 April 2026",t:"11am–8pm",desc:"Singapore's newest rooftop venue at Labrador Tower. City-and-sea views and Emilia-Romagna menu.",m:true,img:VENUES[0].img},
-  {v:"Raffles Hotel",d:"Sunday, 10 May 2026",t:"11am–6pm",desc:"Tour the iconic Raffles Ballroom and Palm Court gardens. Meet the wedding planning team.",img:null},
-  {v:"Monti",d:"Sunday, 26 April 2026",t:"12pm–7pm",desc:"Marina Bay at its most romantic. Italian cuisine tastings and waterfront solemnisation setups.",m:true,img:VENUES[2].img}
-];return(<section style={{padding:"44px 24px 72px",background:"var(--cr)"}}><div style={{maxWidth:940,margin:"0 auto"}}><h1 style={{fontFamily:"var(--fh)",fontSize:"clamp(28px,4vw,40px)",fontWeight:300,marginBottom:8}}>Upcoming Wedding Showcases</h1><p style={{color:"var(--g)",fontSize:14,maxWidth:560,marginBottom:32}}>Visit venues in person and enjoy exclusive showcase-only packages.</p>{evs.map((e,i)=><article key={i} style={{background:"var(--w)",borderRadius:14,overflow:"hidden",marginBottom:18,display:"grid",gridTemplateColumns:e.f?"1fr 1fr":"170px 1fr",boxShadow:"var(--ss)"}}><div style={{minHeight:e.f?260:140}}><VI src={e.img} alt={`${e.v} wedding showcase ${e.d} Singapore`} style={{width:"100%",height:"100%"}}/></div><div style={{padding:e.f?28:18,display:"flex",flexDirection:"column",justifyContent:"center"}}><div style={{display:"flex",gap:5,marginBottom:8}}>{e.f&&<span style={{background:"var(--go)",color:"var(--w)",padding:"2px 8px",borderRadius:999,fontSize:10,fontWeight:700}}>FEATURED</span>}{e.m&&<span className="mb"><Crown size={8}/>1-Host</span>}</div><h2 style={{fontFamily:"var(--fh)",fontSize:e.f?26:19,fontWeight:400,marginBottom:5}}>{e.v} Wedding Showcase</h2><p style={{fontSize:13,fontWeight:600,color:"var(--gd)",marginBottom:8,display:"flex",alignItems:"center",gap:4}}><CalendarDays size={12}/>{e.d} · {e.t}</p><p style={{fontSize:13,color:"var(--cl)",lineHeight:1.5,marginBottom:12}}>{e.desc}</p><button className="bg" style={{alignSelf:"flex-start",fontSize:13,padding:"9px 18px"}}>Register <ChevronRight size={12}/></button></div></article>)}</div></section>);}
 
 function Abt(){return(<section style={{padding:"44px 24px 72px",background:"var(--cr)"}}><div style={{maxWidth:860,margin:"0 auto"}}><h1 style={{fontFamily:"var(--fh)",fontSize:"clamp(28px,4vw,40px)",fontWeight:300,marginBottom:18,textAlign:"center"}}>About Singapore Wedding Venues</h1><p style={{fontSize:15,lineHeight:1.8,color:"var(--cl)",textAlign:"center",maxWidth:660,margin:"0 auto 36px"}}>Singapore Wedding Venues is the city-state's premier AI-powered venue discovery platform. We feature {VENUES.length} of Singapore's most iconic wedding venues — from legendary five-star hotels to intimate rooftop restaurants and heritage garden estates.</p><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:18,marginBottom:44}}>{[{ic:Sparkles,t:"AI-Powered",d:`Match from ${VENUES.length} venues in seconds.`},{ic:Building2,t:`${VENUES.length} Iconic Venues`,d:"Hotels, rooftops, heritage, gardens — every style covered."},{ic:Crown,t:"1-Host Collection",d:"10 signature venues with 6,500+ weddings of dedicated experience."},{ic:Award,t:"Trusted Platform",d:"Real reviews, transparent pricing, AI-powered comparison tools."}].map((v,i)=><div key={i} style={{background:"var(--w)",borderRadius:12,padding:22,textAlign:"center",boxShadow:"var(--ss)"}}><v.ic size={26} style={{color:"var(--go)",marginBottom:10}}/><h3 style={{fontFamily:"var(--fh)",fontSize:18,fontWeight:500,marginBottom:6}}>{v.t}</h3><p style={{fontSize:13,color:"var(--cl)",lineHeight:1.5}}>{v.d}</p></div>)}</div><div style={{background:"var(--w)",borderRadius:14,padding:28,boxShadow:"var(--ss)",maxWidth:500,margin:"0 auto"}}><h2 style={{fontFamily:"var(--fh)",fontSize:24,fontWeight:400,marginBottom:16,textAlign:"center"}}>Get in Touch</h2><div style={{display:"flex",flexDirection:"column",gap:10}}><input className="inp" placeholder="Your Name"/><input className="inp" placeholder="Email" type="email"/><textarea className="inp" placeholder="Tell us about your dream wedding…" rows={3} style={{resize:"vertical"}}/><button className="bg" style={{alignSelf:"center",padding:"11px 28px"}}><Send size={13}/>Send</button></div></div></div></section>);}
 
