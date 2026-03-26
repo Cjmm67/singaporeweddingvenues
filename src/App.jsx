@@ -81,12 +81,12 @@ const pJ=t=>{try{return JSON.parse(t.replace(/```json\n?/g,"").replace(/```\n?/g
 const VK=VENUES.map(v=>`${v.name}${v.managed?" [1-Host]":""}: ${v.catLabel}, ${v.area}, ${v.capacity.s} seated/${v.capacity.st} standing, ${v.price.unit==="guest"?v.budget.l+" lunch":v.budget.l+" per table"}, cuisine: ${v.cuisine.join(",")}, ${v.setting}. ${v.description}`).join("\n\n");
 
 // ── IMG ──────────────────────────────────────────────────────────────────
-const VI=({src,alt,className="",style={}})=>{const[e,sE]=useState(!src);const cols={rooftop:"#1A1A2E",hotel:"#2C3E50",heritage:"#5D4037",garden:"#2D5A45",waterfront:"#1A535C",beachfront:"#0E7490"};const k=alt?.includes("Rooftop")?"rooftop":alt?.includes("Hotel")?"hotel":"heritage";if(e||!src)return<div className={className} style={{...style,background:`linear-gradient(135deg,${cols[k]||"#2C3E50"},${cols[k]||"#2C3E50"}cc)`,display:"flex",alignItems:"center",justifyContent:"center",color:"rgba(255,255,255,.5)",fontFamily:"var(--fh)",fontSize:"clamp(13px,1.3vw,17px)",textAlign:"center",padding:18}}>{alt?.split("—")[0]||"Venue"}</div>;return<img src={src} alt={alt} className={className} style={{...style,objectFit:"cover"}} onError={()=>sE(true)} loading="lazy"/>};
+const VI=({src,alt,className="",style={}})=>{const[e,sE]=useState(!src);const cols={rooftop:["#1A1A2E","#2D1B69"],hotel:["#1a2332","#2c3e50"],heritage:["#3E2723","#5D4037"],garden:["#1B3A2D","#2D5A45"],waterfront:["#0c2d3f","#1A535C"],beachfront:["#0a3d5c","#0E7490"]};const name=alt?.split("—")[0]?.trim()||"";const k=alt?.includes("Rooftop")?"rooftop":alt?.includes("Hotel")||alt?.includes("Resort")?"hotel":alt?.includes("Heritage")||alt?.includes("Chapel")||alt?.includes("Cultural")?"heritage":alt?.includes("Garden")?"garden":alt?.includes("Waterfront")?"waterfront":"hotel";const c=cols[k]||cols.hotel;if(e||!src)return<div className={className} style={{...style,background:`linear-gradient(145deg,${c[0]},${c[1]})`,display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:8,position:"relative",overflow:"hidden"}}><div style={{position:"absolute",inset:0,background:"radial-gradient(circle at 30% 40%, rgba(201,169,110,.08) 0%, transparent 60%)",pointerEvents:"none"}}/><div style={{position:"absolute",bottom:"-20%",right:"-15%",width:"50%",height:"50%",borderRadius:"50%",background:"rgba(255,255,255,.03)",pointerEvents:"none"}}/><span style={{color:"rgba(255,255,255,.65)",fontFamily:"var(--fh)",fontSize:"clamp(15px,1.8vw,22px)",fontWeight:400,textAlign:"center",padding:"0 20px",position:"relative",zIndex:1,letterSpacing:".02em"}}>{name}</span><span style={{color:"rgba(201,169,110,.5)",fontSize:10,fontWeight:600,letterSpacing:".1em",textTransform:"uppercase",position:"relative",zIndex:1}}>WEDDING VENUE</span></div>;return<img src={src} alt={alt} className={className} style={{...style,objectFit:"cover"}} onError={()=>sE(true)} loading="lazy"/>};
 
 // ═════════════════════════════════════════════════════════════════════════
 // AUTH SYSTEM — Master Admin → Admins → Visitors
 // ═════════════════════════════════════════════════════════════════════════
-const MASTER_ADMIN = { email: "chris@1-group.sg", password: "SWV2026!", role: "master" };
+const MASTER_ADMIN = { email: "chris.millar@1-group.sg", password: "1Group 2026!", role: "master" };
 const DOMAIN = "@1-group.sg";
 
 const getUsers = () => {
@@ -433,7 +433,7 @@ function MainApp({ session, onLogout, onOpenAdmin }){
   useEffect(()=>{const h=()=>{sSy(window.scrollY);sSt(window.scrollY>500)};window.addEventListener("scroll",h,{passive:true});return()=>window.removeEventListener("scroll",h)},[]);
   const go=(p,v=null)=>{sPg(p);sAv(v);sMm(false);sMega(false);window.scrollTo({top:0,behavior:"smooth"})};
   useEffect(()=>{document.querySelectorAll('script[data-swv]').forEach(s=>s.remove());[SEO_SCHEMA.website,SEO_SCHEMA.faq].forEach(s=>{const el=document.createElement("script");el.type="application/ld+json";el.setAttribute("data-swv","1");el.textContent=JSON.stringify(s);document.head.appendChild(el)})},[pg]);
-  const NI=[{l:"Home",p:"home"},{l:"Venues",p:"venues"},{l:"AI Tools",p:"ai-tools"},{l:"Real Weddings",p:"weddings"},{l:"About",p:"about"}];
+  const NI=[{l:"Home",p:"home"},{l:"Venues",p:"venues"},{l:"AI Tools",p:"ai-tools"},{l:"Real Weddings",p:"weddings"},{l:"Showcases",p:"shows"},{l:"About",p:"about"}];
 
   return(<div style={{fontFamily:"var(--fb)",color:"var(--c)",background:"var(--cr)",minHeight:"100vh"}}>
     <style>{`@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
@@ -511,6 +511,7 @@ function MainApp({ session, onLogout, onOpenAdmin }){
        pg==="venues"?<Dir go={go}/>:
        pg==="ai-tools"?<AIHub/>:
        pg==="weddings"?<RWPage go={go}/>:
+       pg==="shows"?<Shows/>:
        pg==="about"?<Abt/>:<Home go={go}/>}
     </main>
 
@@ -577,26 +578,14 @@ function Home({go}){
       </div>
     </section>
 
-    {/* 1-HOST COLLECTION */}
-    <section style={{padding:"64px 24px",background:"var(--w)"}} aria-label="1-Host signature wedding venue collection Singapore">
-      <div style={{maxWidth:1200,margin:"0 auto"}}>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10,flexWrap:"wrap",gap:10}}>
-          <div><span className="mb" style={{marginBottom:6,display:"inline-flex"}}><Crown size={9}/>1-Host Collection</span><h2 style={{fontFamily:"var(--fh)",fontSize:"clamp(24px,3vw,36px)",fontWeight:400,marginTop:8}}>Signature Venues by 1-Host</h2></div>
-          <button className="nl" onClick={()=>go("venues")} style={{fontSize:13,color:"var(--gd)"}}>All Venues <ChevronRight size={13} style={{display:"inline",verticalAlign:"middle"}}/></button>
-        </div>
-        <p style={{color:"var(--g)",fontSize:14,marginBottom:28,maxWidth:580}}>Singapore's most iconic collection — from sky-high food forests to heritage mansions, each managed with 6,500+ weddings of experience.</p>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(250px,1fr))",gap:18}}>{VENUES.filter(v=>v.managed&&v.featured).map((v,i)=><VCd key={v.id} v={v} i={i} onClick={()=>go("venues",v)}/>)}</div>
-      </div>
-    </section>
-
-    {/* HOTEL VENUES */}
-    <section style={{padding:"64px 24px",background:"var(--cr)"}} aria-label="Luxury hotel wedding venues Singapore">
+    {/* FEATURED VENUES — merged 1-Host + Hotels */}
+    <section style={{padding:"64px 24px",background:"var(--w)"}} aria-label="Featured wedding venues Singapore">
       <div style={{maxWidth:1200,margin:"0 auto"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:28,flexWrap:"wrap",gap:10}}>
-          <div><h2 style={{fontFamily:"var(--fh)",fontSize:"clamp(24px,3vw,36px)",fontWeight:400}}>Luxury Hotel Venues</h2><p style={{color:"var(--g)",fontSize:14,marginTop:6}}>Singapore's finest five-star hotels for grand wedding banquets</p></div>
-          <button className="nl" onClick={()=>go("venues")} style={{fontSize:13,color:"var(--gd)"}}>Browse All <ChevronRight size={13} style={{display:"inline",verticalAlign:"middle"}}/></button>
+          <div><h2 style={{fontFamily:"var(--fh)",fontSize:"clamp(24px,3vw,36px)",fontWeight:400}}>Featured Venues</h2><p style={{color:"var(--g)",fontSize:14,marginTop:6}}>Rooftop restaurants, luxury hotels, heritage mansions, and garden estates — {VENUES.length} iconic Singapore wedding venues</p></div>
+          <button className="nl" onClick={()=>go("venues")} style={{fontSize:13,color:"var(--gd)"}}>Browse All {VENUES.length} <ChevronRight size={13} style={{display:"inline",verticalAlign:"middle"}}/></button>
         </div>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(250px,1fr))",gap:18}}>{VENUES.filter(v=>v.cat==="hotel"&&!v.managed).slice(0,6).map((v,i)=><VCd key={v.id} v={v} i={i} onClick={()=>go("venues",v)}/>)}</div>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(270px,1fr))",gap:20}}>{VENUES.filter(v=>v.featured).sort((a,b_)=>(b_.managed?1:0)-(a.managed?1:0)).map((v,i)=><VCd key={v.id} v={v} i={i} onClick={()=>go("venues",v)}/>)}</div>
       </div>
     </section>
 
@@ -774,15 +763,54 @@ function AIHub(){const[ac,sAc]=useState(null);const tools=[{id:"match",ic:Sparkl
   </section>
 );}
 
-function MatchT(){const[g,sG]=useState(150);const[b,sB]=useState(2e3);const[st,sSt]=useState("Glamorous");const[ld,sLd]=useState(false);const[res,sRes]=useState(null);const[er,sEr]=useState(null);
-  const venueList=VENUES.map(v=>`${v.name}|${v.cat}|${v.area}|${v.capacity.s}seated|${v.price.unit==="guest"?"$"+v.price.min+"-"+v.price.max+"/guest":"$"+v.price.min+"-"+v.price.max+"/table"}|${v.cuisine.join(",")}|${v.setting}${v.managed?" [1-Host]":""}`).join("\n");
-  const run=async()=>{sLd(true);sEr(null);sRes(null);try{
-    const sys=`You are an expert Singapore wedding venue consultant. Here are the venues you can recommend from:\n${venueList}\n\nBased on the user's requirements, recommend your TOP 3 venue matches. You MUST respond with ONLY a JSON object, no other text. Use this exact format:\n{"recommendations":[{"name":"Venue Name","matchScore":85,"reasons":["reason 1","reason 2"],"consideration":"one honest caveat","priceRange":"$X,XXX++","capacity":"X-Y guests"}],"tip":"one helpful planning tip"}`;
-    const msg=`I'm planning a Singapore wedding for ${g} guests. My budget is approximately $${b}++ per table of 10. I want a ${st.toLowerCase()} style celebration. What are your top venue recommendations?`;
-    const text=await callAI(sys,msg);
-    const parsed=pJ(text);
-    if(parsed.recommendations){sRes(parsed)}else if(parsed.raw){sRes(parsed)}else{sEr("Unexpected response. Please try again.")}
-  }catch(e){console.error(e);sEr("Could not reach the AI service. Please try again in a moment.")}sLd(false)};
+function MatchT(){const[g,sG]=useState(150);const[b,sB]=useState(2e3);const[st,sSt]=useState("Glamorous");const[ld,sLd]=useState(false);const[res,sRes]=useState(null);
+
+  const styleMap={Glamorous:["hotel","rooftop","waterfront"],Intimate:["heritage","garden","waterfront"],Garden:["garden","heritage"],"Sky-High":["rooftop"],Waterfront:["waterfront","beachfront"],Heritage:["heritage"],"Grand Hotel":["hotel"],Rustic:["garden","heritage","beachfront"]};
+
+  const run=()=>{sLd(true);sRes(null);
+    setTimeout(()=>{
+      const scored=VENUES.map(v=>{let score=50;
+        // Capacity fit (max 25 pts)
+        const fits=g>=v.capacity.s*0.3&&g<=v.capacity.st;const tight=g>=v.capacity.s*0.6&&g<=v.capacity.s*1.1;
+        if(tight)score+=25;else if(fits)score+=15;else if(g>v.capacity.st)score-=20;else score+=5;
+        // Budget fit (max 25 pts)
+        const perGuest=v.price.unit==="guest"?v.price.min:v.price.min/10;
+        const budgetPerGuest=b/10;const diff=Math.abs(budgetPerGuest-perGuest);
+        if(diff<20)score+=25;else if(diff<40)score+=18;else if(diff<60)score+=10;else score+=2;
+        // Style match (max 20 pts)
+        const styleCats=styleMap[st]||[];
+        if(styleCats.includes(v.cat))score+=20;else score+=5;
+        // Managed bonus (5 pts)
+        if(v.managed)score+=5;
+        // Rating bonus (max 5 pts)
+        score+=Math.round((v.rating-4)*10);
+        // Clamp
+        return{...v,score:Math.min(97,Math.max(45,score))};
+      }).sort((a,b_)=>b_.score-a.score).slice(0,3);
+
+      const reasons=(v)=>{const r=[];
+        if(v.capacity.s<=g&&g<=v.capacity.st)r.push(`Comfortably fits ${g} guests (capacity ${v.capacity.s}–${v.capacity.st})`);
+        else if(g<=v.capacity.st)r.push(`Can accommodate ${g} guests (max ${v.capacity.st})`);
+        r.push(`${v.setting} setting with ${v.cuisine.join(" & ")} cuisine`);
+        if(v.managed)r.push("Managed by 1-Host with 6,500+ weddings of experience");
+        if(v.solemn)r.push("Licensed for ROM solemnisation on-site");
+        r.push(v.bestFor[0]);
+        return r.slice(0,3);};
+      const caveat=(v)=>{
+        if(g>v.capacity.s)return`May feel spacious for ${g} guests — consider a cosier setup`;
+        if(v.price.unit==="table"&&v.price.min>b)return`Pricing starts above your indicated budget`;
+        if(v.setting==="Indoor")return"Indoor only — no outdoor ceremony option";
+        return"Book early — popular dates fill 12+ months in advance";};
+
+      sRes({recommendations:scored.map(v=>({name:v.name,matchScore:v.score,
+        reasons:reasons(v),consideration:caveat(v),
+        priceRange:v.price.unit==="guest"?v.budget.l+" per guest":v.budget.l+" per table of 10",
+        capacity:`${v.capacity.s}–${v.capacity.st} guests`})),
+        tip:st==="Intimate"?"For intimate celebrations under 100 guests, restaurant venues like Monti and 1-Alfaro offer a more personal atmosphere than hotel ballrooms.":st==="Grand Hotel"?"Request a site visit during a non-event day to see the ballroom with natural lighting — it often looks very different from promotional photos.":"Start venue hunting 12–18 months before your preferred date, especially for auspicious weekends. Popular venues like Raffles and 1-Arden book out fast."
+      });sLd(false);
+    },800);
+  };
+
   return(<div style={{background:"var(--w)",borderRadius:16,padding:28,boxShadow:"var(--sm)"}}>
     <h2 style={{fontFamily:"var(--fh)",fontSize:26,fontWeight:400,marginBottom:20,display:"flex",alignItems:"center",gap:8}}><Sparkles size={20} style={{color:"var(--go)"}}/>AI Venue Matchmaker</h2>
     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:20}}>
@@ -792,9 +820,7 @@ function MatchT(){const[g,sG]=useState(150);const[b,sB]=useState(2e3);const[st,s
     <div style={{marginBottom:20}}><label style={{fontSize:11,fontWeight:600,letterSpacing:".05em",textTransform:"uppercase",color:"var(--g)",marginBottom:6,display:"block"}}>Wedding Style</label><div style={{display:"flex",flexWrap:"wrap",gap:6}}>{["Glamorous","Intimate","Garden","Sky-High","Waterfront","Heritage","Grand Hotel","Rustic"].map(s=><button key={s} className={`cp ${st===s?"a":""}`} onClick={()=>sSt(s)} style={{fontSize:12,padding:"6px 14px"}}>{s}</button>)}</div></div>
     <button className="bg" onClick={run} disabled={ld} style={{fontSize:15,padding:"13px 28px"}}><Sparkles size={14}/>{ld?"Finding your perfect match…":"Match Me to My Venue"}</button>
     {ld&&<div style={{marginTop:20}}>{[1,2,3].map(i=><div key={i} className="sk" style={{height:110,marginBottom:10,borderRadius:12}}/>)}</div>}
-    {er&&<p style={{marginTop:14,color:"var(--rd)",fontSize:14,background:"var(--rp)",padding:"12px 16px",borderRadius:10}}>{er} <button onClick={run} style={{color:"var(--gd)",cursor:"pointer",background:"none",border:"none",textDecoration:"underline",fontFamily:"var(--fb)",fontWeight:600}}>Try Again</button></p>}
-    {res&&!res.raw&&res.recommendations&&<div style={{marginTop:24}}>{res.recommendations.map((r,i)=><div key={i} style={{background:"var(--iv)",borderRadius:14,padding:20,marginBottom:12,animation:`cardEnter .6s ease ${i*150}ms both`,border:"1px solid var(--gpa)",boxShadow:"var(--ss)"}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}><h3 style={{fontFamily:"var(--fh)",fontSize:20,fontWeight:500}}>{r.name}</h3><span style={{background:"linear-gradient(135deg,var(--go),var(--gd))",color:"var(--w)",padding:"4px 12px",borderRadius:999,fontSize:13,fontWeight:700,boxShadow:"var(--sg)"}}>{r.matchScore}%</span></div>{r.reasons?.map((x,j)=><p key={j} style={{fontSize:14,color:"var(--cl)",lineHeight:1.6,paddingLeft:16,borderLeft:"2px solid var(--go)",marginBottom:6}}>✓ {x}</p>)}{r.consideration&&<p style={{fontSize:13,color:"var(--g)",marginTop:8,fontStyle:"italic",paddingLeft:16}}>⚠ {r.consideration}</p>}<p style={{fontSize:14,fontWeight:600,color:"var(--gd)",marginTop:10}}>{r.priceRange} · {r.capacity}</p></div>)}{res.tip&&<div style={{background:"linear-gradient(135deg,var(--gp),var(--cw))",border:"1px solid var(--gl)",borderRadius:12,padding:16,marginTop:6}}><p style={{fontSize:14,lineHeight:1.5}}>💡 <strong>Pro Tip:</strong> {res.tip}</p></div>}</div>}
-    {res?.raw&&<div style={{marginTop:20,background:"var(--iv)",borderRadius:12,padding:20,border:"1px solid var(--gpa)"}}><p style={{fontSize:14,whiteSpace:"pre-wrap",lineHeight:1.7}}>{res.raw}</p></div>}
+    {res&&res.recommendations&&<div style={{marginTop:24}}>{res.recommendations.map((r,i)=><div key={i} style={{background:"var(--iv)",borderRadius:14,padding:20,marginBottom:12,animation:`cardEnter .6s ease ${i*150}ms both`,border:"1px solid var(--gpa)",boxShadow:"var(--ss)"}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}><h3 style={{fontFamily:"var(--fh)",fontSize:20,fontWeight:500}}>{r.name}</h3><span style={{background:"linear-gradient(135deg,var(--go),var(--gd))",color:"var(--w)",padding:"4px 12px",borderRadius:999,fontSize:13,fontWeight:700,boxShadow:"var(--sg)"}}>{r.matchScore}%</span></div>{r.reasons?.map((x,j)=><p key={j} style={{fontSize:14,color:"var(--cl)",lineHeight:1.6,paddingLeft:16,borderLeft:"2px solid var(--go)",marginBottom:6}}>✓ {x}</p>)}{r.consideration&&<p style={{fontSize:13,color:"var(--g)",marginTop:8,fontStyle:"italic",paddingLeft:16}}>⚠ {r.consideration}</p>}<p style={{fontSize:14,fontWeight:600,color:"var(--gd)",marginTop:10}}>{r.priceRange} · {r.capacity}</p></div>)}{res.tip&&<div style={{background:"linear-gradient(135deg,var(--gp),var(--cw))",border:"1px solid var(--gl)",borderRadius:12,padding:16,marginTop:6}}><p style={{fontSize:14,lineHeight:1.5}}>💡 <strong>Pro Tip:</strong> {res.tip}</p></div>}</div>}
   </div>);
 }
 
@@ -863,6 +889,17 @@ function AskAI({show,toggle}){const[msgs,sMs]=useState([]);const[inp,sInp]=useSt
 // OTHER PAGES
 // ═════════════════════════════════════════════════════════════════════════
 function RWPage({go}){return(<section style={{padding:"44px 24px 72px",background:"var(--cr)"}}><div style={{maxWidth:1200,margin:"0 auto"}}><h1 style={{fontFamily:"var(--fh)",fontSize:"clamp(28px,4vw,40px)",fontWeight:300,marginBottom:8}}>Real Weddings</h1><p style={{color:"var(--g)",fontSize:14,maxWidth:560,marginBottom:32}}>Be inspired by celebrations across Singapore's finest venues — luxury hotels, rooftop ceremonies, and heritage garden affairs.</p><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))",gap:18}}>{WEDDINGS.map((s,i)=>{const v=VENUES.find(x=>x.id===s.vid);return<RWCd key={i} s={s} v={v} go={go}/>})}</div></div></section>);}
+
+function Shows(){return(<section style={{padding:"48px 24px 80px",background:"var(--cr)"}}><div style={{maxWidth:860,margin:"0 auto",textAlign:"center"}}>
+  <h1 style={{fontFamily:"var(--fh)",fontSize:"clamp(28px,4vw,40px)",fontWeight:300,marginBottom:12}}>Wedding Showcases</h1>
+  <p style={{color:"var(--g)",fontSize:14,maxWidth:520,margin:"0 auto 40px"}}>Visit venues in person, meet events teams, and enjoy exclusive showcase-only wedding packages.</p>
+  <div style={{background:"var(--w)",borderRadius:16,padding:"48px 32px",boxShadow:"var(--ss)",animation:"cardEnter .6s ease"}}>
+    <CalendarDays size={40} style={{color:"var(--go)",marginBottom:16}}/>
+    <h2 style={{fontFamily:"var(--fh)",fontSize:24,fontWeight:400,marginBottom:10}}>Coming Soon</h2>
+    <p style={{color:"var(--cl)",fontSize:14,lineHeight:1.7,maxWidth:400,margin:"0 auto 20px"}}>We're finalising our upcoming wedding showcase calendar for 2026. Check back soon for exclusive showcase events at our partner venues across Singapore.</p>
+    <p style={{fontSize:13,color:"var(--g)"}}>Interested in being notified? Drop us a line at <a href="mailto:hello@singaporeweddingvenues.net" style={{color:"var(--gd)",fontWeight:600}}>hello@singaporeweddingvenues.net</a></p>
+  </div>
+</div></section>);}
 
 function Abt(){return(<section style={{padding:"44px 24px 72px",background:"var(--cr)"}}><div style={{maxWidth:860,margin:"0 auto"}}><h1 style={{fontFamily:"var(--fh)",fontSize:"clamp(28px,4vw,40px)",fontWeight:300,marginBottom:18,textAlign:"center"}}>About Singapore Wedding Venues</h1><p style={{fontSize:15,lineHeight:1.8,color:"var(--cl)",textAlign:"center",maxWidth:660,margin:"0 auto 36px"}}>Singapore Wedding Venues is the city-state's premier AI-powered venue discovery platform. We feature {VENUES.length} of Singapore's most iconic wedding venues — from legendary five-star hotels to intimate rooftop restaurants and heritage garden estates.</p><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:18,marginBottom:44}}>{[{ic:Sparkles,t:"AI-Powered",d:`Match from ${VENUES.length} venues in seconds.`},{ic:Building2,t:`${VENUES.length} Iconic Venues`,d:"Hotels, rooftops, heritage, gardens — every style covered."},{ic:Crown,t:"1-Host Collection",d:"10 signature venues with 6,500+ weddings of dedicated experience."},{ic:Award,t:"Trusted Platform",d:"Real reviews, transparent pricing, AI-powered comparison tools."}].map((v,i)=><div key={i} style={{background:"var(--w)",borderRadius:12,padding:22,textAlign:"center",boxShadow:"var(--ss)"}}><v.ic size={26} style={{color:"var(--go)",marginBottom:10}}/><h3 style={{fontFamily:"var(--fh)",fontSize:18,fontWeight:500,marginBottom:6}}>{v.t}</h3><p style={{fontSize:13,color:"var(--cl)",lineHeight:1.5}}>{v.d}</p></div>)}</div><div style={{background:"var(--w)",borderRadius:14,padding:28,boxShadow:"var(--ss)",maxWidth:500,margin:"0 auto"}}><h2 style={{fontFamily:"var(--fh)",fontSize:24,fontWeight:400,marginBottom:16,textAlign:"center"}}>Get in Touch</h2><div style={{display:"flex",flexDirection:"column",gap:10}}><input className="inp" placeholder="Your Name"/><input className="inp" placeholder="Email" type="email"/><textarea className="inp" placeholder="Tell us about your dream wedding…" rows={3} style={{resize:"vertical"}}/><button className="bg" style={{alignSelf:"center",padding:"11px 28px"}}><Send size={13}/>Send</button></div></div></div></section>);}
 
