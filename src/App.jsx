@@ -448,7 +448,7 @@ function MainApp({ session, onLogout, onOpenAdmin }){
     @keyframes bI{from{opacity:0;filter:blur(10px);transform:translateY(12px) scale(.97)}to{opacity:1;filter:blur(0);transform:translateY(0) scale(1)}}
     @keyframes kB{0%{transform:scale(1)}100%{transform:scale(1.12)}}
     @keyframes sh{0%{background-position:-200% 0}100%{background-position:200% 0}}
-    @keyframes fl{0%,100%{transform:translateY(0) translateX(0);opacity:.2}25%{transform:translateY(-18px) translateX(8px);opacity:.45}50%{transform:translateY(-35px) translateX(-6px);opacity:.3}75%{transform:translateY(-15px) translateX(12px);opacity:.4}}
+    @keyframes fl{0%,100%{transform:translateY(0) translateX(0);opacity:.15}25%{transform:translateY(-22px) translateX(10px);opacity:.4}50%{transform:translateY(-40px) translateX(-8px);opacity:.25}75%{transform:translateY(-18px) translateX(14px);opacity:.35}}
     @keyframes pu{0%,100%{box-shadow:0 0 0 0 rgba(201,169,110,.4)}50%{box-shadow:0 0 0 12px rgba(201,169,110,0)}}
     @keyframes slideInL{from{opacity:0;transform:translateX(-40px)}to{opacity:1;transform:translateX(0)}}
     @keyframes slideInR{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
@@ -456,10 +456,18 @@ function MainApp({ session, onLogout, onOpenAdmin }){
     @keyframes gradShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
     @keyframes textGlow{0%,100%{text-shadow:0 0 0 transparent}50%{text-shadow:0 0 30px rgba(201,169,110,.15)}}
     @keyframes revealLine{from{transform:scaleX(0)}to{transform:scaleX(1)}}
-    @keyframes heroTextIn{0%{opacity:0;transform:translateY(20px);filter:blur(6px)}60%{opacity:1;filter:blur(0)}100%{opacity:1;transform:translateY(0);filter:blur(0)}}
+    @keyframes heroTextIn{0%{opacity:0;transform:translateY(24px);filter:blur(8px)}50%{opacity:1;filter:blur(0)}100%{opacity:1;transform:translateY(0);filter:blur(0)}}
     @keyframes cardEnter{from{opacity:0;transform:translateY(40px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
-    @keyframes countPop{0%{transform:scale(1)}50%{transform:scale(1.08)}100%{transform:scale(1)}}
+    @keyframes countPop{0%{transform:scale(1)}50%{transform:scale(1.12)}100%{transform:scale(1)}}
     @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes heartbeat{0%,100%{transform:scale(1)}14%{transform:scale(1.15)}28%{transform:scale(1)}}
+    @keyframes btnShine{0%{left:-100%}100%{left:200%}}
+    @keyframes bokeh{0%,100%{transform:translate(0,0) scale(1);opacity:.12}33%{transform:translate(30px,-40px) scale(1.3);opacity:.2}66%{transform:translate(-20px,20px) scale(.8);opacity:.08}}
+    @keyframes dividerReveal{from{transform:scaleX(0);opacity:0}to{transform:scaleX(1);opacity:1}}
+    @keyframes wordReveal{0%{opacity:0;transform:translateY(14px);filter:blur(4px)}100%{opacity:1;transform:translateY(0);filter:blur(0)}}
+    @keyframes softBounce{0%{transform:translateY(0)}50%{transform:translateY(-6px)}100%{transform:translateY(0)}}
+    @keyframes parallaxDrift{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-15px) rotate(1deg)}}
+    @keyframes rippleOut{0%{transform:scale(0);opacity:.4}100%{transform:scale(4);opacity:0}}
     @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
     .sk{background:linear-gradient(90deg,var(--gg) 25%,var(--gp) 50%,var(--gg) 75%);background-size:200% 100%;animation:sh 1.5s ease-in-out infinite;border-radius:8px}
     .vc{transition:transform .4s var(--e),box-shadow .4s var(--e);position:relative;overflow:hidden;border-radius:14px;background:var(--iv);cursor:pointer}
@@ -467,16 +475,20 @@ function MainApp({ session, onLogout, onOpenAdmin }){
     .vc .vi{transition:transform .7s var(--e)}.vc:hover .vi{transform:scale(1.08)}
     .vc::after{content:'';position:absolute;bottom:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,transparent,var(--go),transparent);transform:translateX(-100%);transition:transform .7s var(--e)}.vc:hover::after{transform:translateX(100%)}
     .vc::before{content:'';position:absolute;top:0;left:0;right:0;height:100%;background:linear-gradient(180deg,transparent 60%,rgba(201,169,110,.04) 100%);opacity:0;transition:opacity .4s;z-index:1;pointer-events:none}.vc:hover::before{opacity:1}
-    .bg{background:linear-gradient(135deg,var(--go),var(--gd));color:var(--w);border:none;padding:12px 28px;border-radius:8px;font-family:var(--fb);font-weight:600;font-size:14px;letter-spacing:.04em;cursor:pointer;transition:all .2s var(--e);display:inline-flex;align-items:center;gap:8px;text-decoration:none}
-    .bg:hover{filter:brightness(1.1);transform:translateY(-1px);box-shadow:var(--sg)}.bg:active{transform:translateY(0)}
+    .bg{background:linear-gradient(135deg,var(--go),var(--gd));color:var(--w);border:none;padding:12px 28px;border-radius:8px;font-family:var(--fb);font-weight:600;font-size:14px;letter-spacing:.04em;cursor:pointer;transition:all .25s var(--e);display:inline-flex;align-items:center;gap:8px;text-decoration:none;position:relative;overflow:hidden}
+    .bg:hover{filter:brightness(1.1);transform:translateY(-2px);box-shadow:var(--sg)}.bg:active{transform:translateY(0)}
+    .bg::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);transition:none}.bg:hover::after{animation:btnShine .6s ease forwards}
     .nl{position:relative;color:var(--c);text-decoration:none;font-size:14px;font-weight:500;letter-spacing:.03em;padding:8px 0;cursor:pointer;background:none;border:none;font-family:var(--fb)}
     .nl::after{content:'';position:absolute;bottom:-2px;left:0;width:100%;height:2px;background:var(--go);transform:scaleX(0);transform-origin:center;transition:transform .3s var(--e)}
     .nl:hover::after,.nl.a::after{transform:scaleX(1)}
     .inp{border:1px solid var(--gpa);padding:10px 16px;border-radius:8px;font-family:var(--fb);font-size:14px;transition:border-color .2s,box-shadow .2s;width:100%;outline:none;background:var(--w)}
     .inp:focus{border-color:var(--go);box-shadow:0 0 0 3px rgba(201,169,110,.15)}
-    .cp{padding:7px 16px;border-radius:999px;font-family:var(--fb);font-weight:500;font-size:13px;cursor:pointer;border:1px solid var(--gpa);background:var(--w);transition:all .2s var(--e);white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
-    .cp:hover,.cp.a{background:var(--c);color:var(--w);border-color:var(--c)}
+    .cp{padding:7px 16px;border-radius:999px;font-family:var(--fb);font-weight:500;font-size:13px;cursor:pointer;border:1px solid var(--gpa);background:var(--w);transition:all .25s var(--e);white-space:nowrap;display:inline-flex;align-items:center;gap:5px;position:relative;overflow:hidden}
+    .cp:hover,.cp.a{background:var(--c);color:var(--w);border-color:var(--c);transform:translateY(-1px)}
     .mb{background:linear-gradient(135deg,var(--go),var(--gd));color:var(--w);font-size:9px;font-weight:700;letter-spacing:.06em;padding:3px 8px;border-radius:999px;text-transform:uppercase;display:inline-flex;align-items:center;gap:3px}
+    .nav-heart{animation:heartbeat 3s ease-in-out infinite}
+    .sdiv{height:1px;background:linear-gradient(90deg,transparent,var(--go),transparent);margin:0 auto;max-width:120px}
+    .sdiv.vis{animation:dividerReveal .8s ease forwards}
     @media(max-width:1023px){.hd{display:none!important}.sm{display:block!important}}
     `}</style>
 
@@ -484,7 +496,7 @@ function MainApp({ session, onLogout, onOpenAdmin }){
     <nav style={{position:"sticky",top:0,zIndex:50,background:sy>20?"rgba(255,255,255,.97)":"var(--w)",backdropFilter:sy>20?"blur(12px)":"none",borderBottom:"1px solid var(--gp)",transition:"all .3s"}} role="navigation" aria-label="Main navigation">
       <div style={{maxWidth:1280,margin:"0 auto",padding:"0 24px",height:68,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
         <button onClick={()=>go("home")} style={{background:"none",border:"none",cursor:"pointer",display:"flex",alignItems:"center",gap:8}} aria-label="Home">
-          <Heart size={20} style={{color:"var(--ro)"}} fill="var(--ro)"/>
+          <Heart size={20} style={{color:"var(--ro)"}} fill="var(--ro)" className="nav-heart"/>
           <span style={{fontFamily:"var(--fh)",fontSize:19,fontWeight:500,color:"var(--c)"}}>Singapore Wedding Venues</span>
         </button>
         <div className="hd" style={{display:"flex",alignItems:"center",gap:22}}>
@@ -521,6 +533,7 @@ function MainApp({ session, onLogout, onOpenAdmin }){
        pg==="about"?<Abt/>:<Home go={go}/>}
     </main>
 
+    <ScrollProgress/>
     <Ftr go={go}/>
     <AskAI show={ai} toggle={()=>sAi(!ai)}/>
     {st&&<button onClick={()=>window.scrollTo({top:0,behavior:"smooth"})} style={{position:"fixed",bottom:ai?420:96,right:24,width:40,height:40,borderRadius:"50%",background:"var(--c)",color:"var(--w)",border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",zIndex:40,boxShadow:"var(--sm)"}} aria-label="Scroll to top"><ArrowUp size={16}/></button>}
@@ -584,8 +597,11 @@ function Home({go}){
       </div>
     </section>
 
+    <SectionDivider style={{marginTop:-1,marginBottom:-1}}/>
+
     {/* FEATURED VENUES — merged 1-Host + Hotels */}
-    <section style={{padding:"64px 24px",background:"var(--w)"}} aria-label="Featured wedding venues Singapore">
+    <section style={{padding:"64px 24px",background:"var(--w)",position:"relative",overflow:"hidden"}} aria-label="Featured wedding venues Singapore">
+      <BokehField count={4} color="rgba(201,169,110," style={{opacity:.5}}/>
       <div style={{maxWidth:1200,margin:"0 auto"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:28,flexWrap:"wrap",gap:10}}>
           <div><h2 style={{fontFamily:"var(--fh)",fontSize:"clamp(24px,3vw,36px)",fontWeight:400}}>Featured Venues</h2><p style={{color:"var(--g)",fontSize:14,marginTop:6}}>Rooftop restaurants, luxury hotels, heritage mansions, and garden estates — {VENUES.length} iconic Singapore wedding venues</p></div>
@@ -604,15 +620,18 @@ function Home({go}){
     </section>
 
     {/* REAL WEDDINGS PREVIEW */}
-    <section style={{padding:"64px 24px",background:"var(--cr)"}}>
+    <SectionDivider style={{marginTop:-1,marginBottom:-1}}/>
+    <section style={{padding:"64px 24px",background:"var(--cr)",position:"relative",overflow:"hidden"}}>
+      <BokehField count={3} color="rgba(212,165,165,"/>
       <div style={{maxWidth:1200,margin:"0 auto"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:28}}><h2 style={{fontFamily:"var(--fh)",fontSize:"clamp(24px,3vw,36px)",fontWeight:400}}>Real Weddings</h2><button className="nl" onClick={()=>go("weddings")} style={{fontSize:13,color:"var(--gd)"}}>All Stories <ChevronRight size={13} style={{display:"inline",verticalAlign:"middle"}}/></button></div>
         <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))",gap:18}}>{WEDDINGS.slice(0,4).map((s,i)=>{const v=VENUES.find(x=>x.id===s.vid);return(<RWCd key={i} s={s} v={v} go={go}/>)})}</div>
       </div>
     </section>
 
-    <StatStrip/><TestCarousel/>
+    <StatStrip/><SectionDivider/><TestCarousel/>
 
+    <SectionDivider style={{marginTop:-1,marginBottom:-1}}/>
     {/* NEWSLETTER */}
     <section style={{padding:"56px 24px",background:"linear-gradient(135deg,var(--cw),var(--rp),var(--gp),var(--cw))",backgroundSize:"300% 300%",animation:"gradShift 8s ease infinite"}}>
       <div style={{maxWidth:500,margin:"0 auto",textAlign:"center"}}>
@@ -654,7 +673,18 @@ function RWCd({s,v,go}){const[r,vis]=useSR();return(
   </article>
 );}
 
-function StatItem({target,suffix,label}){const[r,c]=useCtr(target);return<div ref={r}><p style={{fontFamily:"var(--fh)",fontSize:36,fontWeight:300,color:"var(--go)"}}>{c.toLocaleString()}{suffix}</p><p style={{fontSize:12,color:"var(--gi)",marginTop:2}}>{label}</p></div>}
+// ── MOTION COMPONENTS ────────────────────────────────────────────────────
+function ScrollProgress(){
+  const[pct,setPct]=useState(0);
+  useEffect(()=>{const h=()=>{const doc=document.documentElement;const scrolled=doc.scrollTop/(doc.scrollHeight-doc.clientHeight)*100;setPct(scrolled)};window.addEventListener("scroll",h,{passive:true});return()=>window.removeEventListener("scroll",h)},[]);
+  return<div style={{position:"fixed",top:0,left:0,right:0,height:3,zIndex:60,background:"transparent",pointerEvents:"none"}}><div style={{height:"100%",background:"linear-gradient(90deg,var(--go),var(--gd),var(--go))",width:pct+"%",transition:"width .1s linear",boxShadow:pct>2?"0 0 8px rgba(201,169,110,.4)":"none"}}/></div>;
+}
+
+function SectionDivider({style={}}){const[r,v]=useSR();return<div ref={r} className={"sdiv"+(v?" vis":"")} style={{...style,transform:v?"scaleX(1)":"scaleX(0)"}}/>;}
+
+function BokehField({count=6,color="rgba(201,169,110,",style={}}){return<div style={{position:"absolute",inset:0,overflow:"hidden",pointerEvents:"none",...style}}>{Array.from({length:count},(_,i)=><div key={i} style={{position:"absolute",left:(i*17.3+5)%90+"%",top:(i*23.7+8)%85+"%",width:Math.random()*60+30,height:Math.random()*60+30,borderRadius:"50%",background:color+(0.04+Math.random()*0.06)+")",animation:"bokeh "+(12+Math.random()*10)+"s ease-in-out "+(i*1.5)+"s infinite",filter:"blur("+(8+Math.random()*12)+"px)"}}/>) }</div>;}
+
+function StatItem({target,suffix,label}){const[r,c]=useCtr(target);return<div ref={r}><p style={{fontFamily:"var(--fh)",fontSize:36,fontWeight:300,color:"var(--go)",animation:c>=target?"countPop .4s ease":""}}>{c.toLocaleString()}{suffix}</p><p style={{fontSize:12,color:"var(--gi)",marginTop:2}}>{label}</p></div>}
 
 function StatStrip(){const d=[{t:VENUES.length,s:"+",l:"Venues Listed"},{t:6500,s:"+",l:"Weddings Hosted"},{t:354,s:"",l:"Google Reviews"},{t:12,s:"+",l:"Years of Excellence"}];return(
   <section style={{background:"var(--c)",padding:"44px 24px",color:"var(--w)"}}>
