@@ -238,6 +238,7 @@ function SignInPage({ onLogin }) {
             <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
               <Shield size={14} style={{ color: "var(--go)" }} />
               <span style={{ fontSize: 12, color: "var(--g)" }}>Secured portal · {DOMAIN} accounts only</span>
+              <span style={{ fontSize: 10, color: "var(--gi)", display: "block", marginTop: 4 }}>v13</span>
             </div>
           </div>
         </div>
