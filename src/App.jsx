@@ -1,1124 +1,1154 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
+import { Heart, MapPin, Users, ChevronRight, ChevronLeft, Star, Sparkles, Calculator, CalendarDays, GitCompareArrows, MessageCircle, X, Menu, ArrowUp, Send, TreePine, Building2, Sunset, Landmark, Waves, UtensilsCrossed, Check, Instagram, Facebook, Mail, Crown, Award, Lock, Shield, UserPlus, LogOut, Eye, EyeOff, Trash2, Settings } from "lucide-react";
 
-/* ═══════════════════════════════════════════════════════════
-   SINGAPOREWEDDINGVENUES.NET — V14 SingaporeBrides Redesign
-   Coral Pink + Pure White + Blush editorial palette
-   ═══════════════════════════════════════════════════════════ */
+/* Singapore Wedding Venues — singaporeweddingvenues.net
+   Singapore's Premier AI-Powered Wedding Venue Discovery Platform
+   28 venues: 10 × 1-Host Collection + 18 × Major Hotels & Heritage */
 
-const STYLE = `
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
-
-:root {
-  /* ── SingaporeBrides-Inspired Palette ── */
-  --white:          #FFFFFF;
-  --blush:          #FFF0ED;
-  --blush-light:    #FFF8F5;
-  --blush-pale:     #FFFBFA;
-
-  --coral:          #E8837C;
-  --coral-light:    #F2A9A4;
-  --coral-pale:     #FADBD8;
-  --coral-deep:     #D4625A;
-  --coral-rich:     #C0504A;
-
-  --warm-grey:      #6B6B6B;
-  --grey:           #999999;
-  --grey-light:     #D0D0D0;
-  --grey-pale:      #EEEEEE;
-  --grey-ghost:     #F7F7F7;
-
-  --charcoal:       #333333;
-  --charcoal-light: #555555;
-  --dark:           #1E1E1E;
-
-  --sage:           #A8C5A0;
-  --sage-light:     #D4E4D0;
-  --sky:            #8CB4D4;
-  --gold-soft:      #D4B88C;
-
-  /* Functional */
-  --success:        #7FB77E;
-  --warning:        #E5C07B;
-  --error:          #D47070;
-
-  /* Shadows */
-  --shadow-sm:      0 1px 4px rgba(0,0,0,0.05);
-  --shadow-md:      0 4px 16px rgba(0,0,0,0.07);
-  --shadow-lg:      0 8px 32px rgba(0,0,0,0.09);
-  --shadow-xl:      0 16px 48px rgba(0,0,0,0.11);
-  --shadow-coral:   0 4px 20px rgba(232,131,124,0.18);
-
-  /* Typography */
-  --font-heading:   'Cormorant Garamond', Georgia, serif;
-  --font-body:      'DM Sans', -apple-system, sans-serif;
-
-  /* Spacing & Shape */
-  --section-gap:    80px;
-  --card-radius:    10px;
-  --btn-radius:     6px;
-  --pill-radius:    999px;
-
-  /* Transitions */
-  --ease:           cubic-bezier(0.4, 0, 0.2, 1);
-  --ease-bounce:    cubic-bezier(0.34, 1.56, 0.64, 1);
-  --fast:           180ms;
-  --base:           320ms;
-  --slow:           550ms;
-}
-
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
-  font-family: var(--font-body);
-  color: var(--charcoal);
-  background: var(--white);
-  -webkit-font-smoothing: antialiased;
-}
-
-/* ── Scroll Animations ── */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(28px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-@keyframes slideRight {
-  from { opacity: 0; transform: translateX(-24px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-@keyframes shimmer {
-  0%   { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-@keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50%      { transform: scale(1.04); }
-}
-@keyframes heroZoom {
-  0%   { transform: scale(1); }
-  100% { transform: scale(1.06); }
-}
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(-8px); }
-}
-@keyframes coraldot {
-  0%, 100% { opacity: 0.3; }
-  50%      { opacity: 0.8; }
-}
-@keyframes progressBar {
-  from { width: 0%; }
-  to   { width: 100%; }
-}
-
-.reveal {
-  opacity: 0;
-  transform: translateY(28px);
-  transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
-}
-.reveal.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Coral shimmer on hover */
-.card-shimmer {
-  position: relative;
-  overflow: hidden;
-}
-.card-shimmer::after {
-  content: '';
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, transparent, var(--coral-light), transparent);
-  transform: translateX(-100%);
-  transition: transform 0.5s var(--ease);
-}
-.card-shimmer:hover::after {
-  transform: translateX(100%);
-}
-`;
-
-/* ═══════════════════ VENUE DATA ═══════════════════ */
-const VENUES = [
-  { id:"raffles-hotel", name:"Raffles Hotel Singapore", category:"hotel", location:"City Hall", capacity:{min:30,max:500}, cuisine:["International","Chinese"], setting:"both", solemnisation:true, features:["Heritage icon since 1887","Grand ballroom with 7m ceilings","Tropical courtyard gardens"], description:"Singapore's most storied luxury hotel offers timeless elegance for weddings of every scale.", rating:4.9, featured:true },
-  { id:"fullerton-hotel", name:"The Fullerton Hotel", category:"hotel", location:"Marina Bay", capacity:{min:20,max:400}, cuisine:["International","Chinese"], setting:"both", solemnisation:true, features:["Neoclassical heritage building","Marina Bay waterfront views","Pillarless ballroom"], description:"A magnificent neoclassical landmark overlooking Marina Bay transforms postal heritage into a breathtaking wedding backdrop.", rating:4.8, featured:true },
-  { id:"capella-singapore", name:"Capella Singapore", category:"hotel", location:"Sentosa Island", capacity:{min:20,max:280}, cuisine:["International","Chinese","Modern European"], setting:"both", solemnisation:true, features:["Sentosa island resort","Foster + Partners design","Ultra-private and exclusive"], description:"Amid 30 acres of Sentosa rainforest, Capella blends colonial grandeur with contemporary luxury.", rating:4.9, featured:true },
-  { id:"marina-bay-sands", name:"Marina Bay Sands", category:"hotel", location:"Marina Bay", capacity:{min:50,max:1200}, cuisine:["International","Chinese","Western"], setting:"both", solemnisation:true, features:["Iconic Singapore landmark","Multiple ballrooms","SkyPark ceremonies"], description:"The world's most photographed hotel offers unparalleled scale and spectacle for grand celebrations.", rating:4.7, featured:true },
-  { id:"1-arden", name:"1-Arden", category:"rooftop", location:"Marina Bay", capacity:{min:30,max:200}, cuisine:["Modern Asian","Western"], setting:"both", solemnisation:true, features:["51st floor food forest","360° Marina Bay views","Singapore's highest restaurant"], description:"Say 'I do' at Singapore's highest food forest with sweeping 360-degree views of the Marina Bay skyline.", rating:4.8, featured:true },
-  { id:"1-altitude", name:"1-Altitude", category:"rooftop", location:"Raffles Place", capacity:{min:50,max:350}, cuisine:["International","Western"], setting:"both", solemnisation:true, features:["World's highest alfresco bar","Panoramic city views","Three distinct levels"], description:"At 282 metres above sea level, celebrate your love at the pinnacle of Singapore's skyline.", rating:4.7, featured:true },
-  { id:"oumi", name:"Oumi", category:"restaurant", location:"Tanjong Pagar", capacity:{min:20,max:80}, cuisine:["Modern Japanese"], setting:"indoor", solemnisation:false, features:["Omakase wedding menus","Intimate luxury dining","Japanese zen aesthetics"], description:"An intimate modern Japanese sanctuary for couples seeking refined omakase-style wedding celebrations.", rating:4.8, featured:false },
-  { id:"the-clifford-pier", name:"The Clifford Pier", category:"heritage", location:"Fullerton Bay", capacity:{min:30,max:250}, cuisine:["Modern Asian","International"], setting:"both", solemnisation:true, features:["Heritage waterfront pier","Marina Bay views","Art Deco architecture"], description:"This beautifully restored landing point on Marina Bay offers dramatic Art Deco grandeur.", rating:4.7, featured:true },
-  { id:"national-gallery", name:"National Gallery Singapore", category:"heritage", location:"City Hall", capacity:{min:50,max:400}, cuisine:["International","Western"], setting:"both", solemnisation:true, features:["Former Supreme Court","World-class art museum","Rooftop terrace"], description:"Two national monuments house Southeast Asia's largest art collection — and your unforgettable celebration.", rating:4.8, featured:false },
-  { id:"chijmes", name:"CHIJMES", category:"heritage", location:"City Hall", capacity:{min:30,max:300}, cuisine:["International","Asian"], setting:"both", solemnisation:true, features:["Gothic chapel","Beautiful courtyard","Heritage dining hall"], description:"A stunning 19th-century convent chapel and courtyard that creates fairytale wedding moments in the city centre.", rating:4.6, featured:true },
-  { id:"one-farrer", name:"One Farrer Hotel", category:"hotel", location:"Farrer Park", capacity:{min:30,max:500}, cuisine:["International","Chinese"], setting:"both", solemnisation:true, features:["Urban resort concept","Lush Sky Gardens","Multiple event spaces"], description:"An urban resort with lush gardens, versatile ballrooms, and a dedicated wedding planning team.", rating:4.5, featured:false },
-  { id:"shangrila-singapore", name:"Shangri-La Singapore", category:"hotel", location:"Orange Grove Road", capacity:{min:30,max:600}, cuisine:["International","Chinese","Asian"], setting:"both", solemnisation:true, features:["15 acres of gardens","Iconic Island Ballroom","Valley Wing luxury"], description:"Set amidst 15 acres of tropical gardens, this legendary property blends natural beauty with grand-scale celebrations.", rating:4.8, featured:true },
-  { id:"ritz-carlton", name:"The Ritz-Carlton Millenia", category:"hotel", location:"Marina Bay", capacity:{min:30,max:500}, cuisine:["International","Chinese","Western"], setting:"both", solemnisation:true, features:["Marina Bay panorama","Modern art collection","Grand Ballroom"], description:"Contemporary luxury with panoramic Marina Bay views and one of Asia's finest modern art collections.", rating:4.8, featured:false },
-  { id:"mandarin-oriental", name:"Mandarin Oriental Singapore", category:"hotel", location:"Marina Bay", capacity:{min:20,max:400}, cuisine:["International","Chinese"], setting:"both", solemnisation:true, features:["Fan-shaped architecture","Marina Bay frontage","Intimate and grand options"], description:"An iconic fan-shaped landmark on Marina Bay offering both intimate and grand wedding celebrations.", rating:4.7, featured:false },
-  { id:"andaz-singapore", name:"Andaz Singapore", category:"hotel", location:"Bugis", capacity:{min:20,max:300}, cuisine:["International","Asian","Western"], setting:"both", solemnisation:true, features:["Hyatt lifestyle brand","Rooftop pool bar","Local neighbourhood vibe"], description:"A vibrant lifestyle hotel that blends Singapore's cultural tapestry with contemporary design.", rating:4.6, featured:false },
-  { id:"sol-and-luna", name:"Sol & Luna", category:"restaurant", location:"Dempsey Hill", capacity:{min:20,max:120}, cuisine:["Modern European","Mediterranean"], setting:"both", solemnisation:true, features:["Dempsey Hill charm","Garden dining","Mediterranean warmth"], description:"Nestled in Dempsey Hill's lush greenery, Sol & Luna offers Mediterranean warmth for intimate celebrations.", rating:4.5, featured:false },
-  { id:"flower-dome", name:"Flower Dome, Gardens by the Bay", category:"garden", location:"Marina Bay", capacity:{min:100,max:500}, cuisine:["Varies by caterer"], setting:"indoor", solemnisation:true, features:["World's largest greenhouse","Stunning floral displays","Iconic Supertree backdrop"], description:"The world's largest glass greenhouse transforms into a magical garden wonderland for grand celebrations.", rating:4.8, featured:true },
-  { id:"hortpark", name:"HortPark", category:"garden", location:"Southern Ridges", capacity:{min:30,max:200}, cuisine:["Varies by caterer"], setting:"outdoor", solemnisation:true, features:["Lush garden setting","Southern Ridges connection","Open-air ceremonies"], description:"A gardening hub along the Southern Ridges offering lush, open-air ceremony spaces amid tropical blooms.", rating:4.4, featured:false },
-  { id:"fort-canning", name:"Fort Canning Hotel", category:"heritage", location:"Fort Canning", capacity:{min:20,max:200}, cuisine:["International","Asian"], setting:"both", solemnisation:true, features:["Heritage hilltop setting","Lush park surrounds","Colonial-era charm"], description:"A heritage gem atop Fort Canning Hill, surrounded by centuries-old trees and romantic park pathways.", rating:4.5, featured:false },
-  { id:"pan-pacific", name:"Pan Pacific Singapore", category:"hotel", location:"Marina Bay", capacity:{min:30,max:600}, cuisine:["International","Chinese"], setting:"both", solemnisation:true, features:["Marina Bay views","Pacific Ballroom","Skyline terrace"], description:"Modern luxury overlooking Marina Bay with one of Singapore's most versatile ballroom configurations.", rating:4.6, featured:false },
-];
-
-const CATEGORIES = [
-  { id:"all", label:"All Venues", icon:"✨" },
-  { id:"hotel", label:"Hotels & Resorts", icon:"🏨" },
-  { id:"rooftop", label:"Rooftops", icon:"🌆" },
-  { id:"garden", label:"Gardens", icon:"🌿" },
-  { id:"heritage", label:"Heritage", icon:"🏛️" },
-  { id:"restaurant", label:"Restaurants", icon:"🍽️" },
-];
-
-const GRADIENTS = {
-  hotel:"linear-gradient(135deg, #F2D7D5 0%, #E8837C 100%)",
-  rooftop:"linear-gradient(135deg, #D6EAF8 0%, #85929E 100%)",
-  garden:"linear-gradient(135deg, #D5F5E3 0%, #82E0AA 100%)",
-  heritage:"linear-gradient(135deg, #F9E79F 0%, #D4AC0D 100%)",
-  restaurant:"linear-gradient(135deg, #FADBD8 0%, #E8837C 100%)",
-  beachfront:"linear-gradient(135deg, #D1F2EB 0%, #48C9B0 100%)",
-  ballroom:"linear-gradient(135deg, #E8DAEF 0%, #AF7AC5 100%)",
+const SEO_SCHEMA = {
+  website: {"@context":"https://schema.org","@type":"WebSite","name":"Singapore Wedding Venues","url":"https://www.singaporeweddingvenues.net","description":"Singapore's premier AI-powered wedding venue discovery platform. Explore 28+ iconic venues — luxury hotels, rooftop restaurants, heritage mansions, and garden estates.","potentialAction":{"@type":"SearchAction","target":"https://www.singaporeweddingvenues.net/search?q={search_term_string}","query-input":"required name=search_term_string"}},
+  faq: {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What are the best wedding venues in Singapore for 2026?","acceptedAnswer":{"@type":"Answer","text":"Top venues include Raffles Hotel, The Fullerton Hotel, Capella Singapore, Marina Bay Sands, 1-Arden at CapitaSpring Level 51, 1-Alfaro at Labrador Tower, and Monti at Fullerton Pavilion. "}},{"@type":"Question","name":"What is a solemnisation ceremony in Singapore?","acceptedAnswer":{"@type":"Answer","text":"A solemnisation is the legal wedding ceremony conducted under the Registry of Marriages (ROM). Popular venues include 1-Arden, Monti, The Alkaff Mansion, Raffles Hotel, Shangri-La, and Capella Singapore."}},{"@type":"Question","name":"How many guests can a Singapore hotel wedding accommodate?","acceptedAnswer":{"@type":"Answer","text":"Hotel ballrooms accommodate 200–2,500 guests. Marina Bay Sands fits 2,500, Shangri-La 800, Hilton Orchard 800, Grand Hyatt 600. Intimate restaurant venues like 1-Alfaro (120 seated) suit smaller celebrations."}}]}
 };
 
-const HERO_SLIDES = [
-  { title:"Discover Your Dream\nWedding Venue", subtitle:"Singapore's most comprehensive venue guide with AI-powered planning tools", cta:"Explore Venues", gradient:"linear-gradient(135deg, #E8837C 0%, #F2A9A4 40%, #FFF0ED 100%)" },
-  { title:"Rooftop Romance\nAbove the City", subtitle:"Say 'I do' with panoramic skyline views at Singapore's most breathtaking heights", cta:"View Rooftops", gradient:"linear-gradient(135deg, #85929E 0%, #AEB6BF 40%, #D6EAF8 100%)" },
-  { title:"Garden Celebrations\nAmid Tropical Beauty", subtitle:"Exchange vows surrounded by lush greenery and stunning floral displays", cta:"Explore Gardens", gradient:"linear-gradient(135deg, #82E0AA 0%, #A9DFBF 40%, #D5F5E3 100%)" },
-  { title:"Heritage Elegance\nTimeless Settings", subtitle:"Celebrate in Singapore's most iconic historical landmarks and restored buildings", cta:"View Heritage", gradient:"linear-gradient(135deg, #D4AC0D 0%, #F0E68C 40%, #FFF8DC 100%)" },
+const VENUES=[
+{id:"1-alfaro",name:"1-Alfaro",tagline:"The Lighthouse",isNew:true,managed:"1-Host",location:"Labrador Tower Level 34, 1 Pasir Panjang Rd, S118479",area:"Pasir Panjang",description:"Singapore's latest rooftop wedding venue. Meaning 'The Lighthouse' in Italian, 1-Alfaro features floor-to-ceiling glass walls, panoramic city-and-sea views, and the world's highest agrivoltaics farm-to-table concept with authentic Emilia-Romagna flavours by the MONTI team.",capacity:{s:120,st:320},setting:"Indoor & Outdoor",cuisine:["Modern Italian","Farm-to-Table"],cat:"rooftop",catLabel:"Rooftop · Sky Dining",featured:true,solemn:true,rating:4.9,img:"https://www.1-host.sg/wp-content/uploads/2024/12/this-Host-featured-image-wordpress-794-x-1150-px-4-x-5-in-467-x-632-px-2-1.jpg",hero:"https://www.1-host.sg/wp-content/uploads/2024/12/1-Host-Wordpress-Main-Banner-2.jpg",gallery:["https://www.1-host.sg/wp-content/uploads/2024/12/2-5.jpg","https://www.1-host.sg/wp-content/uploads/2024/12/1-5.jpg","https://www.1-host.sg/wp-content/uploads/2024/12/3-5.jpg","https://www.1-host.sg/wp-content/uploads/2024/12/4-4.jpg"],bestFor:["Rooftop solemnisation with sea views","Italian farm-to-table dinner","Intimate 120-guest celebration"],web:"https://www.1-host.sg/venues/1-alfaro/"},
+{id:"1-altitude-coast",name:"1-Altitude Coast",tagline:"Sentosa Seascapes",managed:"1-Host",location:"The Outpost Hotel, Sentosa",area:"Sentosa",description:"Panoramic seascapes from Sentosa's highest vantage point. Sun, sea, and sky for magical beachfront celebrations.",capacity:{s:80,st:200},setting:"Outdoor",cuisine:["International","Western"],cat:"beachfront",catLabel:"Beachfront",featured:false,solemn:true,rating:4.6,img:"https://www.1-host.sg/wp-content/uploads/2021/01/1-AC_Website-Featured-1-e1720493055549.png",hero:"https://www.1-host.sg/wp-content/uploads/2021/01/1-AC_Website-Featured-1-e1720493055549.png",gallery:[],bestFor:["Beachfront sunset solemnisation","Coastal cocktail reception","Island getaway wedding"],web:"https://www.1-host.sg/venues/wedding-1-altitude-coast/"},
+{id:"1-arden",name:"1-Arden",tagline:"Sky Garden · Level 51",managed:"1-Host",location:"Level 51, CapitaSpring, 88 Market St, S048948",area:"Raffles Place",description:"Tie the knot overlooking sweeping sunset views from the world's highest food forest at Level 51 of CapitaSpring. Helmed by Executive Chef John-Paul Fiechtner with Coastal Australian cuisine — wild-caught, sustainably raised produce in farm-to-table dishes.",capacity:{s:230,st:350},setting:"Indoor & Outdoor",cuisine:["Coastal Australian","Farm-to-Table"],cat:"rooftop",catLabel:"Rooftop · Sky Garden",featured:true,solemn:true,rating:4.8,img:"https://www.1-host.sg/wp-content/uploads/2022/01/Arden_Website-Featured.png",hero:"https://www.1-host.sg/wp-content/uploads/2022/01/Arden-Hero-Image.png",gallery:["https://www.1-host.sg/wp-content/uploads/2022/01/1.jpg","https://www.1-host.sg/wp-content/uploads/2022/01/2.jpg","https://www.1-host.sg/wp-content/uploads/2022/01/1-Arden-Wedding-Outdoor.jpg","https://www.1-host.sg/wp-content/uploads/2022/01/1-Arden-Wedding-Night.jpg"],bestFor:["Sunset sky garden solemnisation","Grand reception up to 230 guests","Farm-to-table Australian cuisine"],web:"https://www.1-host.sg/venues/wedding-1-arden/"},
+{id:"1-atico",name:"1-Atico",tagline:"Orchard Skyline",managed:"1-Host",location:"ION Orchard, S238801",area:"Orchard",description:"Perched atop ION Orchard. Panoramic skyline views with modern sophistication. City lights become your wedding décor. Couples praise the breathtaking view and seamless coordination.",capacity:{s:120,st:200},setting:"Indoor & Outdoor",cuisine:["International","Modern European"],cat:"rooftop",catLabel:"Rooftop · Sky Dining",featured:true,solemn:true,rating:4.8,img:"https://www.1-host.sg/wp-content/uploads/2021/01/Atico_Website-Featured-1.png",hero:"https://www.1-host.sg/wp-content/uploads/2021/01/Atico_Website-Featured-1.png",gallery:[],bestFor:["Glamorous Orchard celebration","Panoramic skyline solemnisation","Modern sophisticated reception"],web:"https://www.1-host.sg/venues/wedding-1-atico/"},
+{id:"1-flowerhill",name:"1-Flowerhill",tagline:"Heritage on Sentosa",managed:"1-Host",location:"6 Imbiah Rd, Sentosa, S099696",area:"Sentosa",description:"Century-old heritage building at Sentosa Sensoryscape. Charming colonial arches, green-and-white balustrades, spiral staircases under lush tropical foliage. Heritage meets garden paradise.",capacity:{s:90,st:150},setting:"Indoor & Outdoor",cuisine:["Modern European"],cat:"heritage",catLabel:"Heritage · Garden",featured:true,solemn:true,rating:4.7,img:"https://www.1-host.sg/wp-content/uploads/2024/01/Untitled-design-1.jpg",hero:"https://www.1-host.sg/wp-content/uploads/2024/01/Untitled-design-1.jpg",gallery:[],bestFor:["Intimate heritage garden ceremony","Colonial-charm solemnisation","Sentosa island escape"],web:"https://www.1-host.sg/venues/1-flowerhill/"},
+{id:"andaz",name:"Andaz Singapore",tagline:"Kampong Glam Creative",location:"5 Fraser St, S189354",area:"Bugis",description:"Where 'personal style' meets celebration. Flexible packages, sustainable practices, and tailored menus inspired by the creative energy of Kampong Glam neighbourhood.",capacity:{s:300,st:400},setting:"Indoor & Outdoor",cuisine:["International","Asian","Western"],cat:"hotel",catLabel:"Lifestyle Hotel",featured:false,solemn:true,rating:4.7,img:"https://assets.hyatt.com/content/dam/hyatt/hyattdam/images/2018/08/21/1023/Andaz-Singapore-P085-Ballroom-Wedding.jpg/Andaz-Singapore-P085-Ballroom-Wedding.16x9.jpg",hero:"https://assets.hyatt.com/content/dam/hyatt/hyattdam/images/2018/08/21/1023/Andaz-Singapore-P085-Ballroom-Wedding.jpg/Andaz-Singapore-P085-Ballroom-Wedding.16x9.jpg",gallery:[],bestFor:["Creative contemporary wedding","Sustainable celebration","Kampong Glam charm"],web:"https://www.hyatt.com/andaz/en-US/sinaz-andaz-singapore"},
+{id:"capella",name:"Capella Singapore",tagline:"Sentosa Resort by Foster + Partners",location:"1 The Knolls, Sentosa, S098297",area:"Sentosa",description:"Designed by Sir Norman Foster amid 30 acres of rainforest. Colonial grandeur meets contemporary luxury. Private estate celebrations with verdant lawns and cascading water features.",capacity:{s:280,st:400},setting:"Indoor & Outdoor",cuisine:["International","Chinese","Modern European"],cat:"hotel",catLabel:"Luxury Resort",featured:false,solemn:true,rating:4.9,img:"https://images.unsplash.com/photo-1582719508461-905c673771fd?w=1200&q=80",hero:"https://images.unsplash.com/photo-1582719508461-905c673771fd?w=1200&q=80",gallery:[],bestFor:["Ultra-private island estate wedding","Tropical garden celebration","World-class resort experience"],web:"https://www.capellahotels.com/en/capella-singapore"},
+{id:"chijmes",name:"CHIJMES Hall",tagline:"Gothic Chapel Grandeur",location:"30 Victoria St, S187996",area:"City Hall",description:"Gothic chapel converted into Singapore's most photogenic event venue. Soaring vaulted ceilings, stained glass windows, and dramatic architecture impossible to replicate elsewhere.",capacity:{s:300,st:400},setting:"Indoor & Outdoor",cuisine:["International","Western"],cat:"heritage",catLabel:"Heritage · Chapel",featured:false,solemn:true,rating:4.6,img:"https://images.unsplash.com/photo-1464808322410-1a934aab61e5?w=1200&q=80",hero:"https://images.unsplash.com/photo-1464808322410-1a934aab61e5?w=1200&q=80",gallery:[],bestFor:["Gothic chapel ceremony","Stained glass photography","Heritage courtyard reception"],web:"https://www.chijmes.com.sg/"},
+{id:"four-seasons",name:"Four Seasons Hotel Singapore",tagline:"Orchard Boulevard Elegance",location:"190 Orchard Blvd, S248646",area:"Orchard",description:"Floor-to-ceiling windows, custom glass chandeliers, and some of the city's finest cuisine paired with legendary Four Seasons service in an Orchard Boulevard setting.",capacity:{s:350,st:450},setting:"Indoor & Outdoor",cuisine:["International","Chinese","Western"],cat:"hotel",catLabel:"Luxury Hotel",featured:false,solemn:true,rating:4.8,img:"https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=1200&q=80",hero:"https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=1200&q=80",gallery:[],bestFor:["Intimate luxury celebration","World-class culinary experience","Orchard garden solemnisation"],web:"https://www.fourseasons.com/singapore/weddings/"},
+{id:"grand-hyatt",name:"Grand Hyatt Singapore",tagline:"Scotts Road Grand",location:"10 Scotts Rd, S228211",area:"Orchard",description:"Striking versatility on Scotts Road — grand pillarless ballroom for 600 guests, private bar for after-parties. Polished Orchard Road glamour for every wedding.",capacity:{s:600,st:800},setting:"Indoor & Outdoor",cuisine:["International","Chinese","Western"],cat:"hotel",catLabel:"Luxury Hotel",featured:false,solemn:true,rating:4.6,img:"https://assets.hyatt.com/content/dam/hyatt/hyattdam/images/2019/09/24/1341/Grand-Hyatt-Singapore-P320-Grand-Ballroom-Wedding.jpg/Grand-Hyatt-Singapore-P320-Grand-Ballroom-Wedding.16x9.jpg",hero:"https://assets.hyatt.com/content/dam/hyatt/hyattdam/images/2019/09/24/1341/Grand-Hyatt-Singapore-P320-Grand-Ballroom-Wedding.jpg/Grand-Hyatt-Singapore-P320-Grand-Ballroom-Wedding.16x9.jpg",gallery:[],bestFor:["Large-scale grand ballroom","Orchard Road luxury","After-party private bar"],web:"https://www.hyatt.com/grand-hyatt/en-US/sinrs-grand-hyatt-singapore/"},
+{id:"hilton-orchard",name:"Hilton Singapore Orchard",tagline:"Orchard Road Modern Grand",location:"333 Orchard Rd, S238867",area:"Orchard",description:"Singapore's largest Hilton — Grand Ballroom for 800 guests, Imperial Ballroom for amphitheatre-style celebrations, The Manor botanical enclave for intimate garden weddings.",capacity:{s:800,st:1000},setting:"Indoor & Outdoor",cuisine:["International","Chinese","Western"],cat:"hotel",catLabel:"Modern Hotel · Grand",featured:false,solemn:true,rating:4.6,img:"https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=1200&q=80",hero:"https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=1200&q=80",gallery:[],bestFor:["Large-scale wedding (800 guests)","The Manor botanical garden","Orchard Road convenience"],web:"https://www.hilton.com/en/hotels/sinorhi-hilton-singapore-orchard/"},
+{id:"intercontinental",name:"InterContinental Singapore",tagline:"Peranakan Heritage Luxury",location:"80 Middle Rd, S188966",area:"Bugis",description:"Peranakan-inspired luxury blending rich cultural heritage with modern elegance. Restored Bugis Junction shophouse setting for a uniquely Singaporean wedding backdrop.",capacity:{s:350,st:450},setting:"Indoor",cuisine:["International","Chinese","Peranakan"],cat:"hotel",catLabel:"Heritage Hotel",featured:false,solemn:true,rating:4.7,img:"https://images.unsplash.com/photo-1455587734955-081b22074882?w=1200&q=80",hero:"https://images.unsplash.com/photo-1455587734955-081b22074882?w=1200&q=80",gallery:[],bestFor:["Peranakan-themed wedding","Heritage shophouse celebration","Cultural-meets-luxury"],web:"https://singapore.intercontinental.com/weddings"},
+{id:"jen-tanglin",name:"JEN Singapore Tanglin",tagline:"Botanic Gardens Neighbour",location:"1A Cuscaden Rd, S249716",area:"Tanglin",description:"Vibrant design-forward hotel steps from the UNESCO Botanic Gardens. Playful contemporary spaces with personality — steps from Singapore's UNESCO-listed Botanic Gardens.",capacity:{s:350,st:450},setting:"Indoor & Outdoor",cuisine:["International","Chinese","Western"],cat:"hotel",catLabel:"Lifestyle Hotel",featured:false,solemn:true,rating:4.5,img:"https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=1200&q=80",hero:"https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=1200&q=80",gallery:[],bestFor:["Vibrant contemporary wedding","Botanic Gardens proximity","Contemporary design-forward"],web:"https://www.shangri-la.com/singapore/jen-tanglin/weddings/"},
+{id:"jw-marriott",name:"JW Marriott South Beach",tagline:"Forest of Lights",location:"30 Beach Rd, S189763",area:"City Hall",description:"The Grand Ballroom's iconic 11,520-light Forest of Lights LED wall creates a breathtaking backdrop. Heritage building housing contemporary luxury with Instagram-famous illuminated experiences.",capacity:{s:400,st:500},setting:"Indoor & Outdoor",cuisine:["International","Chinese","Western"],cat:"hotel",catLabel:"Modern Hotel · Iconic",featured:false,solemn:true,rating:4.7,img:"https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=1200&q=80",hero:"https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=1200&q=80",gallery:[],bestFor:["Forest of Lights LED backdrop","Modern grand ballroom","Heritage meets contemporary"],web:"https://www.marriott.com/en-us/hotels/sinjw-jw-marriott-hotel-singapore-south-beach/"},
+{id:"mandarin-oriental",name:"Mandarin Oriental, Singapore",tagline:"Marina Bay Waterfront Luxury",location:"5 Raffles Ave, S039797",area:"Marina Bay",description:"Marina Bay waterfront combining Asian warmth with international sophistication. The Oriental Ballroom for grand celebrations; Cherry Garden for exquisite Chinese banquets.",capacity:{s:400,st:500},setting:"Indoor",cuisine:["International","Chinese","Western"],cat:"hotel",catLabel:"Luxury Hotel · Waterfront",featured:false,solemn:true,rating:4.7,img:"https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=1200&q=80",hero:"https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=1200&q=80",gallery:[],bestFor:["Marina Bay waterfront banquet","Chinese Cherry Garden dinner","Asian-luxury wedding"],web:"https://www.mandarinoriental.com/en/singapore/marina-bay/meetings-and-events/weddings"},
+{id:"mbs",name:"Marina Bay Sands",tagline:"Asia's Grandest Stage",location:"10 Bayfront Ave, S018956",area:"Marina Bay",description:"The architectural marvel defining Singapore's skyline. Sands Grand Ballroom hosts up to 2,500 guests — Asia's largest. SkyPark ceremonies 200m above the bay. Unmistakably spectacular.",capacity:{s:2500,st:3000},setting:"Indoor",cuisine:["International","Chinese","Western","Halal"],cat:"hotel",catLabel:"Luxury Hotel · Iconic",featured:true,solemn:true,rating:4.7,img:"https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=1200&q=80",hero:"https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=1200&q=80",gallery:[],bestFor:["Grand-scale banquet (500+ guests)","SkyPark rooftop ceremony","Iconic landmark celebration"],web:"https://www.marinabaysands.com/weddings.html"},
+{id:"monti",name:"Monti",tagline:"Marina Bay Waterfront",managed:"1-Host",location:"Fullerton Pavilion, 82 Collyer Quay, S049327",area:"Marina Bay",description:"Chic, luxe, and intimate with breathtaking Marina Bay views. Solemnisations on the iconic spherical dome are a dream for couples seeking a swanky city soirée. Award-winning Italian cuisine. Glamorous, stylish, and unforgettable.",capacity:{s:180,st:420},setting:"Indoor & Outdoor",cuisine:["Italian","Mediterranean"],cat:"waterfront",catLabel:"Waterfront · Iconic",featured:true,solemn:true,rating:4.9,img:"https://www.1-host.sg/wp-content/uploads/2021/01/this-Host-featured-image-wordpress-794-x-1150-px-4-x-5-in-467-x-632-px-1.jpg",hero:"https://www.1-host.sg/wp-content/uploads/2021/01/1-host-Wordpress-header-5.jpg",gallery:["https://www.1-host.sg/wp-content/uploads/2021/01/Wordpress-images-2560-x-1709-px-22.jpg","https://www.1-host.sg/wp-content/uploads/2021/01/Monti_7.jpg","https://www.1-host.sg/wp-content/uploads/2021/01/MONTI-2-2.jpg"],bestFor:["Iconic Marina Bay solemnisation","Italian waterfront dinner","Glamorous city soirée"],web:"https://www.1-host.sg/venues/wedding-monti/"},
+{id:"national-gallery",name:"National Gallery Singapore",tagline:"Where Art Meets History",location:"1 St Andrew's Rd, S178957",area:"City Hall",description:"Exchange vows in the historic City Hall Chamber — where Singapore's independence was proclaimed. Southeast Asia's largest public collection of modern art as your backdrop.",capacity:{s:500,st:700},setting:"Indoor",cuisine:["International","Modern European"],cat:"heritage",catLabel:"Heritage · Cultural",featured:false,solemn:true,rating:4.7,img:"https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=1200&q=80",hero:"https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=1200&q=80",gallery:[],bestFor:["Historic City Hall ceremony","Art gallery backdrop","Cultural landmark wedding"],web:"https://www.nationalgallery.sg/venue-hire"},
+{id:"raffles-hotel",name:"Raffles Hotel Singapore",tagline:"Timeless Elegance Since 1887",location:"1 Beach Rd, S189673",area:"City Hall",description:"Singapore's most storied luxury hotel. From intimate garden solemnisations beneath tropical palms to grand banquets in the ornate Raffles Ballroom with 7-metre ceilings. Over 130 years of heritage elegance.",capacity:{s:500,st:600},setting:"Indoor & Outdoor",cuisine:["International","Western","Chinese"],cat:"hotel",catLabel:"Luxury Hotel",featured:true,solemn:true,rating:4.9,img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_5553-55?wid=1920",hero:"https://m.ahstatic.com/is/image/accorhotels/aja_p_5553-55?wid=1920",gallery:[],bestFor:["Grand heritage ballroom wedding","Tropical courtyard solemnisation","Iconic Singapore celebration"],web:"https://www.raffles.com/singapore/weddings/"},
+{id:"shangri-la",name:"Shangri-La Singapore",tagline:"15 Acres of Gardens",location:"22 Orange Grove Rd, S258350",area:"Orchard",description:"15 acres of lush tropical gardens. The legendary Island Ballroom fits 800 guests. Garden terraces and waterfall settings offer serene alternatives for intimate celebrations.",capacity:{s:800,st:1000},setting:"Indoor & Outdoor",cuisine:["International","Chinese","Western"],cat:"hotel",catLabel:"Luxury Hotel · Garden",featured:false,solemn:true,rating:4.8,img:"https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=1200&q=80",hero:"https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=1200&q=80",gallery:[],bestFor:["Grand ballroom wedding (800 guests)","Tropical garden solemnisation","Waterfall terrace ceremony"],web:"https://www.shangri-la.com/singapore/shangrila/weddings/"},
+{id:"marriott-tang",name:"Singapore Marriott Tang Plaza",tagline:"Orchard Road Icon",location:"320 Orchard Rd, S238865",area:"Orchard",description:"Orchard Road icon with Certified Wedding Planners and award-winning Wan Hao Chinese Restaurant. Grand Ballroom for up to 550 guests.",capacity:{s:550,st:700},setting:"Indoor",cuisine:["Chinese","International"],cat:"hotel",catLabel:"Luxury Hotel",featured:false,solemn:true,rating:4.6,img:"https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=1200&q=80",hero:"https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=1200&q=80",gallery:[],bestFor:["Chinese banquet specialist","Award-winning Wan Hao cuisine","Orchard Road prestige"],web:"https://www.marriott.com/en-us/hotels/sindt-singapore-marriott-tang-plaza-hotel/"},
+{id:"alkaff-mansion",name:"The Alkaff Mansion",tagline:"Heritage Hilltop Estate",managed:"1-Host",location:"10 Telok Blangah Green, S109178",area:"Telok Blangah",description:"Lovingly restored hilltop mansion surrounded by lush tropical gardens. Heritage romance — covered verandahs, ivy-draped walls, worlds away from the city yet minutes from it.",capacity:{s:200,st:300},setting:"Indoor & Outdoor",cuisine:["Mediterranean","International"],cat:"heritage",catLabel:"Heritage · Garden",featured:false,solemn:true,rating:4.7,img:"https://www.1-host.sg/wp-content/uploads/2021/01/tam.jpg",hero:"https://www.1-host.sg/wp-content/uploads/2021/01/tam.jpg",gallery:[],bestFor:["Heritage garden wedding","Romantic verandah solemnisation","Rustic-elegant reception"],web:"https://www.1-host.sg/venues/wedding-the-alkaff-mansion/"},
+{id:"fullerton-hotel",name:"The Fullerton Hotel Singapore",tagline:"Neoclassical Marina Bay",location:"1 Fullerton Square, S049178",area:"Marina Bay",description:"Magnificent neoclassical landmark overlooking Marina Bay. The Straits Room offers pillarless grandeur; the rooftop pool deck provides sunset solemnisations with the city skyline as witness.",capacity:{s:400,st:500},setting:"Indoor & Outdoor",cuisine:["International","Western","Chinese"],cat:"hotel",catLabel:"Luxury Hotel · Heritage",featured:true,solemn:true,rating:4.8,img:"https://image-tc.galaxy.tf/wijpeg-9brotku75lkjyoarluej1n954/weddings_og-image.jpg",hero:"https://image-tc.galaxy.tf/wijpeg-9brotku75lkjyoarluej1n954/weddings_og-image.jpg",gallery:[],bestFor:["Heritage waterfront ballroom","Rooftop pool ceremony","Art Deco photography backdrop"],web:"https://www.fullertonhotels.com/fullerton-hotel-singapore/weddings"},
+{id:"the-garage",name:"The Garage",tagline:"Botanic Gardens Heritage",managed:"1-Host",location:"50 Cluny Park Rd, S257488",area:"Botanic Gardens",description:"Within Singapore's UNESCO World Heritage Botanic Gardens. 1920s Art Deco conservation building — forest-wedding-under-the-stars atmosphere with modern indoor comforts.",capacity:{s:90,st:150},setting:"Indoor & Outdoor",cuisine:["Modern European"],cat:"garden",catLabel:"Garden · Heritage",featured:false,solemn:true,rating:4.6,img:"https://www.1-host.sg/wp-content/uploads/2021/01/this-Host-featured-image-wordpress-794-x-1150-px-4-x-5-in-467-x-632-px-2-1.jpg",hero:"https://www.1-host.sg/wp-content/uploads/2021/01/this-Host-featured-image-wordpress-794-x-1150-px-4-x-5-in-467-x-632-px-2-1.jpg",gallery:[],bestFor:["UNESCO heritage garden wedding","Art Deco setting","Forest-under-the-stars reception"],web:"https://www.1-host.sg/venues/wedding-at-the-garage/"},
+{id:"ritz-carlton",name:"The Ritz-Carlton, Millenia",tagline:"Marina Bay Art & Views",location:"7 Raffles Ave, S039799",area:"Marina Centre",description:"Contemporary art meets Marina Bay grandeur. Dedicated wedding floor with panoramic bay views. An acclaimed art collection provides stunning photo backdrops with impeccable service.",capacity:{s:480,st:600},setting:"Indoor",cuisine:["International","Western","Chinese"],cat:"hotel",catLabel:"Luxury Hotel",featured:false,solemn:true,rating:4.8,img:"https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&q=80",hero:"https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&q=80",gallery:[],bestFor:["Marina Bay views wedding","Art collection photo backdrop","Premium hotel experience"],web:"https://www.ritzcarlton.com/en/hotels/sinrz-the-ritz-carlton-millenia-singapore/weddings/"},
+{id:"the-riverhouse",name:"The Riverhouse",tagline:"Clarke Quay Waterfront",managed:"1-Host",location:"3A River Valley Rd, S179020",area:"Clarke Quay",description:"Modern-meets-traditional aesthetics along the Singapore River. Intimate yet never compromising on style, location, or cosiness.",capacity:{s:100,st:200},setting:"Indoor & Outdoor",cuisine:["Chinese","International"],cat:"waterfront",catLabel:"Waterfront · Heritage",featured:false,solemn:true,rating:4.7,img:"https://www.1-host.sg/wp-content/uploads/2021/01/Riverhouse_Website-Featured.png",hero:"https://www.1-host.sg/wp-content/uploads/2021/01/Riverhouse_Website-Featured.png",gallery:[],bestFor:["Intimate riverside ceremony","Chinese banquet reception","Modern-heritage celebration"],web:"https://www.1-host.sg/venues/wedding-the-riverhouse/"},
+{id:"st-regis",name:"The St. Regis Singapore",tagline:"Old-World Opulence",location:"29 Tanglin Rd, S247911",area:"Tanglin",description:"White-glove sophistication through signature Butler service. The John Jacob Ballroom — first and only in Singapore with two skylights. Bespoke wedding curation treating every couple as royalty.",capacity:{s:350,st:450},setting:"Indoor",cuisine:["International","French","Chinese"],cat:"hotel",catLabel:"Luxury Hotel",featured:false,solemn:true,rating:4.8,img:"https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=1200&q=80",hero:"https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=1200&q=80",gallery:[],bestFor:["Ultra-luxury bespoke wedding","Butler-serviced celebration","Old-world elegance"],web:"https://www.marriott.com/hotels/event-planning/wedding-planning/sinxr-the-st-regis-singapore/"},
+{id:"the-summerhouse",name:"The Summerhouse",tagline:"Garden Estate",managed:"1-Host",location:"3 Park Lane, S798387",area:"Seletar",description:"European-style estate surrounded by greenery and edible gardens. Fairy lights, elegant terraces, and a magical gazebo for romantic ceremonies.",capacity:{s:100,st:180},setting:"Outdoor",cuisine:["Modern European","Farm-to-Table"],cat:"garden",catLabel:"Garden · Estate",featured:false,solemn:true,rating:4.6,img:"https://www.1-host.sg/wp-content/uploads/2021/01/Host-featured-image-wordpress-794-x-1150-px-5-e1720491106172.jpg",hero:"https://www.1-host.sg/wp-content/uploads/2021/01/Host-featured-image-wordpress-794-x-1150-px-5-e1720491106172.jpg",gallery:[],bestFor:["Garden gazebo ceremony","Farm-to-table dinner","Nature-wrapped celebration"],web:"https://www.1-host.sg/venues/wedding-the-summerhouse/"}
 ];
 
-const BLOG_POSTS = [
-  { id:1, title:"8 Stunning Rooftop Wedding Venues You Need to See", category:"Venues", excerpt:"From 1-Arden's 51st floor food forest to 1-Altitude's world-famous sky bar — discover Singapore's most breathtaking rooftop celebrations." },
-  { id:2, title:"Your Complete Guide to Chinese Tea Ceremony Etiquette", category:"Traditions", excerpt:"Everything you need to know about this cherished Chinese wedding tradition, from preparation to the perfect tea set." },
-  { id:3, title:"How to Plan a Garden Solemnisation in Singapore", category:"Planning", excerpt:"ROM-licensed outdoor venues, weather contingency plans, and decor ideas for your dream garden wedding." },
-  { id:4, title:"2026 Wedding Trends Every Singapore Bride Should Know", category:"Trends", excerpt:"Sustainability, AI wedding planning, micro-weddings, and the return of maximalist florals." },
+const CATS=[{id:"all",label:"All Venues",icon:Sparkles},{id:"hotel",label:"Hotels",icon:Building2},{id:"rooftop",label:"Rooftop",icon:Sunset},{id:"heritage",label:"Heritage",icon:Landmark},{id:"garden",label:"Garden",icon:TreePine},{id:"waterfront",label:"Waterfront",icon:Waves},{id:"beachfront",label:"Beachfront",icon:Waves}];
+
+const REVIEWS=[
+  {text:"10/10 best decision ever for both me & my wife to host our wedding at Monti! Kudos to the team for going the extra mile.",who:"Nicholas Low",where:"Monti",s:5},
+  {text:"We held our wedding at 1-Atico, and it was nothing short of magical. The panoramic skyline view and seamless setup made it the perfect place to say 'I do.'",who:"Jeremiah Aw",where:"1-Atico",s:5},
+  {text:"Had our wedding at Alkaff Mansion and it was amazing! Our coordinator Joan was responsive and very helpful.",who:"Wei Chen Beh",where:"The Alkaff Mansion",s:5},
+  {text:"The Riverhouse was the first and only venue we viewed and we were locked in! Absolutely gorgeous.",who:"Leona Leong",where:"The Riverhouse",s:5},
+  {text:"1-Arden blew us away. The sky garden at sunset was the most incredible backdrop we could have asked for. Our guests are still raving about it.",who:"Amanda Ng",where:"1-Arden",s:5},
+  {text:"The Summerhouse felt like a fairy tale. The garden gazebo, the fairy lights, the farm-to-table food — everything was perfect for our intimate celebration.",who:"Jonathan Khoo",where:"The Summerhouse",s:5}
 ];
 
-const REAL_WEDDINGS = [
-  { couple:"Sarah & James", venue:"1-Arden", guests:120, style:"Modern Rooftop" },
-  { couple:"Wei Lin & Darren", venue:"Raffles Hotel", guests:350, style:"Grand Heritage" },
-  { couple:"Priya & Vikram", venue:"Capella Singapore", guests:80, style:"Intimate Tropical" },
+// NOTE: Replace coupleImg with actual 1-Host couple photos when available
+const WEDDINGS=[
+  {couple:"Rachel & Edwin",venue:"Monti",guests:120,type:"Waterfront Italian dinner",quote:"The Marina Bay sunset during our solemnisation was the most magical moment of our lives.",photo:"@pixioo",vid:"monti",coupleImg:"https://images.unsplash.com/photo-1519741497674-611481863552?w=900&q=80&fit=crop&crop=faces,center&h=600",
+    story:"Rachel and Edwin always knew they wanted a waterfront celebration. When they first visited Monti at Fullerton Pavilion, the panoramic Marina Bay view sealed the deal. Their solemnisation took place on the iconic dome at golden hour, with the city skyline glowing behind them. The 120 guests enjoyed a five-course Italian dinner curated by the Monti team, featuring handmade pasta and a stunning tiramisu wedding cake. The couple's first dance happened under the stars with Marina Bay Sands glittering in the background."},
+  {couple:"Priya & Arjun",venue:"1-Arden",guests:80,type:"Sunset sky garden",quote:"Being surrounded by the food forest 51 floors above felt like a dream.",photo:"@fellowfolks",vid:"1-arden",coupleImg:"https://images.unsplash.com/photo-1544078751-58fee2d8a03b?w=900&q=80&fit=crop&crop=faces,center&h=600",
+    story:"Priya and Arjun wanted something unforgettable and intimate. At 1-Arden on Level 51 of CapitaSpring, they found it. Their ROM solemnisation was held in the sky garden surrounded by the world's highest urban food forest. As the sun set over the Singapore skyline, 80 guests shared a Coastal Australian dinner by Executive Chef John-Paul Fiechtner. The couple incorporated Indian traditions with a modern twist, including a flower garland exchange in the open-air terrace."},
+  {couple:"Wei Ling & Jun Hao",venue:"The Alkaff Mansion",guests:150,type:"Heritage garden lunch",quote:"The heritage mansion made our tea ceremony feel so connected to tradition.",photo:"@iluminen",vid:"alkaff-mansion",coupleImg:"https://images.unsplash.com/photo-1546032996-6dfacbacbf3f?w=900&q=80&fit=crop&crop=faces,center&h=600",
+    story:"Wei Ling and Jun Hao chose The Alkaff Mansion for its deep sense of heritage. The century-old hilltop estate surrounded by tropical gardens was the perfect backdrop for their traditional Chinese tea ceremony. 150 guests gathered for a Mediterranean-inspired lunch on the mansion's covered verandah, with ivy-draped walls and heritage architecture creating photos that looked like a European countryside wedding in the heart of Singapore."},
+  {couple:"Sarah & David",venue:"1-Alfaro",guests:100,type:"Rooftop lighthouse dinner",quote:"Our guests couldn't stop talking about the panoramic views and incredible Italian food.",photo:"@d.t._pictures",vid:"1-alfaro",coupleImg:"https://images.unsplash.com/photo-1549417229-7686ac5595fd?w=900&q=80&fit=crop&crop=faces,center&h=600",
+    story:"Sarah and David were among the first couples to celebrate at 1-Alfaro, Singapore's newest rooftop venue at Labrador Tower. The floor-to-ceiling glass walls offered breathtaking views of the city and sea. Their 100 guests enjoyed authentic Emilia-Romagna cuisine from the MONTI team, featuring the venue's signature farm-to-table concept. The couple's vows were exchanged as the sun painted the sky in shades of gold and pink."},
+  {couple:"Nurul & Faris",venue:"1-Atico",guests:60,type:"Orchard skyline ROM",quote:"Intimate solemnisation above Orchard Road — chic and unforgettable.",photo:"@wemerryground",vid:"1-atico",coupleImg:"https://images.unsplash.com/photo-1621112904887-419379ce6824?w=900&q=80&fit=crop&crop=faces,center&h=600",
+    story:"Nurul and Faris kept it intimate and modern. Perched atop ION Orchard, 1-Atico provided a stunning skyline backdrop for their ROM solemnisation with just 60 of their closest family and friends. The couple chose a contemporary nikah ceremony followed by a modern European dinner. The panoramic city views at night, with Orchard Road's lights twinkling below, made for magical reception photos."},
+  {couple:"Joanne & Marcus",venue:"The Summerhouse",guests:70,type:"Garden estate brunch",quote:"Fairy lights and farm-to-table felt like a European countryside wedding.",photo:"@ikicompany",vid:"the-summerhouse",coupleImg:"https://images.unsplash.com/photo-1595407660626-db35dcd16609?w=900&q=80&fit=crop&crop=faces,center&h=600",
+    story:"Joanne and Marcus wanted a relaxed, nature-filled celebration. The Summerhouse's European-style garden estate in Seletar was their dream venue. Fairy lights strung between the trees, a magical gazebo ceremony, and a farm-to-table brunch menu featuring produce from the venue's own edible garden created the intimate countryside wedding they had always imagined — just 70 guests, great food, and pure joy."}
 ];
 
-/* ═══════════════════ HOOKS ═══════════════════ */
-function useReveal() {
-  const ref = useRef(null);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) { el.classList.add('visible'); obs.unobserve(el); }
-    }, { threshold: 0.12 });
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
-  return ref;
-}
+const HERO_SLIDES=[
+  {vid:"1-alfaro",h:"Where Love Meets\nthe Skyline",sub:"Singapore's newest rooftop venue — 1-Alfaro at Labrador Tower"},
+  {vid:"1-arden",h:"Say 'I Do' Among\nthe Clouds",sub:"Exchange vows 51 floors above the city at 1-Arden, CapitaSpring"},
+  {vid:"monti",h:"Romance on\nthe Waterfront",sub:"Iconic Marina Bay celebrations at Monti, Fullerton Pavilion"},
+  {vid:"raffles-hotel",h:"Timeless Elegance\nSince 1887",sub:"Grand heritage celebrations at Raffles Hotel Singapore"}
+];
 
-/* ═══════════════════ COMPONENTS ═══════════════════ */
+// ── HOOKS ────────────────────────────────────────────────────────────────
+const useSR=(o={})=>{const r=useRef(null);const[v,sV]=useState(false);useEffect(()=>{const el=r.current;if(!el)return;const obs=new IntersectionObserver(([e])=>{if(e.isIntersecting){sV(true);obs.unobserve(e.target)}},{threshold:o.t||.1,rootMargin:"0px 0px -30px 0px"});obs.observe(el);return()=>obs.disconnect()},[]);return[r,v]};
+const useCtr=(target,dur=2e3)=>{const[c,sC]=useState(0);const[r,v]=useSR();useEffect(()=>{if(!v)return;let s=0;const step=target/(dur/16);const t=setInterval(()=>{s+=step;if(s>=target){sC(target);clearInterval(t)}else sC(Math.floor(s))},16);return()=>clearInterval(t)},[v,target]);return[r,c]};
 
-/* ── Navigation ── */
-function Nav({ activePage, setActivePage, scrolled }) {
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const pages = [
-    { id:"home", label:"Home" },
-    { id:"venues", label:"Venues" },
-    { id:"ai-tools", label:"AI Tools" },
-    { id:"real-weddings", label:"Real Weddings" },
-    { id:"blog", label:"Blog" },
-  ];
+// ── CLAUDE API ───────────────────────────────────────────────────────────
+const callAI=async(sys,msg)=>{const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,system:sys,messages:[{role:"user",content:msg}]})});if(!r.ok)throw new Error(`API ${r.status}`);const d=await r.json();return d.content?.[0]?.text||""};
+const pJ=t=>{try{return JSON.parse(t.replace(/```json\n?/g,"").replace(/```\n?/g,"").trim())}catch{return{raw:t}}};
+const VK=VENUES.map(v=>`${v.name}${v.managed?" [1-Host]":""}: ${v.catLabel}, ${v.area}, ${v.capacity.s} seated/${v.capacity.st} standing, cuisine: ${v.cuisine.join(",")}, ${v.setting}. ${v.description}`).join("\n\n");
+
+// ── IMG ──────────────────────────────────────────────────────────────────
+const VI=({src,alt,className="",style={}})=>{const[e,sE]=useState(!src);const cols={rooftop:["#1A1A2E","#2D1B69"],hotel:["#1a2332","#2c3e50"],heritage:["#3E2723","#5D4037"],garden:["#1B3A2D","#2D5A45"],waterfront:["#0c2d3f","#1A535C"],beachfront:["#0a3d5c","#0E7490"]};const name=alt?.split("—")[0]?.trim()||"";const k=alt?.includes("Rooftop")?"rooftop":alt?.includes("Hotel")||alt?.includes("Resort")?"hotel":alt?.includes("Heritage")||alt?.includes("Chapel")||alt?.includes("Cultural")?"heritage":alt?.includes("Garden")?"garden":alt?.includes("Waterfront")?"waterfront":"hotel";const c=cols[k]||cols.hotel;if(e||!src)return<div className={className} style={{...style,background:`linear-gradient(145deg,${c[0]},${c[1]})`,display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:8,position:"relative",overflow:"hidden"}}><div style={{position:"absolute",inset:0,background:"radial-gradient(circle at 30% 40%, rgba(232,131,124,.08) 0%, transparent 60%)",pointerEvents:"none"}}/><div style={{position:"absolute",bottom:"-20%",right:"-15%",width:"50%",height:"50%",borderRadius:"50%",background:"rgba(255,255,255,.03)",pointerEvents:"none"}}/><span style={{color:"rgba(255,255,255,.65)",fontFamily:"var(--fh)",fontSize:"clamp(15px,1.8vw,22px)",fontWeight:400,textAlign:"center",padding:"0 20px",position:"relative",zIndex:1,letterSpacing:".02em"}}>{name}</span><span style={{color:"rgba(232,131,124,.5)",fontSize:10,fontWeight:600,letterSpacing:".1em",textTransform:"uppercase",position:"relative",zIndex:1}}>WEDDING VENUE</span></div>;return<img src={src} alt={alt} className={className} style={{...style,objectFit:"cover"}} onError={()=>sE(true)} loading="lazy"/>};
+
+// ═════════════════════════════════════════════════════════════════════════
+// AUTH SYSTEM — Master Admin → Admins → Visitors
+// ═════════════════════════════════════════════════════════════════════════
+const MASTER_ADMIN = { email: "chris.millar@1-group.sg", password: "1Group2026!", role: "master" };
+const DOMAIN = "@1-group.sg";
+
+const getUsers = () => {
+  try { return JSON.parse(localStorage.getItem("swv_users") || "[]"); } catch { return []; }
+};
+const saveUsers = (users) => localStorage.setItem("swv_users", JSON.stringify(users));
+const getSession = () => {
+  try { return JSON.parse(sessionStorage.getItem("swv_session") || "null"); } catch { return null; }
+};
+const saveSession = (s) => s ? sessionStorage.setItem("swv_session", JSON.stringify(s)) : sessionStorage.removeItem("swv_session");
+
+// ── SIGN IN PAGE ─────────────────────────────────────────────────────────
+function SignInPage({ onLogin }) {
+  const [email, setEmail] = useState("");
+  const [pass, setPass] = useState("");
+  const [err, setErr] = useState("");
+  const [showPass, setShowPass] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    setErr("");
+    setLoading(true);
+
+    setTimeout(() => {
+      const cleanEmail = email.trim().toLowerCase();
+      if (!cleanEmail.endsWith(DOMAIN)) {
+        setErr(`Only ${DOMAIN} email addresses are allowed`);
+        setLoading(false);
+        return;
+      }
+      // Check master admin
+      if (cleanEmail === MASTER_ADMIN.email && pass === MASTER_ADMIN.password) {
+        const session = { email: cleanEmail, role: "master", name: "Master Admin" };
+        saveSession(session);
+        onLogin(session);
+        setLoading(false);
+        return;
+      }
+      // Check registered users in localStorage (same-browser accounts)
+      const users = getUsers();
+      const user = users.find(u => u.email === cleanEmail);
+      if (user) {
+        if (user.password !== pass) { setErr("Incorrect password."); setLoading(false); return; }
+        if (!user.active) { setErr("Account has been deactivated. Contact your administrator."); setLoading(false); return; }
+        const session = { email: cleanEmail, role: user.role, name: user.name };
+        saveSession(session);
+        onLogin(session);
+        setLoading(false);
+        return;
+      }
+      // Any @1-group.sg email with the team password gets visitor access
+      if (pass === MASTER_ADMIN.password) {
+        const name = cleanEmail.split("@")[0].split(".").map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(" ");
+        const session = { email: cleanEmail, role: "visitor", name: name };
+        saveSession(session);
+        onLogin(session);
+        setLoading(false);
+        return;
+      }
+      setErr("Incorrect password. Use the team password provided by your administrator.");
+      setLoading(false);
+    }, 600);
+  };
+
   return (
-    <nav style={{
-      position:'fixed', top:0, left:0, right:0, zIndex:1000,
-      background: scrolled ? 'rgba(255,255,255,0.97)' : 'rgba(255,255,255,0.92)',
-      backdropFilter:'blur(12px)', WebkitBackdropFilter:'blur(12px)',
-      borderBottom: scrolled ? '1px solid #eee' : '1px solid transparent',
-      transition:'all 0.3s ease',
-      boxShadow: scrolled ? '0 2px 20px rgba(0,0,0,0.06)' : 'none',
-    }}>
-      <div style={{ maxWidth:1200, margin:'0 auto', padding:'0 24px', display:'flex', alignItems:'center', justifyContent:'space-between', height:64 }}>
+    <div style={{ minHeight: "100vh", background: "var(--cr)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, fontFamily: "var(--fb)" }}>
+      {/* Decorative background */}
+      <div style={{ position: "fixed", top: "-20%", right: "-15%", width: "60vw", height: "60vw", background: "radial-gradient(circle, rgba(232,131,124,.06) 0%, transparent 70%)", animation: "morphBlob 25s ease-in-out infinite", pointerEvents: "none" }} />
+      <div style={{ position: "fixed", bottom: "-20%", left: "-15%", width: "50vw", height: "50vw", background: "radial-gradient(circle, rgba(212,165,165,.05) 0%, transparent 70%)", animation: "morphBlob 20s ease-in-out 5s infinite", pointerEvents: "none" }} />
+
+      <div style={{ width: "100%", maxWidth: 420, position: "relative", zIndex: 1 }}>
         {/* Logo */}
-        <div style={{ cursor:'pointer', display:'flex', alignItems:'center', gap:8 }} onClick={() => setActivePage('home')}>
-          <span style={{ fontFamily:'var(--font-heading)', fontSize:22, fontWeight:600, color:'var(--coral)', letterSpacing:'-0.02em' }}>SWV</span>
-          <span style={{ fontFamily:'var(--font-body)', fontSize:11, color:'var(--warm-grey)', letterSpacing:'0.06em', textTransform:'uppercase', fontWeight:500 }}>Singapore Wedding Venues</span>
+        <div style={{ textAlign: "center", marginBottom: 40, animation: "heroTextIn .8s ease forwards" }}>
+          <Heart size={36} style={{ color: "var(--ro)", marginBottom: 16 }} fill="var(--ro)" />
+          <h1 style={{ fontFamily: "var(--fh)", fontSize: 28, fontWeight: 400, color: "var(--c)", marginBottom: 6 }}>Singapore Wedding Venues</h1>
+          <p style={{ fontSize: 13, color: "var(--g)", letterSpacing: ".02em" }}>Admin & Team Portal</p>
         </div>
 
-        {/* Desktop Nav */}
-        <div style={{ display:'flex', alignItems:'center', gap:32 }} className="desktop-nav">
-          {pages.map(p => (
-            <button key={p.id} onClick={() => setActivePage(p.id)} style={{
-              background:'none', border:'none', cursor:'pointer',
-              fontFamily:'var(--font-body)', fontSize:14, fontWeight: activePage === p.id ? 600 : 500,
-              color: activePage === p.id ? 'var(--coral)' : 'var(--charcoal)',
-              letterSpacing:'0.02em', padding:'4px 0',
-              borderBottom: activePage === p.id ? '2px solid var(--coral)' : '2px solid transparent',
-              transition:'all 0.25s ease',
-            }}>
-              {p.label}
-            </button>
-          ))}
-        </div>
+        {/* Sign In Card */}
+        <div style={{ background: "var(--w)", borderRadius: 20, padding: "36px 32px", boxShadow: "0 20px 60px rgba(0,0,0,.08), 0 0 0 1px rgba(232,131,124,.08)", animation: "cardEnter .6s ease .2s both" }}>
+          <h2 style={{ fontFamily: "var(--fh)", fontSize: 24, fontWeight: 500, marginBottom: 6 }}>Welcome back</h2>
+          <p style={{ fontSize: 13, color: "var(--g)", marginBottom: 28 }}>Sign in with your 1-Group email</p>
 
-        {/* CTA + Hamburger */}
-        <div style={{ display:'flex', alignItems:'center', gap:16 }}>
-          <button onClick={() => setActivePage('venues')} style={{
-            background:'var(--coral)', color:'var(--white)', border:'none', cursor:'pointer',
-            padding:'10px 22px', borderRadius:'var(--btn-radius)',
-            fontFamily:'var(--font-body)', fontSize:13, fontWeight:600, letterSpacing:'0.03em',
-            transition:'all 0.2s ease',
-          }}
-            onMouseEnter={e => { e.target.style.background='var(--coral-deep)'; e.target.style.transform='translateY(-1px)'; e.target.style.boxShadow='var(--shadow-coral)'; }}
-            onMouseLeave={e => { e.target.style.background='var(--coral)'; e.target.style.transform='translateY(0)'; e.target.style.boxShadow='none'; }}
-          >
-            Find My Venue
-          </button>
-
-          {/* Hamburger */}
-          <button onClick={() => setMobileOpen(!mobileOpen)} style={{
-            background:'none', border:'none', cursor:'pointer', padding:8,
-            display:'none',
-          }} className="hamburger-btn">
-            <div style={{ width:20, height:2, background:'var(--charcoal)', marginBottom:5, transition:'0.3s' }} />
-            <div style={{ width:20, height:2, background:'var(--charcoal)', marginBottom:5, transition:'0.3s' }} />
-            <div style={{ width:20, height:2, background:'var(--charcoal)', transition:'0.3s' }} />
-          </button>
-        </div>
-      </div>
-
-      {/* Coral accent line */}
-      <div style={{ height:2, background:'linear-gradient(90deg, var(--coral), var(--coral-light), var(--coral))', opacity: scrolled ? 1 : 0, transition:'opacity 0.3s' }} />
-    </nav>
-  );
-}
-
-/* ── Hero Carousel ── */
-function HeroCarousel({ setActivePage }) {
-  const [current, setCurrent] = useState(0);
-  const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrent(c => (c + 1) % HERO_SLIDES.length);
-      setProgress(0);
-    }, 6000);
-    const tick = setInterval(() => setProgress(p => Math.min(p + 1.67, 100)), 100);
-    return () => { clearInterval(interval); clearInterval(tick); };
-  }, [current]);
-
-  const slide = HERO_SLIDES[current];
-  return (
-    <section style={{
-      position:'relative', height:'70vh', minHeight:480, maxHeight:680,
-      background: slide.gradient,
-      display:'flex', alignItems:'center', justifyContent:'center',
-      overflow:'hidden', transition:'background 1s ease',
-    }}>
-      {/* Decorative circles */}
-      <div style={{ position:'absolute', top:'-10%', right:'-5%', width:400, height:400, borderRadius:'50%', background:'rgba(255,255,255,0.08)', animation:'float 8s ease-in-out infinite' }} />
-      <div style={{ position:'absolute', bottom:'-15%', left:'-8%', width:500, height:500, borderRadius:'50%', background:'rgba(255,255,255,0.05)', animation:'float 10s ease-in-out infinite 2s' }} />
-      <div style={{ position:'absolute', top:'30%', left:'20%', width:200, height:200, borderRadius:'50%', background:'rgba(255,255,255,0.06)', animation:'float 7s ease-in-out infinite 1s' }} />
-
-      {/* Content */}
-      <div style={{ position:'relative', zIndex:2, textAlign:'center', maxWidth:700, padding:'0 24px' }}>
-        <h1 key={current} style={{
-          fontFamily:'var(--font-heading)', fontWeight:300, fontSize:'clamp(2rem, 5vw, 3.5rem)',
-          color:'var(--white)', lineHeight:1.15, letterSpacing:'-0.02em',
-          whiteSpace:'pre-line', textShadow:'0 2px 20px rgba(0,0,0,0.08)',
-          animation:'fadeUp 0.8s ease forwards',
-        }}>
-          {slide.title}
-        </h1>
-        <p key={`sub-${current}`} style={{
-          fontFamily:'var(--font-body)', fontSize:'clamp(0.9rem, 2vw, 1.1rem)',
-          color:'rgba(255,255,255,0.9)', marginTop:20, lineHeight:1.6, maxWidth:550, margin:'20px auto 0',
-          animation:'fadeUp 0.8s ease 0.2s both',
-        }}>
-          {slide.subtitle}
-        </p>
-        <button onClick={() => setActivePage('venues')} style={{
-          marginTop:32, padding:'14px 36px', background:'var(--white)', color:'var(--coral)',
-          border:'none', borderRadius:'var(--btn-radius)', cursor:'pointer',
-          fontFamily:'var(--font-body)', fontSize:15, fontWeight:600, letterSpacing:'0.03em',
-          boxShadow:'0 4px 20px rgba(0,0,0,0.1)', transition:'all 0.3s ease',
-          animation:'fadeUp 0.8s ease 0.4s both',
-        }}
-          onMouseEnter={e => { e.target.style.transform='translateY(-2px)'; e.target.style.boxShadow='0 8px 30px rgba(0,0,0,0.15)'; }}
-          onMouseLeave={e => { e.target.style.transform='translateY(0)'; e.target.style.boxShadow='0 4px 20px rgba(0,0,0,0.1)'; }}
-        >
-          {slide.cta} →
-        </button>
-      </div>
-
-      {/* Dots + Progress */}
-      <div style={{ position:'absolute', bottom:28, left:'50%', transform:'translateX(-50%)', display:'flex', flexDirection:'column', alignItems:'center', gap:12 }}>
-        <div style={{ display:'flex', gap:10 }}>
-          {HERO_SLIDES.map((_, i) => (
-            <button key={i} onClick={() => { setCurrent(i); setProgress(0); }} style={{
-              width: i === current ? 28 : 8, height:8, borderRadius:4,
-              background: i === current ? 'var(--white)' : 'rgba(255,255,255,0.4)',
-              border:'none', cursor:'pointer', transition:'all 0.4s ease',
-            }} />
-          ))}
-        </div>
-        <div style={{ width:120, height:2, background:'rgba(255,255,255,0.2)', borderRadius:1, overflow:'hidden' }}>
-          <div style={{ height:'100%', background:'var(--white)', width:`${progress}%`, transition:'width 0.1s linear' }} />
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ── Quick Search Strip ── */
-function QuickSearch({ setActivePage, setSearchFilters }) {
-  const [guests, setGuests] = useState('');
-  const [style, setStyle] = useState('');
-  return (
-    <section style={{ background:'var(--blush)', padding:'28px 24px', borderBottom:'1px solid var(--coral-pale)' }}>
-      <div style={{ maxWidth:900, margin:'0 auto', display:'flex', flexWrap:'wrap', gap:12, alignItems:'center', justifyContent:'center' }}>
-        <input value={guests} onChange={e => setGuests(e.target.value)} placeholder="Guest count" type="number" style={{
-          flex:'1 1 140px', padding:'12px 16px', borderRadius:'var(--btn-radius)', border:'1px solid var(--coral-pale)',
-          fontFamily:'var(--font-body)', fontSize:14, outline:'none', background:'var(--white)',
-          transition:'border-color 0.2s',
-        }}
-          onFocus={e => e.target.style.borderColor='var(--coral)'}
-          onBlur={e => e.target.style.borderColor='var(--coral-pale)'}
-        />
-        <select value={style} onChange={e => setStyle(e.target.value)} style={{
-          flex:'1 1 160px', padding:'12px 16px', borderRadius:'var(--btn-radius)', border:'1px solid var(--coral-pale)',
-          fontFamily:'var(--font-body)', fontSize:14, outline:'none', background:'var(--white)',
-          color: style ? 'var(--charcoal)' : 'var(--grey)', appearance:'none', cursor:'pointer',
-        }}>
-          <option value="">Venue style</option>
-          <option value="hotel">Hotel & Resort</option>
-          <option value="rooftop">Rooftop</option>
-          <option value="garden">Garden & Outdoor</option>
-          <option value="heritage">Heritage</option>
-          <option value="restaurant">Restaurant</option>
-        </select>
-        <select style={{
-          flex:'1 1 160px', padding:'12px 16px', borderRadius:'var(--btn-radius)', border:'1px solid var(--coral-pale)',
-          fontFamily:'var(--font-body)', fontSize:14, outline:'none', background:'var(--white)', color:'var(--grey)',
-        }}>
-          <option>Location</option>
-          <option>Marina Bay</option>
-          <option>City Hall</option>
-          <option>Sentosa</option>
-          <option>Orchard</option>
-          <option>Dempsey Hill</option>
-        </select>
-        <button onClick={() => { setActivePage('venues'); }} style={{
-          padding:'12px 32px', background:'var(--coral)', color:'var(--white)', border:'none',
-          borderRadius:'var(--btn-radius)', cursor:'pointer', fontFamily:'var(--font-body)',
-          fontSize:14, fontWeight:600, letterSpacing:'0.03em', transition:'all 0.2s ease',
-          whiteSpace:'nowrap',
-        }}
-          onMouseEnter={e => { e.target.style.background='var(--coral-deep)'; }}
-          onMouseLeave={e => { e.target.style.background='var(--coral)'; }}
-        >
-          Search Venues
-        </button>
-      </div>
-    </section>
-  );
-}
-
-/* ── Venue Card ── */
-function VenueCard({ venue, onClick, delay = 0 }) {
-  const ref = useReveal();
-  const grad = GRADIENTS[venue.category] || GRADIENTS.hotel;
-  return (
-    <div ref={ref} className="reveal card-shimmer" onClick={onClick} style={{
-      background:'var(--white)', borderRadius:'var(--card-radius)', overflow:'hidden',
-      boxShadow:'var(--shadow-sm)', cursor:'pointer',
-      transition:'all 0.35s ease', transitionDelay:`${delay}ms`,
-    }}
-      onMouseEnter={e => { e.currentTarget.style.transform='translateY(-6px)'; e.currentTarget.style.boxShadow='var(--shadow-lg)'; }}
-      onMouseLeave={e => { e.currentTarget.style.transform='translateY(0)'; e.currentTarget.style.boxShadow='var(--shadow-sm)'; }}
-    >
-      {/* Image placeholder */}
-      <div style={{
-        aspectRatio:'4/3', background:grad, position:'relative', overflow:'hidden',
-        display:'flex', alignItems:'flex-end', justifyContent:'flex-start', padding:16,
-      }}>
-        {/* Category badge */}
-        <span style={{
-          position:'absolute', top:12, left:12, background:'var(--white)', color:'var(--coral)',
-          padding:'4px 12px', borderRadius:'var(--pill-radius)', fontFamily:'var(--font-body)',
-          fontSize:11, fontWeight:600, letterSpacing:'0.05em', textTransform:'uppercase',
-        }}>
-          {CATEGORIES.find(c => c.id === venue.category)?.icon} {venue.category}
-        </span>
-        {/* Rating */}
-        <span style={{
-          position:'absolute', top:12, right:12, background:'rgba(255,255,255,0.9)', color:'var(--charcoal)',
-          padding:'4px 10px', borderRadius:'var(--pill-radius)', fontFamily:'var(--font-body)',
-          fontSize:12, fontWeight:600,
-        }}>
-          ★ {venue.rating}
-        </span>
-        {/* Venue name overlay */}
-        <span style={{
-          fontFamily:'var(--font-heading)', fontSize:20, fontWeight:500, color:'var(--white)',
-          textShadow:'0 2px 12px rgba(0,0,0,0.2)', lineHeight:1.2,
-        }}>
-          {venue.name}
-        </span>
-      </div>
-
-      {/* Card body */}
-      <div style={{ padding:'16px 18px 18px' }}>
-        <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:8, flexWrap:'wrap' }}>
-          <span style={{ fontFamily:'var(--font-body)', fontSize:12, color:'var(--warm-grey)' }}>📍 {venue.location}</span>
-          <span style={{ color:'var(--grey-light)' }}>·</span>
-          <span style={{ fontFamily:'var(--font-body)', fontSize:12, color:'var(--warm-grey)' }}>👥 {venue.capacity.min}–{venue.capacity.max}</span>
-          {venue.solemnisation && <>
-            <span style={{ color:'var(--grey-light)' }}>·</span>
-            <span style={{ fontFamily:'var(--font-body)', fontSize:11, color:'var(--sage)', fontWeight:600 }}>ROM ✓</span>
-          </>}
-        </div>
-        <p style={{
-          fontFamily:'var(--font-body)', fontSize:13, color:'var(--warm-grey)', lineHeight:1.5,
-          display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden',
-        }}>
-          {venue.description}
-        </p>
-        <button style={{
-          marginTop:14, padding:'8px 20px', background:'transparent', color:'var(--coral)',
-          border:'1.5px solid var(--coral)', borderRadius:'var(--btn-radius)', cursor:'pointer',
-          fontFamily:'var(--font-body)', fontSize:13, fontWeight:600, letterSpacing:'0.02em',
-          transition:'all 0.2s ease', width:'100%',
-        }}
-          onMouseEnter={e => { e.target.style.background='var(--coral)'; e.target.style.color='var(--white)'; }}
-          onMouseLeave={e => { e.target.style.background='transparent'; e.target.style.color='var(--coral)'; }}
-        >
-          View Details →
-        </button>
-      </div>
-    </div>
-  );
-}
-
-/* ── Venue Detail Modal ── */
-function VenueDetail({ venue, onClose }) {
-  if (!venue) return null;
-  const grad = GRADIENTS[venue.category] || GRADIENTS.hotel;
-  return (
-    <div style={{ position:'fixed', inset:0, zIndex:2000, background:'rgba(0,0,0,0.5)', backdropFilter:'blur(4px)', display:'flex', alignItems:'center', justifyContent:'center', padding:24 }} onClick={onClose}>
-      <div style={{ background:'var(--white)', borderRadius:16, maxWidth:700, width:'100%', maxHeight:'85vh', overflow:'auto', animation:'fadeUp 0.4s ease' }} onClick={e => e.stopPropagation()}>
-        <div style={{ height:240, background:grad, position:'relative', display:'flex', alignItems:'flex-end', padding:28, borderRadius:'16px 16px 0 0' }}>
-          <button onClick={onClose} style={{ position:'absolute', top:16, right:16, width:36, height:36, borderRadius:'50%', background:'rgba(255,255,255,0.9)', border:'none', cursor:'pointer', fontSize:18, display:'flex', alignItems:'center', justifyContent:'center' }}>✕</button>
-          <div>
-            <span style={{ fontFamily:'var(--font-body)', fontSize:11, fontWeight:600, color:'rgba(255,255,255,0.8)', textTransform:'uppercase', letterSpacing:'0.06em' }}>{venue.category}</span>
-            <h2 style={{ fontFamily:'var(--font-heading)', fontSize:32, fontWeight:400, color:'var(--white)', marginTop:4, textShadow:'0 2px 12px rgba(0,0,0,0.15)' }}>{venue.name}</h2>
-          </div>
-        </div>
-        <div style={{ padding:28 }}>
-          {/* Stats grid */}
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(140px, 1fr))', gap:16, marginBottom:24 }}>
-            {[
-              { label:'Location', value:venue.location },
-              { label:'Capacity', value:`${venue.capacity.min}–${venue.capacity.max} guests` },
-              { label:'Setting', value:venue.setting },
-              { label:'Rating', value:`★ ${venue.rating} / 5.0` },
-            ].map(s => (
-              <div key={s.label} style={{ background:'var(--blush-light)', padding:'14px 16px', borderRadius:8 }}>
-                <div style={{ fontFamily:'var(--font-body)', fontSize:11, color:'var(--grey)', fontWeight:600, textTransform:'uppercase', letterSpacing:'0.05em', marginBottom:4 }}>{s.label}</div>
-                <div style={{ fontFamily:'var(--font-body)', fontSize:15, color:'var(--charcoal)', fontWeight:500 }}>{s.value}</div>
+          <form onSubmit={handleLogin}>
+            <div style={{ marginBottom: 18 }}>
+              <label style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".06em", textTransform: "uppercase", color: "var(--g)", marginBottom: 6, display: "block" }}>Email Address</label>
+              <div style={{ position: "relative" }}>
+                <Mail size={16} style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "var(--gi)" }} />
+                <input
+                  className="inp"
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="yourname@1-group.sg"
+                  required
+                  style={{ paddingLeft: 42 }}
+                />
               </div>
-            ))}
+            </div>
+
+            <div style={{ marginBottom: 24 }}>
+              <label style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".06em", textTransform: "uppercase", color: "var(--g)", marginBottom: 6, display: "block" }}>Password</label>
+              <div style={{ position: "relative" }}>
+                <Lock size={16} style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "var(--gi)" }} />
+                <input
+                  className="inp"
+                  type={showPass ? "text" : "password"}
+                  value={pass}
+                  onChange={e => setPass(e.target.value)}
+                  placeholder="Enter your password"
+                  required
+                  style={{ paddingLeft: 42, paddingRight: 42 }}
+                />
+                <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--gi)", padding: 4 }}>
+                  {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </div>
+
+            {err && (
+              <div style={{ background: "var(--rp)", border: "1px solid var(--rl)", borderRadius: 10, padding: "10px 14px", marginBottom: 18, animation: "fU .3s ease" }}>
+                <p style={{ fontSize: 13, color: "var(--rd)" }}>{err}</p>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="bg"
+              disabled={loading}
+              style={{ width: "100%", justifyContent: "center", padding: "14px 24px", fontSize: 15, borderRadius: 12, opacity: loading ? 0.7 : 1 }}
+            >
+              {loading ? (
+                <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,.3)", borderTopColor: "var(--w)", borderRadius: "50%", animation: "spin .6s linear infinite", display: "inline-block" }} />
+                  Signing in…
+                </span>
+              ) : (
+                <><Lock size={15} /> Sign In</>
+              )}
+            </button>
+          </form>
+
+          <div style={{ marginTop: 24, padding: "16px 0 0", borderTop: "1px solid var(--gpa)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
+              <Shield size={14} style={{ color: "var(--go)" }} />
+              <span style={{ fontSize: 12, color: "var(--g)" }}>Secured portal · {DOMAIN} accounts only</span>
+              <span style={{ fontSize: 10, color: "var(--gi)", display: "block", marginTop: 4 }}>v13</span>
+            </div>
           </div>
-          <p style={{ fontFamily:'var(--font-body)', fontSize:15, color:'var(--warm-grey)', lineHeight:1.7, marginBottom:20 }}>{venue.description}</p>
-          <h3 style={{ fontFamily:'var(--font-heading)', fontSize:22, fontWeight:500, color:'var(--charcoal)', marginBottom:12 }}>Key Features</h3>
-          <div style={{ display:'flex', flexWrap:'wrap', gap:8, marginBottom:24 }}>
-            {venue.features.map((f, i) => (
-              <span key={i} style={{ background:'var(--blush)', color:'var(--coral-deep)', padding:'6px 14px', borderRadius:'var(--pill-radius)', fontFamily:'var(--font-body)', fontSize:13, fontWeight:500 }}>{f}</span>
-            ))}
+        </div>
+
+        <p style={{ textAlign: "center", fontSize: 11, color: "var(--g)", marginTop: 24 }}>
+          Need access? Contact your administrator or the master admin.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ── ADMIN PANEL ──────────────────────────────────────────────────────────
+function AdminPanel({ session, onClose }) {
+  const [users, setUsers] = useState(getUsers());
+  const [showAdd, setShowAdd] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [newEmail, setNewEmail] = useState("");
+  const [newPass, setNewPass] = useState("");
+  const [newRole, setNewRole] = useState(session.role === "master" ? "admin" : "visitor");
+  const [addErr, setAddErr] = useState("");
+  const [addOk, setAddOk] = useState("");
+
+  const canCreateAdmin = session.role === "master";
+  const canCreateVisitor = session.role === "master" || session.role === "admin";
+  const manageable = session.role === "master" ? users : users.filter(u => u.role === "visitor" && u.createdBy === session.email);
+
+  const handleAdd = (e) => {
+    e.preventDefault();
+    setAddErr(""); setAddOk("");
+    const cleanEmail = newEmail.trim().toLowerCase();
+    if (!cleanEmail.endsWith(DOMAIN)) { setAddErr(`Email must end with ${DOMAIN}`); return; }
+    if (cleanEmail === MASTER_ADMIN.email) { setAddErr("Cannot create account with master admin email"); return; }
+    const existing = users.find(u => u.email === cleanEmail);
+    if (existing) { setAddErr("An account with this email already exists"); return; }
+    if (!newPass || newPass.length < 6) { setAddErr("Password must be at least 6 characters"); return; }
+    if (session.role === "admin" && newRole === "admin") { setAddErr("Only the Master Admin can create admin accounts"); return; }
+
+    const newUser = {
+      email: cleanEmail,
+      name: newName.trim() || cleanEmail.split("@")[0],
+      password: newPass,
+      role: newRole,
+      active: true,
+      createdBy: session.email,
+      createdAt: new Date().toISOString()
+    };
+    const updated = [...users, newUser];
+    setUsers(updated);
+    saveUsers(updated);
+    setNewName(""); setNewEmail(""); setNewPass("");
+    setAddOk(`${newUser.name} (${newRole}) created successfully`);
+    setShowAdd(false);
+    setTimeout(() => setAddOk(""), 3000);
+  };
+
+  const toggleActive = (email) => {
+    const updated = users.map(u => u.email === email ? { ...u, active: !u.active } : u);
+    setUsers(updated);
+    saveUsers(updated);
+  };
+
+  const removeUser = (email) => {
+    if (!confirm(`Remove ${email}? This cannot be undone.`)) return;
+    const updated = users.filter(u => u.email !== email);
+    setUsers(updated);
+    saveUsers(updated);
+  };
+
+  const roleColor = (r) => r === "admin" ? "var(--go)" : "var(--sa)";
+  const roleBg = (r) => r === "admin" ? "var(--gp)" : "rgba(181,196,177,.2)";
+
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+      <div onClick={onClose} style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,.5)", backdropFilter: "blur(6px)" }} />
+      <div style={{ position: "relative", background: "var(--w)", borderRadius: 20, width: "100%", maxWidth: 640, maxHeight: "85vh", overflow: "auto", boxShadow: "var(--sx)", animation: "cardEnter .4s ease" }}>
+        <div style={{ padding: "24px 28px", borderBottom: "1px solid var(--gpa)", display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, background: "var(--w)", zIndex: 1, borderRadius: "20px 20px 0 0" }}>
+          <div>
+            <h2 style={{ fontFamily: "var(--fh)", fontSize: 24, fontWeight: 500, display: "flex", alignItems: "center", gap: 8 }}>
+              <Settings size={20} style={{ color: "var(--go)" }} />
+              User Management
+            </h2>
+            <p style={{ fontSize: 12, color: "var(--g)", marginTop: 2 }}>
+              Signed in as <strong>{session.name}</strong> · {session.role === "master" ? "Master Admin" : session.role === "admin" ? "Admin" : "Visitor"}
+            </p>
           </div>
-          <h3 style={{ fontFamily:'var(--font-heading)', fontSize:22, fontWeight:500, color:'var(--charcoal)', marginBottom:12 }}>Cuisine</h3>
-          <p style={{ fontFamily:'var(--font-body)', fontSize:14, color:'var(--warm-grey)', marginBottom:24 }}>{venue.cuisine.join(' · ')}</p>
-          <button style={{
-            width:'100%', padding:'14px', background:'var(--coral)', color:'var(--white)', border:'none',
-            borderRadius:'var(--btn-radius)', cursor:'pointer', fontFamily:'var(--font-body)', fontSize:15, fontWeight:600,
-            transition:'all 0.2s', letterSpacing:'0.02em',
-          }}
-            onMouseEnter={e => e.target.style.background='var(--coral-deep)'}
-            onMouseLeave={e => e.target.style.background='var(--coral)'}
-          >
-            Enquire About This Venue
-          </button>
+          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", padding: 4 }}><X size={20} /></button>
+        </div>
+
+        <div style={{ padding: "20px 28px 28px" }}>
+          {addOk && <div style={{ background: "rgba(127,183,126,.1)", border: "1px solid rgba(127,183,126,.3)", borderRadius: 10, padding: "10px 14px", marginBottom: 16, animation: "fU .3s ease" }}><p style={{ fontSize: 13, color: "#4a8c49" }}>✓ {addOk}</p></div>}
+
+          {/* Add User */}
+          {canCreateVisitor && (
+            <div style={{ marginBottom: 24 }}>
+              {!showAdd ? (
+                <button onClick={() => setShowAdd(true)} className="bg" style={{ fontSize: 13, padding: "10px 20px" }}><UserPlus size={15} />Add {canCreateAdmin ? "Admin or Visitor" : "Visitor"}</button>
+              ) : (
+                <div style={{ background: "var(--gg)", borderRadius: 14, padding: 22, animation: "fU .3s ease" }}>
+                  <h3 style={{ fontFamily: "var(--fh)", fontSize: 18, fontWeight: 500, marginBottom: 14, display: "flex", alignItems: "center", gap: 6 }}><UserPlus size={16} style={{ color: "var(--go)" }} />Create New Account</h3>
+                  <form onSubmit={handleAdd}>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
+                      <div>
+                        <label style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".05em", textTransform: "uppercase", color: "var(--g)", marginBottom: 4, display: "block" }}>Full Name</label>
+                        <input className="inp" value={newName} onChange={e => setNewName(e.target.value)} placeholder="John Smith" required />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".05em", textTransform: "uppercase", color: "var(--g)", marginBottom: 4, display: "block" }}>Role</label>
+                        <select className="inp" value={newRole} onChange={e => setNewRole(e.target.value)} style={{ cursor: "pointer" }}>
+                          {canCreateAdmin && <option value="admin">Admin</option>}
+                          <option value="visitor">Visitor</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div style={{ marginBottom: 12 }}>
+                      <label style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".05em", textTransform: "uppercase", color: "var(--g)", marginBottom: 4, display: "block" }}>Email Address</label>
+                      <input className="inp" type="email" value={newEmail} onChange={e => setNewEmail(e.target.value)} placeholder={`name${DOMAIN}`} required />
+                    </div>
+                    <div style={{ marginBottom: 16 }}>
+                      <label style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".05em", textTransform: "uppercase", color: "var(--g)", marginBottom: 4, display: "block" }}>Password (min 6 chars)</label>
+                      <input className="inp" type="text" value={newPass} onChange={e => setNewPass(e.target.value)} placeholder="Set a password" required minLength={6} />
+                    </div>
+                    {addErr && <p style={{ fontSize: 13, color: "var(--rd)", marginBottom: 12, background: "var(--rp)", padding: "8px 12px", borderRadius: 8 }}>{addErr}</p>}
+                    <div style={{ display: "flex", gap: 10 }}>
+                      <button type="submit" className="bg" style={{ fontSize: 13, padding: "10px 20px" }}><UserPlus size={14} />Create Account</button>
+                      <button type="button" onClick={() => { setShowAdd(false); setAddErr(""); }} style={{ padding: "10px 20px", borderRadius: 8, border: "1px solid var(--gpa)", background: "var(--w)", fontFamily: "var(--fb)", fontSize: 13, cursor: "pointer" }}>Cancel</button>
+                    </div>
+                  </form>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* User List */}
+          <h3 style={{ fontFamily: "var(--fh)", fontSize: 18, fontWeight: 500, marginBottom: 14 }}>
+            {session.role === "master" ? "All Accounts" : "Your Visitor Accounts"} ({manageable.length})
+          </h3>
+          {manageable.length === 0 ? (
+            <p style={{ fontSize: 14, color: "var(--g)", padding: 20, textAlign: "center", background: "var(--gg)", borderRadius: 10 }}>No accounts created yet.</p>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {manageable.map((u, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", background: "var(--gg)", borderRadius: 10, animation: `fU .3s ease ${i * 50}ms both` }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 2 }}>
+                      <span style={{ fontWeight: 600, fontSize: 14 }}>{u.name}</span>
+                      <span style={{ background: roleBg(u.role), color: roleColor(u.role), fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 999, textTransform: "uppercase", letterSpacing: ".04em" }}>{u.role}</span>
+                      {!u.active && <span style={{ background: "var(--rp)", color: "var(--rd)", fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 999 }}>DISABLED</span>}
+                    </div>
+                    <p style={{ fontSize: 12, color: "var(--g)" }}>{u.email}</p>
+                    <p style={{ fontSize: 11, color: "var(--gi)" }}>Created by {u.createdBy} · {new Date(u.createdAt).toLocaleDateString()}</p>
+                  </div>
+                  <div style={{ display: "flex", gap: 6 }}>
+                    <button onClick={() => toggleActive(u.email)} style={{ background: u.active ? "var(--rp)" : "rgba(127,183,126,.15)", border: "none", borderRadius: 8, padding: "6px 10px", cursor: "pointer", fontSize: 11, fontWeight: 600, color: u.active ? "var(--rd)" : "#4a8c49", fontFamily: "var(--fb)" }}>{u.active ? "Disable" : "Enable"}</button>
+                    {session.role === "master" && <button onClick={() => removeUser(u.email)} style={{ background: "none", border: "1px solid var(--gpa)", borderRadius: 8, padding: "6px 8px", cursor: "pointer", color: "var(--g)" }}><Trash2 size={13} /></button>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 }
 
-/* ═══════════════════ PAGE SECTIONS ═══════════════════ */
+// ═════════════════════════════════════════════════════════════════════════
+// AUTH WRAPPER (default export)
+// ═════════════════════════════════════════════════════════════════════════
+export default function App() {
+  const [session, setSession] = useState(() => getSession());
+  const [showAdmin, setShowAdmin] = useState(false);
 
-/* ── Homepage ── */
-function HomePage({ setActivePage }) {
-  const [selectedVenue, setSelectedVenue] = useState(null);
-  const featuredVenues = VENUES.filter(v => v.featured).slice(0, 6);
-  const ref1 = useReveal();
-  const ref2 = useReveal();
-  const ref3 = useReveal();
-  const ref4 = useReveal();
+  if (!session) {
+    return (
+      <>
+        <style>{`@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
+        :root{--w:#FFF;--cr:#FFFFFF;--cw:#FFF8F5;--iv:#FFFBFA;--ro:#E8837C;--rl:#F2A9A4;--rp:#FFF0ED;--rd:#D4625A;--go:#E8837C;--gl:#F2A9A4;--gp:#FADBD8;--gd:#C0504A;--sa:#A8C5A0;--sl:#D4E4D0;--c:#333333;--cl:#555555;--g:#8A8A8A;--gi:#C5C5C5;--gpa:#EEEEEE;--gg:#F7F7F7;--fh:'Cormorant Garamond',serif;--fb:'DM Sans',sans-serif;--e:cubic-bezier(.4,0,.2,1)}
+        *{box-sizing:border-box;margin:0;padding:0}
+        @keyframes morphBlob{0%,100%{border-radius:60% 40% 30% 70%/60% 30% 70% 40%}50%{border-radius:50% 60% 30% 60%/30% 60% 70% 40%}}
+        @keyframes heroTextIn{0%{opacity:0;transform:translateY(20px);filter:blur(6px)}100%{opacity:1;transform:translateY(0);filter:blur(0)}}
+        @keyframes cardEnter{from{opacity:0;transform:translateY(40px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+        @keyframes fU{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .inp{border:1px solid #E8E8E8;padding:10px 16px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;transition:border-color .2s,box-shadow .2s;width:100%;outline:none;background:#FFF}
+        .inp:focus{border-color:#E8837C;box-shadow:0 0 0 3px rgba(232,131,124,.15)}
+        .bg{background:linear-gradient(135deg,#E8837C,#C0504A);color:#FFF;border:none;padding:12px 28px;border-radius:8px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:14px;letter-spacing:.04em;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:8px}
+        .bg:hover{filter:brightness(1.1);transform:translateY(-1px)}
+        `}</style>
+        <SignInPage onLogin={setSession} />
+      </>
+    );
+  }
+
+  const handleLogout = () => { saveSession(null); setSession(null); };
 
   return (
     <>
-      <HeroCarousel setActivePage={setActivePage} />
-      <QuickSearch setActivePage={setActivePage} />
-
-      {/* Featured Venues */}
-      <section style={{ background:'var(--white)', padding:'60px 24px' }}>
-        <div style={{ maxWidth:1200, margin:'0 auto' }}>
-          <div ref={ref1} className="reveal" style={{ textAlign:'center', marginBottom:48 }}>
-            <span style={{ fontFamily:'var(--font-body)', fontSize:12, fontWeight:600, color:'var(--coral)', letterSpacing:'0.08em', textTransform:'uppercase' }}>Curated For You</span>
-            <h2 style={{ fontFamily:'var(--font-heading)', fontSize:'clamp(1.75rem, 3.5vw, 2.5rem)', fontWeight:400, color:'var(--charcoal)', marginTop:8 }}>Featured Wedding Venues</h2>
-            <p style={{ fontFamily:'var(--font-body)', fontSize:15, color:'var(--warm-grey)', marginTop:12, maxWidth:500, margin:'12px auto 0' }}>
-              Discover Singapore's most sought-after wedding venues, handpicked by our editorial team
-            </p>
-          </div>
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(320px, 1fr))', gap:24 }}>
-            {featuredVenues.map((v, i) => (
-              <VenueCard key={v.id} venue={v} delay={i * 80} onClick={() => setSelectedVenue(v)} />
-            ))}
-          </div>
-          <div style={{ textAlign:'center', marginTop:40 }}>
-            <button onClick={() => setActivePage('venues')} style={{
-              padding:'14px 40px', background:'transparent', color:'var(--coral)', border:'2px solid var(--coral)',
-              borderRadius:'var(--btn-radius)', cursor:'pointer', fontFamily:'var(--font-body)', fontSize:15,
-              fontWeight:600, letterSpacing:'0.03em', transition:'all 0.25s ease',
-            }}
-              onMouseEnter={e => { e.target.style.background='var(--coral)'; e.target.style.color='var(--white)'; }}
-              onMouseLeave={e => { e.target.style.background='transparent'; e.target.style.color='var(--coral)'; }}
-            >
-              View All {VENUES.length} Venues →
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* AI Tools Promo */}
-      <section style={{ background:'var(--blush)', padding:'60px 24px' }}>
-        <div ref={ref2} className="reveal" style={{ maxWidth:1000, margin:'0 auto', textAlign:'center' }}>
-          <span style={{ fontFamily:'var(--font-body)', fontSize:12, fontWeight:600, color:'var(--coral)', letterSpacing:'0.08em', textTransform:'uppercase' }}>Powered by AI</span>
-          <h2 style={{ fontFamily:'var(--font-heading)', fontSize:'clamp(1.75rem, 3.5vw, 2.5rem)', fontWeight:400, color:'var(--charcoal)', marginTop:8 }}>Smart Wedding Planning Tools</h2>
-          <p style={{ fontFamily:'var(--font-body)', fontSize:15, color:'var(--warm-grey)', marginTop:12, maxWidth:550, margin:'12px auto 0' }}>
-            Let our AI-powered tools help you find the perfect venue, plan your budget, and create your dream timeline
-          </p>
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(220px, 1fr))', gap:20, marginTop:40 }}>
-            {[
-              { icon:'💍', title:'Venue Matchmaker', desc:'Tell us your style and we\'ll find your perfect match' },
-              { icon:'💰', title:'Budget Calculator', desc:'AI-powered Singapore wedding cost breakdown' },
-              { icon:'📅', title:'Timeline Generator', desc:'Custom day-of schedule with local customs' },
-              { icon:'⚖️', title:'Venue Comparison', desc:'Side-by-side venue comparison with AI insights' },
-            ].map((tool, i) => (
-              <div key={i} onClick={() => setActivePage('ai-tools')} style={{
-                background:'var(--white)', padding:28, borderRadius:'var(--card-radius)',
-                textAlign:'center', cursor:'pointer', boxShadow:'var(--shadow-sm)',
-                transition:'all 0.3s ease',
-              }}
-                onMouseEnter={e => { e.currentTarget.style.transform='translateY(-4px)'; e.currentTarget.style.boxShadow='var(--shadow-md)'; }}
-                onMouseLeave={e => { e.currentTarget.style.transform='translateY(0)'; e.currentTarget.style.boxShadow='var(--shadow-sm)'; }}
-              >
-                <div style={{ fontSize:32, marginBottom:12 }}>{tool.icon}</div>
-                <h3 style={{ fontFamily:'var(--font-heading)', fontSize:20, fontWeight:500, color:'var(--charcoal)', marginBottom:8 }}>{tool.title}</h3>
-                <p style={{ fontFamily:'var(--font-body)', fontSize:13, color:'var(--warm-grey)', lineHeight:1.5 }}>{tool.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Real Weddings Preview */}
-      <section style={{ background:'var(--white)', padding:'60px 24px' }}>
-        <div ref={ref3} className="reveal" style={{ maxWidth:1000, margin:'0 auto' }}>
-          <div style={{ textAlign:'center', marginBottom:40 }}>
-            <span style={{ fontFamily:'var(--font-body)', fontSize:12, fontWeight:600, color:'var(--coral)', letterSpacing:'0.08em', textTransform:'uppercase' }}>Inspiration</span>
-            <h2 style={{ fontFamily:'var(--font-heading)', fontSize:'clamp(1.75rem, 3.5vw, 2.5rem)', fontWeight:400, color:'var(--charcoal)', marginTop:8 }}>Real Wedding Stories</h2>
-          </div>
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(280px, 1fr))', gap:20 }}>
-            {REAL_WEDDINGS.map((w, i) => (
-              <div key={i} style={{
-                background:'var(--blush-light)', padding:24, borderRadius:'var(--card-radius)',
-                border:'1px solid var(--coral-pale)', transition:'all 0.3s',
-              }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor='var(--coral-light)'; e.currentTarget.style.boxShadow='var(--shadow-sm)'; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor='var(--coral-pale)'; e.currentTarget.style.boxShadow='none'; }}
-              >
-                <span style={{ fontFamily:'var(--font-body)', fontSize:11, fontWeight:600, color:'var(--coral)', letterSpacing:'0.06em', textTransform:'uppercase' }}>{w.style}</span>
-                <h3 style={{ fontFamily:'var(--font-heading)', fontSize:24, fontWeight:500, color:'var(--charcoal)', marginTop:6 }}>{w.couple}</h3>
-                <p style={{ fontFamily:'var(--font-body)', fontSize:14, color:'var(--warm-grey)', marginTop:8 }}>at {w.venue} · {w.guests} guests</p>
-                <button style={{
-                  marginTop:16, padding:'8px 20px', background:'transparent', color:'var(--coral)',
-                  border:'1.5px solid var(--coral)', borderRadius:'var(--btn-radius)', cursor:'pointer',
-                  fontFamily:'var(--font-body)', fontSize:13, fontWeight:600, transition:'all 0.2s',
-                }}
-                  onMouseEnter={e => { e.target.style.background='var(--coral)'; e.target.style.color='var(--white)'; }}
-                  onMouseLeave={e => { e.target.style.background='transparent'; e.target.style.color='var(--coral)'; }}
-                >
-                  Read Their Story →
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Blog Preview */}
-      <section style={{ background:'var(--blush-pale)', padding:'60px 24px' }}>
-        <div ref={ref4} className="reveal" style={{ maxWidth:1000, margin:'0 auto' }}>
-          <div style={{ textAlign:'center', marginBottom:40 }}>
-            <span style={{ fontFamily:'var(--font-body)', fontSize:12, fontWeight:600, color:'var(--coral)', letterSpacing:'0.08em', textTransform:'uppercase' }}>From The Blog</span>
-            <h2 style={{ fontFamily:'var(--font-heading)', fontSize:'clamp(1.75rem, 3.5vw, 2.5rem)', fontWeight:400, color:'var(--charcoal)', marginTop:8 }}>Wedding Guides & Inspiration</h2>
-          </div>
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(280px, 1fr))', gap:20 }}>
-            {BLOG_POSTS.slice(0, 3).map((post, i) => (
-              <div key={post.id} style={{
-                background:'var(--white)', padding:24, borderRadius:'var(--card-radius)',
-                boxShadow:'var(--shadow-sm)', transition:'all 0.3s',
-              }}
-                onMouseEnter={e => { e.currentTarget.style.transform='translateY(-4px)'; e.currentTarget.style.boxShadow='var(--shadow-md)'; }}
-                onMouseLeave={e => { e.currentTarget.style.transform='translateY(0)'; e.currentTarget.style.boxShadow='var(--shadow-sm)'; }}
-              >
-                <span style={{ fontFamily:'var(--font-body)', fontSize:11, fontWeight:600, color:'var(--coral)', letterSpacing:'0.06em', textTransform:'uppercase' }}>{post.category}</span>
-                <h3 style={{ fontFamily:'var(--font-heading)', fontSize:20, fontWeight:500, color:'var(--charcoal)', marginTop:8, lineHeight:1.3 }}>{post.title}</h3>
-                <p style={{ fontFamily:'var(--font-body)', fontSize:13, color:'var(--warm-grey)', marginTop:10, lineHeight:1.6 }}>{post.excerpt}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Newsletter */}
-      <section style={{ background:'var(--coral)', padding:'48px 24px' }}>
-        <div style={{ maxWidth:600, margin:'0 auto', textAlign:'center' }}>
-          <h2 style={{ fontFamily:'var(--font-heading)', fontSize:28, fontWeight:400, color:'var(--white)' }}>Stay Inspired</h2>
-          <p style={{ fontFamily:'var(--font-body)', fontSize:14, color:'rgba(255,255,255,0.85)', marginTop:8 }}>
-            Get the latest venue deals, wedding trends, and planning tips delivered to your inbox
-          </p>
-          <div style={{ display:'flex', gap:10, marginTop:24, maxWidth:440, margin:'24px auto 0' }}>
-            <input placeholder="Your email address" style={{
-              flex:1, padding:'12px 16px', borderRadius:'var(--btn-radius)', border:'none',
-              fontFamily:'var(--font-body)', fontSize:14, outline:'none',
-            }} />
-            <button style={{
-              padding:'12px 24px', background:'var(--white)', color:'var(--coral)', border:'none',
-              borderRadius:'var(--btn-radius)', cursor:'pointer', fontFamily:'var(--font-body)',
-              fontSize:14, fontWeight:600, whiteSpace:'nowrap',
-            }}>
-              Subscribe
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <VenueDetail venue={selectedVenue} onClose={() => setSelectedVenue(null)} />
+      <MainApp session={session} onLogout={handleLogout} onOpenAdmin={() => setShowAdmin(true)} />
+      {showAdmin && <AdminPanel session={session} onClose={() => setShowAdmin(false)} />}
     </>
   );
 }
 
-/* ── Venues Directory ── */
-function VenuesPage() {
-  const [filter, setFilter] = useState('all');
-  const [sort, setSort] = useState('featured');
-  const [selectedVenue, setSelectedVenue] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
+// ═════════════════════════════════════════════════════════════════════════
+// MAIN APP (website content)
+// ═════════════════════════════════════════════════════════════════════════
+function MainApp({ session, onLogout, onOpenAdmin }){
+  const[pg,sPg]=useState("home");const[av,sAv]=useState(null);const[aw,sAw]=useState(null);const[mm,sMm]=useState(false);const[mega,sMega]=useState(false);const[sy,sSy]=useState(0);const[ai,sAi]=useState(false);const[st,sSt]=useState(false);
+  useEffect(()=>{const h=()=>{sSy(window.scrollY);sSt(window.scrollY>500)};window.addEventListener("scroll",h,{passive:true});return()=>window.removeEventListener("scroll",h)},[]);
+  const go=(p,v=null)=>{if(p==="wedding-story"){sPg("wedding-story");sAw(v);sAv(null)}else{sPg(p);sAv(v);sAw(null)}sMm(false);sMega(false);window.scrollTo({top:0,behavior:"smooth"})};
+  useEffect(()=>{document.querySelectorAll('script[data-swv]').forEach(s=>s.remove());[SEO_SCHEMA.website,SEO_SCHEMA.faq].forEach(s=>{const el=document.createElement("script");el.type="application/ld+json";el.setAttribute("data-swv","1");el.textContent=JSON.stringify(s);document.head.appendChild(el)})},[pg]);
+  const NI=[{l:"Home",p:"home"},{l:"Venues",p:"venues"},{l:"AI Tools",p:"ai-tools"},{l:"Real Weddings",p:"weddings"},{l:"Blog",p:"blog"},{l:"Showcases",p:"shows"},{l:"About",p:"about"}];
 
-  let filtered = filter === 'all' ? VENUES : VENUES.filter(v => v.category === filter);
-  if (searchTerm) filtered = filtered.filter(v => v.name.toLowerCase().includes(searchTerm.toLowerCase()) || v.location.toLowerCase().includes(searchTerm.toLowerCase()));
-  if (sort === 'name') filtered.sort((a, b) => a.name.localeCompare(b.name));
-  if (sort === 'rating') filtered.sort((a, b) => b.rating - a.rating);
-  if (sort === 'capacity') filtered.sort((a, b) => b.capacity.max - a.capacity.max);
-  if (sort === 'featured') filtered.sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
+  return(<div style={{fontFamily:"var(--fb)",color:"var(--c)",background:"var(--cr)",minHeight:"100vh"}}>
+    <style>{`@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
+    :root{--w:#FFF;--cr:#FFFFFF;--cw:#FFF8F5;--iv:#FFFBFA;--ro:#E8837C;--rl:#F2A9A4;--rp:#FFF0ED;--rd:#D4625A;--go:#E8837C;--gl:#F2A9A4;--gp:#FADBD8;--gd:#C0504A;--sa:#A8C5A0;--c:#333333;--cl:#555555;--g:#8A8A8A;--gi:#C5C5C5;--gpa:#EEEEEE;--gg:#F7F7F7;--fh:'Cormorant Garamond',serif;--fb:'DM Sans',sans-serif;--ss:0 1px 3px rgba(0,0,0,.06);--sm:0 4px 12px rgba(0,0,0,.08);--sl:0 8px 30px rgba(0,0,0,.10);--sx:0 16px 50px rgba(0,0,0,.12);--sg:0 4px 20px rgba(232,131,124,.18);--e:cubic-bezier(.4,0,.2,1)}
+    *{box-sizing:border-box;margin:0;padding:0}
+    @keyframes fU{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes fI{from{opacity:0}to{opacity:1}}
+    @keyframes bI{from{opacity:0;filter:blur(10px);transform:translateY(12px) scale(.97)}to{opacity:1;filter:blur(0);transform:translateY(0) scale(1)}}
+    @keyframes kB{0%{transform:scale(1)}100%{transform:scale(1.12)}}
+    @keyframes sh{0%{background-position:-200% 0}100%{background-position:200% 0}}
+    @keyframes fl{0%,100%{transform:translateY(0) translateX(0);opacity:.15}25%{transform:translateY(-22px) translateX(10px);opacity:.4}50%{transform:translateY(-40px) translateX(-8px);opacity:.25}75%{transform:translateY(-18px) translateX(14px);opacity:.35}}
+    @keyframes pu{0%,100%{box-shadow:0 0 0 0 rgba(232,131,124,.4)}50%{box-shadow:0 0 0 12px rgba(232,131,124,0)}}
+    @keyframes slideInL{from{opacity:0;transform:translateX(-40px)}to{opacity:1;transform:translateX(0)}}
+    @keyframes slideInR{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+    @keyframes morphBlob{0%,100%{border-radius:60% 40% 30% 70%/60% 30% 70% 40%}25%{border-radius:30% 60% 70% 40%/50% 60% 30% 60%}50%{border-radius:50% 60% 30% 60%/30% 60% 70% 40%}75%{border-radius:60% 40% 60% 30%/70% 30% 50% 60%}}
+    @keyframes gradShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+    @keyframes textGlow{0%,100%{text-shadow:0 0 0 transparent}50%{text-shadow:0 0 30px rgba(232,131,124,.15)}}
+    @keyframes revealLine{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+    @keyframes heroTextIn{0%{opacity:0;transform:translateY(24px);filter:blur(8px)}50%{opacity:1;filter:blur(0)}100%{opacity:1;transform:translateY(0);filter:blur(0)}}
+    @keyframes cardEnter{from{opacity:0;transform:translateY(40px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+    @keyframes countPop{0%{transform:scale(1)}50%{transform:scale(1.12)}100%{transform:scale(1)}}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes heartbeat{0%,100%{transform:scale(1)}14%{transform:scale(1.15)}28%{transform:scale(1)}}
+    @keyframes btnShine{0%{left:-100%}100%{left:200%}}
+    @keyframes bokeh{0%,100%{transform:translate(0,0) scale(1);opacity:.12}33%{transform:translate(30px,-40px) scale(1.3);opacity:.2}66%{transform:translate(-20px,20px) scale(.8);opacity:.08}}
+    @keyframes dividerReveal{from{transform:scaleX(0);opacity:0}to{transform:scaleX(1);opacity:1}}
+    @keyframes wordReveal{0%{opacity:0;transform:translateY(14px);filter:blur(4px)}100%{opacity:1;transform:translateY(0);filter:blur(0)}}
+    @keyframes softBounce{0%{transform:translateY(0)}50%{transform:translateY(-6px)}100%{transform:translateY(0)}}
+    @keyframes parallaxDrift{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-15px) rotate(1deg)}}
+    @keyframes rippleOut{0%{transform:scale(0);opacity:.4}100%{transform:scale(4);opacity:0}}
+    @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+    .sk{background:linear-gradient(90deg,var(--gg) 25%,var(--gp) 50%,var(--gg) 75%);background-size:200% 100%;animation:sh 1.5s ease-in-out infinite;border-radius:8px}
+    .vc{transition:transform .4s var(--e),box-shadow .4s var(--e);position:relative;overflow:hidden;border-radius:14px;background:var(--iv);cursor:pointer}
+    .vc:hover{transform:translateY(-10px) scale(1.01);box-shadow:0 20px 60px rgba(0,0,0,.12),0 0 0 1px rgba(232,131,124,.15)}
+    .vc .vi{transition:transform .7s var(--e)}.vc:hover .vi{transform:scale(1.08)}
+    .vc::after{content:'';position:absolute;bottom:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,transparent,var(--go),transparent);transform:translateX(-100%);transition:transform .7s var(--e)}.vc:hover::after{transform:translateX(100%)}
+    .vc::before{content:'';position:absolute;top:0;left:0;right:0;height:100%;background:linear-gradient(180deg,transparent 60%,rgba(232,131,124,.04) 100%);opacity:0;transition:opacity .4s;z-index:1;pointer-events:none}.vc:hover::before{opacity:1}
+    .bg{background:linear-gradient(135deg,var(--go),var(--gd));color:var(--w);border:none;padding:12px 28px;border-radius:8px;font-family:var(--fb);font-weight:600;font-size:14px;letter-spacing:.04em;cursor:pointer;transition:all .25s var(--e);display:inline-flex;align-items:center;gap:8px;text-decoration:none;position:relative;overflow:hidden}
+    .bg:hover{filter:brightness(1.1);transform:translateY(-2px);box-shadow:var(--sg)}.bg:active{transform:translateY(0)}
+    .bg::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);transition:none}.bg:hover::after{animation:btnShine .6s ease forwards}
+    .nl{position:relative;color:var(--c);text-decoration:none;font-size:14px;font-weight:500;letter-spacing:.03em;padding:8px 0;cursor:pointer;background:none;border:none;font-family:var(--fb)}
+    .nl::after{content:'';position:absolute;bottom:-2px;left:0;width:100%;height:2px;background:var(--go);transform:scaleX(0);transform-origin:center;transition:transform .3s var(--e)}
+    .nl:hover::after,.nl.a::after{transform:scaleX(1)}
+    .inp{border:1px solid var(--gpa);padding:10px 16px;border-radius:8px;font-family:var(--fb);font-size:14px;transition:border-color .2s,box-shadow .2s;width:100%;outline:none;background:var(--w)}
+    .inp:focus{border-color:var(--go);box-shadow:0 0 0 3px rgba(232,131,124,.15)}
+    .cp{padding:7px 16px;border-radius:999px;font-family:var(--fb);font-weight:500;font-size:13px;cursor:pointer;border:1px solid var(--gpa);background:var(--w);transition:all .25s var(--e);white-space:nowrap;display:inline-flex;align-items:center;gap:5px;position:relative;overflow:hidden}
+    .cp:hover,.cp.a{background:var(--c);color:var(--w);border-color:var(--c);transform:translateY(-1px)}
+    .mb{background:linear-gradient(135deg,var(--go),var(--gd));color:var(--w);font-size:9px;font-weight:700;letter-spacing:.06em;padding:3px 8px;border-radius:999px;text-transform:uppercase;display:inline-flex;align-items:center;gap:3px}
+    .nav-heart{animation:heartbeat 3s ease-in-out infinite}
+    .sdiv{height:1px;background:linear-gradient(90deg,transparent,var(--go),transparent);margin:0 auto;max-width:120px}
+    .sdiv.vis{animation:dividerReveal .8s ease forwards}
+    @media(max-width:1023px){.hd{display:none!important}.sm{display:block!important}}
+    `}</style>
 
-  return (
-    <section style={{ paddingTop:80, background:'var(--white)', minHeight:'100vh' }}>
-      {/* Header */}
-      <div style={{ background:'var(--blush)', padding:'40px 24px 32px', borderBottom:'1px solid var(--coral-pale)' }}>
-        <div style={{ maxWidth:1200, margin:'0 auto', textAlign:'center' }}>
-          <h1 style={{ fontFamily:'var(--font-heading)', fontSize:'clamp(2rem, 4vw, 2.8rem)', fontWeight:300, color:'var(--charcoal)' }}>Wedding Venue Directory</h1>
-          <p style={{ fontFamily:'var(--font-body)', fontSize:15, color:'var(--warm-grey)', marginTop:8 }}>
-            Explore {VENUES.length} carefully curated venues across Singapore
-          </p>
-        </div>
-      </div>
-
-      {/* Filters */}
-      <div style={{ maxWidth:1200, margin:'0 auto', padding:'24px 24px 0' }}>
-        <div style={{ display:'flex', flexWrap:'wrap', gap:8, marginBottom:16, justifyContent:'center' }}>
-          {CATEGORIES.map(c => (
-            <button key={c.id} onClick={() => setFilter(c.id)} style={{
-              padding:'8px 18px', borderRadius:'var(--pill-radius)', border:'none', cursor:'pointer',
-              fontFamily:'var(--font-body)', fontSize:13, fontWeight: filter === c.id ? 600 : 500,
-              background: filter === c.id ? 'var(--coral)' : 'var(--grey-ghost)',
-              color: filter === c.id ? 'var(--white)' : 'var(--charcoal)',
-              transition:'all 0.2s ease',
-            }}>
-              {c.icon} {c.label}
-            </button>
-          ))}
-        </div>
-        <div style={{ display:'flex', gap:12, flexWrap:'wrap', justifyContent:'space-between', alignItems:'center', marginBottom:24 }}>
-          <input value={searchTerm} onChange={e => setSearchTerm(e.target.value)} placeholder="Search venues..." style={{
-            flex:'1 1 200px', padding:'10px 16px', borderRadius:'var(--btn-radius)', border:'1px solid var(--grey-pale)',
-            fontFamily:'var(--font-body)', fontSize:14, outline:'none', maxWidth:300,
-          }}
-            onFocus={e => e.target.style.borderColor='var(--coral)'}
-            onBlur={e => e.target.style.borderColor='var(--grey-pale)'}
-          />
-          <select value={sort} onChange={e => setSort(e.target.value)} style={{
-            padding:'10px 16px', borderRadius:'var(--btn-radius)', border:'1px solid var(--grey-pale)',
-            fontFamily:'var(--font-body)', fontSize:13, outline:'none', background:'var(--white)', cursor:'pointer',
-          }}>
-            <option value="featured">Featured First</option>
-            <option value="name">A–Z</option>
-            <option value="rating">Highest Rated</option>
-            <option value="capacity">Largest Capacity</option>
-          </select>
-          <span style={{ fontFamily:'var(--font-body)', fontSize:13, color:'var(--grey)' }}>{filtered.length} venues</span>
-        </div>
-      </div>
-
-      {/* Grid */}
-      <div style={{ maxWidth:1200, margin:'0 auto', padding:'0 24px 60px' }}>
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(310px, 1fr))', gap:24 }}>
-          {filtered.map((v, i) => (
-            <VenueCard key={v.id} venue={v} delay={i * 60} onClick={() => setSelectedVenue(v)} />
-          ))}
-        </div>
-        {filtered.length === 0 && (
-          <div style={{ textAlign:'center', padding:'60px 0' }}>
-            <p style={{ fontFamily:'var(--font-body)', fontSize:16, color:'var(--grey)' }}>No venues match your filters. Try broadening your search.</p>
+    {/* NAV */}
+    <nav style={{position:"sticky",top:0,zIndex:50,background:sy>20?"rgba(255,255,255,.97)":"var(--w)",backdropFilter:sy>20?"blur(12px)":"none",borderBottom:"1px solid var(--gp)",transition:"all .3s"}} role="navigation" aria-label="Main navigation">
+      <div style={{maxWidth:1280,margin:"0 auto",padding:"0 24px",height:68,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+        <button onClick={()=>go("home")} style={{background:"none",border:"none",cursor:"pointer",display:"flex",alignItems:"center",gap:8}} aria-label="Home">
+          <Heart size={20} style={{color:"var(--ro)"}} fill="var(--ro)" className="nav-heart"/>
+          <span style={{fontFamily:"var(--fh)",fontSize:19,fontWeight:500,color:"var(--c)"}}>Singapore Wedding Venues</span>
+        </button>
+        <div className="hd" style={{display:"flex",alignItems:"center",gap:22}}>
+          {NI.map(n=><div key={n.p} style={{position:"relative"}} onMouseEnter={()=>n.p==="venues"&&sMega(true)} onMouseLeave={()=>n.p==="venues"&&sMega(false)}>
+            <button className={`nl ${pg===n.p&&!av?"a":""}`} onClick={()=>go(n.p)}>{n.l}</button>
+            {n.p==="venues"&&mega&&<MegaDrop go={go} close={()=>sMega(false)}/>}
+          </div>)}
+          <button className="bg" onClick={()=>go("ai-tools")} style={{padding:"10px 20px",fontSize:13}}><Sparkles size={14}/>Find My Venue</button>
+          {/* User menu */}
+          <div style={{display:"flex",alignItems:"center",gap:8,marginLeft:4}}>
+            {(session.role==="master"||session.role==="admin")&&<button onClick={onOpenAdmin} style={{background:"none",border:"1px solid var(--gpa)",borderRadius:8,padding:"7px 10px",cursor:"pointer",color:"var(--g)",display:"flex",alignItems:"center",gap:4,fontSize:12,fontFamily:"var(--fb)",transition:"all .2s"}} title="User Management"><Settings size={14}/></button>}
+            <div style={{display:"flex",alignItems:"center",gap:6,padding:"6px 12px",background:"var(--gg)",borderRadius:8}}>
+              <div style={{width:24,height:24,borderRadius:"50%",background:session.role==="master"?"var(--go)":session.role==="admin"?"var(--sa)":"var(--gi)",display:"flex",alignItems:"center",justifyContent:"center"}}><Shield size={11} style={{color:"var(--w)"}}/></div>
+              <span style={{fontSize:11,fontWeight:600,color:"var(--c)",maxWidth:100,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{session.email.split("@")[0]}</span>
+            </div>
+            <button onClick={onLogout} style={{background:"none",border:"none",cursor:"pointer",color:"var(--g)",padding:4,transition:"color .2s"}} title="Sign Out"><LogOut size={16}/></button>
           </div>
-        )}
+        </div>
+        <button onClick={()=>sMm(true)} className="sm" style={{display:"none",background:"none",border:"none",cursor:"pointer"}} aria-label="Menu"><Menu size={24}/></button>
       </div>
-      <VenueDetail venue={selectedVenue} onClose={() => setSelectedVenue(null)} />
-    </section>
-  );
+    </nav>
+
+    {mm&&<MobMenu items={NI} go={go} close={()=>sMm(false)} session={session} onLogout={onLogout} onOpenAdmin={onOpenAdmin}/>}
+
+    <main role="main">
+      {av?<Detail v={av} go={go}/>:
+       aw?<WeddingStory s={aw} go={go}/>:
+       pg==="home"?<Home go={go}/>:
+       pg==="venues"?<Dir go={go}/>:
+       pg==="ai-tools"?<AIHub/>:
+       pg==="weddings"?<RWPage go={go}/>:
+       pg==="blog"?<BlogPage/>:
+       pg==="shows"?<Shows/>:
+       pg==="about"?<Abt/>:<Home go={go}/>}
+    </main>
+
+    <ScrollProgress/>
+    <Ftr go={go}/>
+    <AskAI show={ai} toggle={()=>sAi(!ai)}/>
+    {st&&<button onClick={()=>window.scrollTo({top:0,behavior:"smooth"})} style={{position:"fixed",bottom:ai?420:96,right:24,width:40,height:40,borderRadius:"50%",background:"var(--c)",color:"var(--w)",border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",zIndex:40,boxShadow:"var(--sm)"}} aria-label="Scroll to top"><ArrowUp size={16}/></button>}
+  </div>);
 }
 
-/* ── AI Tools Hub ── */
-function AIToolsPage() {
-  const [activeTool, setActiveTool] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState('');
-  const [inputs, setInputs] = useState({ guests:'', style:'', budget:'50000', date:'', venue1:'', venue2:'' });
+// ── MEGA DROPDOWN ────────────────────────────────────────────────────────
+function MegaDrop({go,close}){
+  const host=VENUES.filter(v=>v.managed);
+  const hotels=VENUES.filter(v=>v.cat==="hotel"&&!v.managed);
+  const other=VENUES.filter(v=>!v.managed&&v.cat!=="hotel");
+  return(<div style={{position:"absolute",top:"100%",left:-200,background:"var(--w)",borderRadius:16,boxShadow:"var(--sx)",padding:28,minWidth:680,display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:20,animation:"fI .2s ease",zIndex:60}} onMouseLeave={close}>
+    <div><p style={{fontWeight:600,fontSize:11,letterSpacing:".06em",textTransform:"uppercase",color:"var(--gd)",marginBottom:10,display:"flex",alignItems:"center",gap:4}}><Crown size={10}/>1-Host Collection</p>
+      {host.map(v=><button key={v.id} onClick={()=>{close();go("venues",v)}} style={{display:"block",background:"none",border:"none",cursor:"pointer",fontFamily:"var(--fb)",fontSize:13,color:"var(--c)",padding:"3px 0",textAlign:"left"}}>{v.name}{v.isNew&&<span style={{color:"var(--gd)",fontSize:10,fontWeight:700,marginLeft:4}}>NEW</span>}</button>)}</div>
+    <div><p style={{fontWeight:600,fontSize:11,letterSpacing:".06em",textTransform:"uppercase",color:"var(--g)",marginBottom:10}}>Luxury Hotels</p>
+      {hotels.slice(0,8).map(v=><button key={v.id} onClick={()=>{close();go("venues",v)}} style={{display:"block",background:"none",border:"none",cursor:"pointer",fontFamily:"var(--fb)",fontSize:13,color:"var(--c)",padding:"3px 0",textAlign:"left"}}>{v.name}</button>)}</div>
+    <div><p style={{fontWeight:600,fontSize:11,letterSpacing:".06em",textTransform:"uppercase",color:"var(--g)",marginBottom:10}}>Heritage & Unique</p>
+      {[...hotels.slice(8),...other].slice(0,6).map(v=><button key={v.id} onClick={()=>{close();go("venues",v)}} style={{display:"block",background:"none",border:"none",cursor:"pointer",fontFamily:"var(--fb)",fontSize:13,color:"var(--c)",padding:"3px 0",textAlign:"left"}}>{v.name}</button>)}
+      <button onClick={()=>{close();go("venues")}} style={{display:"block",background:"none",border:"none",cursor:"pointer",fontFamily:"var(--fb)",fontSize:13,color:"var(--gd)",padding:"6px 0",textAlign:"left",fontWeight:600}}>Browse All {VENUES.length} Venues →</button></div>
+  </div>);
+}
 
-  const callClaude = async (system, user) => {
-    setLoading(true); setResult('');
-    try {
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
-        method:"POST", headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:1000, system, messages:[{role:"user",content:user}] })
-      });
-      const data = await res.json();
-      setResult(data.content?.[0]?.text || 'No response received.');
-    } catch { setResult('Something went wrong. Please try again.'); }
-    finally { setLoading(false); }
+function MobMenu({items,go,close,session,onLogout,onOpenAdmin}){return(<div style={{position:"fixed",inset:0,zIndex:100,display:"flex",justifyContent:"flex-end"}}><div onClick={close} style={{position:"absolute",inset:0,background:"rgba(0,0,0,.4)",backdropFilter:"blur(4px)"}}/><div style={{position:"relative",width:280,background:"var(--w)",padding:"68px 24px 24px",animation:"fI .2s ease",display:"flex",flexDirection:"column",gap:4}}><button onClick={close} style={{position:"absolute",top:18,right:18,background:"none",border:"none",cursor:"pointer"}}><X size={20}/></button>{items.map(n=><button key={n.p} onClick={()=>go(n.p)} style={{background:"none",border:"none",fontFamily:"var(--fh)",fontSize:19,fontWeight:500,color:"var(--c)",padding:"11px 0",textAlign:"left",cursor:"pointer",borderBottom:"1px solid var(--gpa)"}}>{n.l}</button>)}<button className="bg" onClick={()=>go("ai-tools")} style={{marginTop:14,width:"100%",justifyContent:"center"}}><Sparkles size={14}/>Find My Venue</button><div style={{marginTop:16,paddingTop:16,borderTop:"1px solid var(--gpa)"}}><div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}><div style={{width:28,height:28,borderRadius:"50%",background:session?.role==="master"?"var(--go)":"var(--sa)",display:"flex",alignItems:"center",justifyContent:"center"}}><Shield size={12} style={{color:"var(--w)"}}/></div><div><p style={{fontSize:13,fontWeight:600}}>{session?.email?.split("@")[0]}</p><p style={{fontSize:11,color:"var(--g)"}}>{session?.role==="master"?"Master Admin":session?.role==="admin"?"Admin":"Visitor"}</p></div></div>{(session?.role==="master"||session?.role==="admin")&&<button onClick={()=>{close();onOpenAdmin()}} style={{background:"none",border:"1px solid var(--gpa)",borderRadius:8,padding:"10px 14px",width:"100%",cursor:"pointer",fontSize:13,fontFamily:"var(--fb)",display:"flex",alignItems:"center",gap:6,marginBottom:8}}><Settings size={14}/>User Management</button>}<button onClick={()=>{close();onLogout()}} style={{background:"none",border:"1px solid var(--gpa)",borderRadius:8,padding:"10px 14px",width:"100%",cursor:"pointer",fontSize:13,fontFamily:"var(--fb)",display:"flex",alignItems:"center",gap:6,color:"var(--rd)"}}><LogOut size={14}/>Sign Out</button></div></div></div>)}
+
+// ═════════════════════════════════════════════════════════════════════════
+// HOME
+// ═════════════════════════════════════════════════════════════════════════
+function Home({go}){
+  const[sl,sSl]=useState(0);const[pr,sPr]=useState(0);
+  useEffect(()=>{const iv=setInterval(()=>sSl(s=>(s+1)%HERO_SLIDES.length),6e3);return()=>clearInterval(iv)},[]);
+  useEffect(()=>{sPr(0);const t=setTimeout(()=>sPr(100),50);return()=>clearTimeout(t)},[sl]);
+  return(<>
+    {/* HERO */}
+    <section style={{position:"relative",height:"75vh",minHeight:500,overflow:"hidden"}} role="banner" aria-label="Featured Singapore wedding venues">
+      {HERO_SLIDES.map((s,i)=>{const v=VENUES.find(x=>x.id===s.vid);return(<div key={i} style={{position:"absolute",inset:0,opacity:sl===i?1:0,transition:"opacity 1s ease"}}><div style={{position:"absolute",inset:0,animation:sl===i?"kB 14s ease-in-out forwards":"none"}}><VI src={v?.hero||v?.img} alt={`${v?.name||"Singapore"} — ${v?.catLabel||"Wedding Venue"} Singapore`} style={{width:"100%",height:"100%"}}/></div><div style={{position:"absolute",inset:0,background:"linear-gradient(180deg,rgba(45,45,45,.08) 0%,rgba(45,45,45,.55) 60%,rgba(45,45,45,.8) 100%)"}}/></div>)})}
+      {/* Decorative morphing blob */}
+      <div style={{position:"absolute",top:"-20%",right:"-10%",width:"50vw",height:"50vw",background:"radial-gradient(circle,rgba(232,131,124,.08) 0%,transparent 70%)",animation:"morphBlob 20s ease-in-out infinite",zIndex:1,pointerEvents:"none"}}/>
+      {/* Floating particles */}
+      <div style={{position:"absolute",inset:0,overflow:"hidden",pointerEvents:"none",zIndex:2}}>{Array.from({length:15},(_,i)=><div key={i} style={{position:"absolute",left:`${(i*7.1+3)%100}%`,top:`${(i*11.3+5)%100}%`,width:Math.random()*7+3,height:Math.random()*7+3,borderRadius:"50%",background:`rgba(232,131,124,${.2+Math.random()*.2})`,animation:`fl ${8+Math.random()*6}s ease-in-out ${i*.4}s infinite`,filter:"blur(1px)"}}/>)}</div>
+      <div style={{position:"absolute",inset:0,zIndex:3,display:"flex",flexDirection:"column",justifyContent:"center",padding:"0 clamp(24px,8vw,120px)"}}>
+        <h1 key={`h-${sl}`} style={{fontFamily:"var(--fh)",fontSize:"clamp(32px,5.5vw,58px)",fontWeight:300,color:"var(--w)",lineHeight:1.1,letterSpacing:"-.02em",maxWidth:580,animation:"heroTextIn .9s ease forwards",whiteSpace:"pre-line"}}>{HERO_SLIDES[sl].h}</h1>
+        <p key={`p-${sl}`} style={{fontFamily:"var(--fb)",fontSize:"clamp(14px,1.5vw,17px)",color:"rgba(255,255,255,.88)",marginTop:16,maxWidth:480,animation:"fU .7s ease .35s both"}}>{HERO_SLIDES[sl].sub}</p>
+        <div style={{display:"flex",gap:12,marginTop:28,animation:"fU .7s ease .55s both",flexWrap:"wrap"}}>
+          <button className="bg" onClick={()=>go("ai-tools")} style={{padding:"14px 28px",fontSize:15}}><Sparkles size={15}/>Find My Venue</button>
+          <button onClick={()=>go("venues")} style={{background:"rgba(255,255,255,.1)",border:"1px solid rgba(255,255,255,.3)",color:"var(--w)",padding:"14px 24px",borderRadius:8,fontFamily:"var(--fb)",fontWeight:500,fontSize:14,cursor:"pointer",backdropFilter:"blur(10px)",transition:"all .3s"}}>Browse {VENUES.length} Venues</button>
+        </div>
+      </div>
+      <div style={{position:"absolute",bottom:0,left:0,right:0,zIndex:4}}>
+        <div style={{height:3,background:"rgba(255,255,255,.15)"}}><div style={{height:"100%",background:"var(--go)",width:`${pr}%`,transition:pr===0?"none":"width 5.9s linear"}}/></div>
+        <div style={{display:"flex",justifyContent:"center",gap:7,padding:12}}>{HERO_SLIDES.map((_,i)=><button key={i} onClick={()=>sSl(i)} style={{width:sl===i?20:7,height:7,borderRadius:4,background:sl===i?"var(--go)":"rgba(255,255,255,.4)",border:"none",cursor:"pointer",transition:"all .3s"}} aria-label={`Slide ${i+1}`}/>)}</div>
+      </div>
+    </section>
+
+    {/* AI CTA */}
+    <section style={{background:"var(--cw)",padding:"40px 24px"}}>
+      <div style={{maxWidth:720,margin:"0 auto",textAlign:"center"}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:6,marginBottom:8}}><Sparkles size={15} style={{color:"var(--go)"}}/><span style={{fontSize:12,fontWeight:600,letterSpacing:".06em",textTransform:"uppercase",color:"var(--gd)"}}>AI-Powered Venue Matching</span></div>
+        <h2 style={{fontFamily:"var(--fh)",fontSize:"clamp(22px,3vw,32px)",fontWeight:400,marginBottom:8}}>Tell us about your dream wedding</h2>
+        <p style={{color:"var(--g)",fontSize:14,marginBottom:20}}>Our AI matches you to the perfect venue from {VENUES.length} iconic Singapore locations — luxury hotels, rooftop restaurants, heritage mansions, and garden estates.</p>
+        <button className="bg" onClick={()=>go("ai-tools")} style={{fontSize:15,padding:"13px 30px"}}><Sparkles size={15}/>Match Me to My Venue</button>
+      </div>
+    </section>
+
+    <SectionDivider style={{marginTop:-1,marginBottom:-1}}/>
+
+    {/* FEATURED VENUES — merged 1-Host + Hotels */}
+    <section style={{padding:"64px 24px",background:"var(--w)",position:"relative",overflow:"hidden"}} aria-label="Featured wedding venues Singapore">
+      <BokehField count={4} color="rgba(232,131,124," style={{opacity:.5}}/>
+      <div style={{maxWidth:1200,margin:"0 auto"}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:28,flexWrap:"wrap",gap:10}}>
+          <div><h2 style={{fontFamily:"var(--fh)",fontSize:"clamp(24px,3vw,36px)",fontWeight:400}}>Featured Venues</h2><p style={{color:"var(--g)",fontSize:14,marginTop:6}}>Rooftop restaurants, luxury hotels, heritage mansions, and garden estates — {VENUES.length} iconic Singapore wedding venues</p></div>
+          <button className="nl" onClick={()=>go("venues")} style={{fontSize:13,color:"var(--gd)"}}>Browse All {VENUES.length} <ChevronRight size={13} style={{display:"inline",verticalAlign:"middle"}}/></button>
+        </div>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(270px,1fr))",gap:20}}>{VENUES.filter(v=>v.featured).sort((a,b_)=>(b_.managed?1:0)-(a.managed?1:0)).map((v,i)=><VCd key={v.id} v={v} i={i} onClick={()=>go("venues",v)}/>)}</div>
+      </div>
+    </section>
+
+    {/* CATEGORIES */}
+    <section style={{padding:"40px 24px",background:"var(--w)"}}>
+      <div style={{maxWidth:1200,margin:"0 auto",textAlign:"center"}}>
+        <h2 style={{fontFamily:"var(--fh)",fontSize:24,fontWeight:400,marginBottom:18}}>Browse by Category</h2>
+        <div style={{display:"flex",gap:8,justifyContent:"center",flexWrap:"wrap"}}>{CATS.filter(c=>c.id!=="all").map(c=><button key={c.id} className="cp" onClick={()=>go("venues")}><c.icon size={13}/>{c.label} <span style={{fontSize:11,color:"var(--g)"}}>({VENUES.filter(v=>v.cat===c.id).length})</span></button>)}</div>
+      </div>
+    </section>
+
+    {/* REAL WEDDINGS PREVIEW */}
+    <SectionDivider style={{marginTop:-1,marginBottom:-1}}/>
+    <section style={{padding:"64px 24px",background:"var(--cr)",position:"relative",overflow:"hidden"}}>
+      <BokehField count={3} color="rgba(212,165,165,"/>
+      <div style={{maxWidth:1200,margin:"0 auto"}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:28}}><h2 style={{fontFamily:"var(--fh)",fontSize:"clamp(24px,3vw,36px)",fontWeight:400}}>Real Weddings</h2><button className="nl" onClick={()=>go("weddings")} style={{fontSize:13,color:"var(--gd)"}}>All Stories <ChevronRight size={13} style={{display:"inline",verticalAlign:"middle"}}/></button></div>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))",gap:18}}>{WEDDINGS.slice(0,4).map((s,i)=>{const v=VENUES.find(x=>x.id===s.vid);return(<RWCd key={i} s={s} v={v} go={go}/>)})}</div>
+      </div>
+    </section>
+
+    <StatStrip/><SectionDivider/><TestCarousel/>
+
+    <SectionDivider style={{marginTop:-1,marginBottom:-1}}/>
+    {/* NEWSLETTER */}
+    <section style={{padding:"56px 24px",background:"linear-gradient(135deg,var(--cw),var(--rp),var(--gp),var(--cw))",backgroundSize:"300% 300%",animation:"gradShift 8s ease infinite"}}>
+      <div style={{maxWidth:500,margin:"0 auto",textAlign:"center"}}>
+        <h2 style={{fontFamily:"var(--fh)",fontSize:28,fontWeight:400,marginBottom:8}}>Stay Inspired</h2>
+        <p style={{color:"var(--g)",fontSize:14,marginBottom:18}}>Weekly venue spotlights, wedding trends, and exclusive promotions.</p>
+        <div style={{display:"flex",gap:10,maxWidth:360,margin:"0 auto"}}><input className="inp" placeholder="Your email address" aria-label="Email for newsletter"/><button className="bg">Subscribe</button></div>
+      </div>
+    </section>
+  </>);
+}
+
+// ── VENUE CARD ───────────────────────────────────────────────────────────
+function VCd({v,i=0,onClick}){const[r,vis]=useSR();return(
+  <article ref={r} className="vc" onClick={onClick} style={{opacity:vis?1:0,transform:vis?"translateY(0) scale(1)":"translateY(35px) scale(.96)",transition:`all .6s var(--e) ${i*80}ms`,boxShadow:"var(--ss)"}} itemScope itemType="https://schema.org/EventVenue">
+    <div style={{position:"relative",paddingTop:"56.25%",overflow:"hidden"}}>
+      <VI src={v.hero||v.img} alt={`${v.name} — ${v.catLabel} wedding venue in ${v.area}, Singapore`} className="vi" style={{position:"absolute",inset:0,width:"100%",height:"100%"}}/>
+      {v.isNew&&<span style={{position:"absolute",top:9,right:9,background:"var(--go)",color:"var(--w)",fontSize:9,fontWeight:700,padding:"2px 7px",borderRadius:999,zIndex:2}}>NEW</span>}
+    </div>
+    <div style={{padding:"12px 14px 16px"}}>
+      <h3 itemProp="name" style={{fontFamily:"var(--fh)",fontSize:19,fontWeight:500,marginBottom:3}}>{v.name}</h3>
+      <p style={{fontSize:12,color:"var(--g)",marginBottom:7,display:"flex",alignItems:"center",gap:3}}><MapPin size={11}/>{v.area}</p>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+        <span style={{fontSize:11,color:"var(--g)"}}><Users size={11} style={{display:"inline",verticalAlign:"middle"}}/> Up to {v.capacity.st||v.capacity.s}</span>
+        
+      </div>
+    </div>
+  </article>
+);}
+
+function RWCd({s,v,go}){const[r,vis]=useSR();return(
+  <article ref={r} className="vc" style={{borderRadius:14,overflow:"hidden",background:"var(--w)",boxShadow:"var(--ss)",cursor:"pointer",opacity:vis?1:0,transform:vis?"translateY(0) scale(1)":"translateY(25px) scale(.97)",transition:"all .6s var(--e)"}} onClick={()=>go("wedding-story",s)}>
+    <div style={{paddingTop:"56.25%",position:"relative",overflow:"hidden"}}><img src={s.coupleImg} alt={s.couple+" wedding at "+s.venue} className="vi" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",objectPosition:"center 25%"}} loading="lazy"/></div>
+    <div style={{padding:"16px 18px 20px"}}>
+      <h3 style={{fontFamily:"var(--fh)",fontSize:20,fontWeight:500,marginBottom:4}}>{s.couple}</h3>
+      <p style={{fontSize:12,color:"var(--gd)",fontWeight:600,marginBottom:4}}>{s.venue} · {s.guests} guests · {s.type}</p>
+      <p style={{fontSize:13,color:"var(--cl)",fontStyle:"italic",lineHeight:1.6,marginBottom:8}}>"{s.quote}"</p>
+      <p style={{fontSize:13,fontWeight:600,color:"var(--gd)",display:"flex",alignItems:"center",gap:4}}>Read Their Story <ChevronRight size={13}/></p>
+    </div>
+  </article>
+);}
+
+// ── MOTION COMPONENTS ────────────────────────────────────────────────────
+function ScrollProgress(){
+  const[pct,setPct]=useState(0);
+  useEffect(()=>{const h=()=>{const doc=document.documentElement;const scrolled=doc.scrollTop/(doc.scrollHeight-doc.clientHeight)*100;setPct(scrolled)};window.addEventListener("scroll",h,{passive:true});return()=>window.removeEventListener("scroll",h)},[]);
+  return<div style={{position:"fixed",top:0,left:0,right:0,height:3,zIndex:60,background:"transparent",pointerEvents:"none"}}><div style={{height:"100%",background:"linear-gradient(90deg,var(--go),var(--gd),var(--go))",width:pct+"%",transition:"width .1s linear",boxShadow:pct>2?"0 0 8px rgba(232,131,124,.4)":"none"}}/></div>;
+}
+
+function SectionDivider({style={}}){const[r,v]=useSR();return<div ref={r} className={"sdiv"+(v?" vis":"")} style={{...style,transform:v?"scaleX(1)":"scaleX(0)"}}/>;}
+
+function BokehField({count=6,color="rgba(232,131,124,",style={}}){return<div style={{position:"absolute",inset:0,overflow:"hidden",pointerEvents:"none",...style}}>{Array.from({length:count},(_,i)=><div key={i} style={{position:"absolute",left:(i*17.3+5)%90+"%",top:(i*23.7+8)%85+"%",width:Math.random()*60+30,height:Math.random()*60+30,borderRadius:"50%",background:color+(0.04+Math.random()*0.06)+")",animation:"bokeh "+(12+Math.random()*10)+"s ease-in-out "+(i*1.5)+"s infinite",filter:"blur("+(8+Math.random()*12)+"px)"}}/>) }</div>;}
+
+function StatItem({target,suffix,label}){const[r,c]=useCtr(target);return<div ref={r}><p style={{fontFamily:"var(--fh)",fontSize:36,fontWeight:300,color:"var(--go)",animation:c>=target?"countPop .4s ease":""}}>{c.toLocaleString()}{suffix}</p><p style={{fontSize:12,color:"var(--gi)",marginTop:2}}>{label}</p></div>}
+
+function StatStrip(){const d=[{t:VENUES.length,s:"+",l:"Venues Listed"},{t:6500,s:"+",l:"Weddings Hosted"},{t:354,s:"",l:"Google Reviews"},{t:12,s:"+",l:"Years of Excellence"}];return(
+  <section style={{background:"var(--c)",padding:"44px 24px",color:"var(--w)"}}>
+    <div style={{maxWidth:860,margin:"0 auto",display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(130px,1fr))",gap:24,textAlign:"center"}}>
+      {d.map((s,i)=><StatItem key={i} target={s.t} suffix={s.s} label={s.l}/>)}
+    </div>
+  </section>
+);}
+
+function TestCarousel(){const[i,sI]=useState(0);useEffect(()=>{const iv=setInterval(()=>sI(x=>(x+1)%REVIEWS.length),5e3);return()=>clearInterval(iv)},[]);const t=REVIEWS[i];return(
+  <section style={{padding:"56px 24px",background:"var(--w)"}}>
+    <div style={{maxWidth:640,margin:"0 auto",textAlign:"center"}}>
+      <h2 style={{fontFamily:"var(--fh)",fontSize:28,fontWeight:400,marginBottom:24}}>What Couples Say</h2>
+      <div style={{display:"flex",justifyContent:"center",gap:3,marginBottom:14}}>{Array.from({length:t.s},(_,j)=><Star key={j} size={14} fill="var(--go)" color="var(--go)"/>)}</div>
+      <blockquote key={i} style={{fontFamily:"var(--fh)",fontSize:"clamp(16px,2vw,21px)",fontWeight:400,fontStyle:"italic",lineHeight:1.6,color:"var(--cl)",minHeight:80,animation:"fI .4s ease"}}>"{t.text}"</blockquote>
+      <p style={{fontWeight:600,fontSize:13,color:"var(--c)",marginTop:14}}>— {t.who}</p>
+      <p style={{fontSize:12,color:"var(--g)",marginTop:2}}>Married at {t.where}</p>
+      <div style={{display:"flex",justifyContent:"center",gap:6,marginTop:18}}>{REVIEWS.map((_,j)=><button key={j} onClick={()=>sI(j)} style={{width:i===j?16:6,height:6,borderRadius:3,background:i===j?"var(--go)":"var(--gi)",border:"none",cursor:"pointer",transition:"all .3s"}}/>)}</div>
+    </div>
+  </section>
+);}
+
+// ═════════════════════════════════════════════════════════════════════════
+// DIRECTORY
+// ═════════════════════════════════════════════════════════════════════════
+function Dir({go}){const[cat,sCat]=useState("all");const[sort,sSort]=useState("featured");
+  let f=cat==="all"?[...VENUES]:VENUES.filter(v=>v.cat===cat);
+  if(sort==="featured")f.sort((a,b)=>(b.featured?1:0)-(a.featured?1:0)||(b.managed?1:0)-(a.managed?1:0));
+  
+  else if(sort==="capacity")f.sort((a,b)=>b.capacity.s-a.capacity.s);
+  return(<section style={{padding:"40px 24px 72px",background:"var(--cr)"}}>
+    <div style={{maxWidth:1200,margin:"0 auto"}}>
+      <header style={{marginBottom:28}}><h1 style={{fontFamily:"var(--fh)",fontSize:"clamp(28px,4vw,40px)",fontWeight:300,marginBottom:8}}>Wedding Venues in Singapore</h1><p style={{color:"var(--g)",fontSize:14,maxWidth:600}}>Explore {VENUES.length} of Singapore's finest wedding venues — legendary five-star hotels, sky-high rooftops, heritage mansions, and garden estates.</p></header>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10,marginBottom:20}}>
+        <div style={{display:"flex",gap:7,flexWrap:"wrap"}}>{CATS.map(c=><button key={c.id} className={`cp ${cat===c.id?"a":""}`} onClick={()=>sCat(c.id)}><c.icon size={12}/>{c.label}</button>)}</div>
+        <select className="inp" value={sort} onChange={e=>sSort(e.target.value)} style={{width:"auto",fontSize:12,padding:"7px 12px"}}><option value="featured">Featured</option><option value="capacity">Largest</option></select>
+      </div>
+      <p style={{fontSize:12,color:"var(--g)",marginBottom:14}}>Showing {f.length} of {VENUES.length} venues</p>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(260px,1fr))",gap:18}}>{f.map((v,i)=><VCd key={v.id} v={v} i={i} onClick={()=>go("venues",v)}/>)}</div>
+    </div>
+  </section>);
+}
+
+// ═════════════════════════════════════════════════════════════════════════
+// DETAIL
+// ═════════════════════════════════════════════════════════════════════════
+function Detail({v,go}){const managedSameCat=VENUES.filter(x=>x.managed&&x.cat===v.cat&&x.id!==v.id);const managedOther=VENUES.filter(x=>x.managed&&x.id!==v.id&&!managedSameCat.includes(x));const sim=managedSameCat.length>=3?managedSameCat.slice(0,3):[...managedSameCat,...managedOther].slice(0,3);return(
+  <article style={{background:"var(--cr)"}} itemScope itemType="https://schema.org/EventVenue">
+    <div style={{maxWidth:1200,margin:"0 auto",padding:"18px 24px 72px"}}>
+      <button onClick={()=>go("venues")} className="nl" style={{marginBottom:14,fontSize:13}}><ChevronLeft size={13} style={{display:"inline",verticalAlign:"middle"}}/> All Venues</button>
+      <div style={{borderRadius:14,overflow:"hidden",height:"clamp(240px,40vh,440px)",position:"relative",marginBottom:24}}>
+        <VI src={v.hero||v.img} alt={`${v.name} wedding venue — ${v.catLabel} in ${v.area}, Singapore`} style={{width:"100%",height:"100%"}}/>
+        <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg,transparent 40%,rgba(45,45,45,.65) 100%)"}}/>
+        <div style={{position:"absolute",bottom:22,left:22,color:"var(--w)"}}>
+          <div style={{display:"flex",gap:6,alignItems:"center",marginBottom:8}}>
+            <span style={{background:"rgba(255,255,255,.15)",backdropFilter:"blur(8px)",padding:"3px 10px",borderRadius:999,fontSize:10,fontWeight:600,letterSpacing:".05em",textTransform:"uppercase"}}>{v.catLabel}</span>
+            {v.managed&&<span className="mb"><Crown size={8}/>{v.managed}</span>}
+          </div>
+          <h1 itemProp="name" style={{fontFamily:"var(--fh)",fontSize:"clamp(26px,4vw,42px)",fontWeight:400}}>{v.name}</h1>
+          <div style={{display:"flex",alignItems:"center",gap:8,marginTop:5,fontSize:13,opacity:.9}}><span><MapPin size={12} style={{display:"inline",verticalAlign:"middle"}}/> {v.area}</span><span>{Array.from({length:5},(_,i)=><Star key={i} size={11} fill={i<Math.floor(v.rating)?"var(--go)":"transparent"} color="var(--go)" style={{display:"inline"}}/>)} {v.rating}</span></div>
+        </div>
+      </div>
+
+      <div style={{display:"grid",gridTemplateColumns:"1fr 300px",gap:24,alignItems:"start"}}>
+        <div>
+          <div style={{background:"var(--w)",borderRadius:12,padding:20,marginBottom:22,boxShadow:"var(--ss)",display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(130px,1fr))",gap:12}}>
+            {[{ic:Users,l:"Capacity",val:`${v.capacity.s} seated · ${v.capacity.st} standing`},{ic:UtensilsCrossed,l:"Cuisine",val:v.cuisine.join(", ")},{ic:MapPin,l:"Setting",val:v.setting},{ic:Check,l:"Solemnisation",val:v.solemn?"Licensed":"Not available"}].map((f,i)=><div key={i} style={{display:"flex",gap:7,alignItems:"flex-start"}}><f.ic size={15} style={{color:"var(--go)",flexShrink:0,marginTop:2}}/><div><p style={{fontSize:10,fontWeight:600,letterSpacing:".05em",textTransform:"uppercase",color:"var(--g)",marginBottom:1}}>{f.l}</p><p style={{fontSize:13}}>{f.val}</p></div></div>)}
+          </div>
+          <h2 style={{fontFamily:"var(--fh)",fontSize:24,fontWeight:400,marginBottom:12}}>About {v.name}</h2>
+          <p itemProp="description" style={{fontSize:14,lineHeight:1.8,color:"var(--cl)",marginBottom:22}}>{v.description}</p>
+          <h3 style={{fontFamily:"var(--fh)",fontSize:19,fontWeight:500,marginBottom:10}}>Best For</h3>
+          <ul style={{listStyle:"none",marginBottom:22}}>{v.bestFor.map((b,i)=><li key={i} style={{fontSize:13,padding:"6px 0",borderBottom:"1px solid var(--gpa)",display:"flex",alignItems:"center",gap:7}}><Check size={13} style={{color:"var(--sa)"}}/>{b}</li>)}</ul>
+          {v.gallery?.length>0&&<><h3 style={{fontFamily:"var(--fh)",fontSize:19,fontWeight:500,marginBottom:10}}>Gallery</h3><div style={{display:"flex",gap:10,overflowX:"auto",paddingBottom:8,marginBottom:22}}>{v.gallery.map((img,i)=><div key={i} style={{flex:"0 0 240px",borderRadius:10,overflow:"hidden",height:160}}><VI src={img} alt={`${v.name} gallery ${i+1} — wedding venue Singapore`} style={{width:"100%",height:"100%"}}/></div>)}</div></>}
+          <h3 style={{fontFamily:"var(--fh)",fontSize:19,fontWeight:500,marginBottom:12}}>Frequently Asked Questions</h3>
+          <div itemScope itemType="https://schema.org/FAQPage" style={{marginBottom:22}}>
+            {[{q:`What is the capacity at ${v.name}?`,a:`${v.name} accommodates up to ${v.capacity.s} guests seated and ${v.capacity.st} standing at ${v.location}.`},{q:`Is ${v.name} licensed for solemnisation?`,a:v.solemn?`Yes, ${v.name} is a licensed ROM solemnisation venue in Singapore.`:`${v.name} does not currently hold a solemnisation licence.`}].map((faq,i)=><div key={i} itemProp="mainEntity" itemScope itemType="https://schema.org/Question" style={{borderBottom:"1px solid var(--gpa)",padding:"12px 0"}}><h4 itemProp="name" style={{fontWeight:600,fontSize:13,marginBottom:5}}>{faq.q}</h4><div itemProp="acceptedAnswer" itemScope itemType="https://schema.org/Answer"><p itemProp="text" style={{fontSize:13,color:"var(--cl)",lineHeight:1.7}}>{faq.a}</p></div></div>)}
+          </div>
+        </div>
+
+        <aside style={{position:"sticky",top:86}}>
+          <div style={{background:"var(--w)",borderRadius:12,padding:20,boxShadow:"var(--sm)",marginBottom:14}}>
+            
+            {v.web&&<a href={v.web} target="_blank" rel="noopener noreferrer" className="bg" style={{width:"100%",justifyContent:"center",marginBottom:8,textDecoration:"none"}}><Mail size={13}/>Enquire Now</a>}
+            
+          </div>
+          {v.managed&&<div style={{background:"linear-gradient(135deg,var(--gp),var(--cw))",borderRadius:12,padding:16,border:"1px solid var(--gl)"}}><div style={{display:"flex",alignItems:"center",gap:5,marginBottom:5}}><Crown size={13} style={{color:"var(--gd)"}}/><span style={{fontSize:11,fontWeight:600,color:"var(--gd)"}}>1-Host Managed</span></div><p style={{fontSize:12,color:"var(--cl)",lineHeight:1.5}}>Part of the 1-Host collection with dedicated coordinators and 6,500+ weddings of experience.</p></div>}
+        </aside>
+      </div>
+      {sim.length>0&&<div style={{marginTop:44}}><h3 style={{fontFamily:"var(--fh)",fontSize:24,fontWeight:400,marginBottom:18}}>Similar Venues</h3><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(250px,1fr))",gap:18}}>{sim.map((x,i)=><VCd key={x.id} v={x} i={i} onClick={()=>go("venues",x)}/>)}</div></div>}
+    </div>
+  </article>
+);}
+
+// ═════════════════════════════════════════════════════════════════════════
+// AI TOOLS (kept concise — all 4 tools + Ask AI)
+// ═════════════════════════════════════════════════════════════════════════
+function ToolCard({t,i,onClick}){const[r,v]=useSR();return<button ref={r} onClick={onClick} style={{background:"var(--w)",borderRadius:12,padding:22,border:"1px solid var(--gpa)",cursor:"pointer",textAlign:"left",transition:`all .4s var(--e) ${i*80}ms`,opacity:v?1:0,transform:v?"translateY(0)":"translateY(14px)",boxShadow:"var(--ss)"}}><t.ic size={24} style={{color:"var(--go)",marginBottom:8}}/><h3 style={{fontFamily:"var(--fh)",fontSize:19,fontWeight:500,marginBottom:5}}>{t.n}</h3><p style={{fontSize:13,color:"var(--g)",lineHeight:1.4}}>{t.d}</p></button>}
+
+function AIHub(){const[ac,sAc]=useState(null);const tools=[{id:"match",ic:Sparkles,n:"AI Venue Matchmaker",d:`Match from ${VENUES.length} venues`},{id:"timeline",ic:CalendarDays,n:"Timeline Generator",d:"Day-of timeline with SG customs"},{id:"compare",ic:GitCompareArrows,n:"Venue Comparison",d:"Side-by-side AI analysis"}];return(
+  <section style={{padding:"44px 24px 72px",background:"var(--cr)"}}>
+    <div style={{maxWidth:880,margin:"0 auto"}}>
+      <div style={{textAlign:"center",marginBottom:36}}><h1 style={{fontFamily:"var(--fh)",fontSize:"clamp(28px,4vw,40px)",fontWeight:300,marginBottom:8}}>AI Wedding Planning Tools</h1><p style={{color:"var(--g)",fontSize:14,maxWidth:520,margin:"0 auto"}}>Powered by AI to simplify your venue search across {VENUES.length} iconic Singapore locations.</p></div>
+      {!ac?<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>{tools.map((t,i)=><ToolCard key={t.id} t={t} i={i} onClick={()=>sAc(t.id)}/>)}</div>:
+      <div><button onClick={()=>sAc(null)} className="nl" style={{marginBottom:18,fontSize:13}}><ChevronLeft size={13} style={{display:"inline",verticalAlign:"middle"}}/> Tools</button>
+        {ac==="match"&&<MatchT/>}{ac==="timeline"&&<TimeT/>}{ac==="compare"&&<CompT/>}
+      </div>}
+    </div>
+  </section>
+);}
+
+function MatchT(){const[g,sG]=useState(150);const[st,sSt]=useState("Glamorous");const[ld,sLd]=useState(false);const[res,sRes]=useState(null);
+
+  const styleMap={Glamorous:["hotel","rooftop","waterfront"],Intimate:["heritage","garden","waterfront"],Garden:["garden","heritage"],"Sky-High":["rooftop"],Waterfront:["waterfront","beachfront"],Heritage:["heritage"],"Grand Hotel":["hotel"],Rustic:["garden","heritage","beachfront"]};
+
+  const run=()=>{sLd(true);sRes(null);
+    setTimeout(()=>{
+      const scored=VENUES.map(v=>{let score=50;
+        // Capacity fit (max 25 pts)
+        const fits=g>=v.capacity.s*0.3&&g<=v.capacity.st;const tight=g>=v.capacity.s*0.6&&g<=v.capacity.s*1.1;
+        if(tight)score+=25;else if(fits)score+=15;else if(g>v.capacity.st)score-=20;else score+=5;
+        score+=15; // base score
+        // Style match (max 20 pts)
+        const styleCats=styleMap[st]||[];
+        if(styleCats.includes(v.cat))score+=20;else score+=5;
+        // Managed bonus (5 pts)
+        if(v.managed)score+=5;
+        // Rating bonus (max 5 pts)
+        score+=Math.round((v.rating-4)*10);
+        // Clamp
+        return{...v,score:Math.min(97,Math.max(45,score))};
+      }).sort((a,b_)=>b_.score-a.score).slice(0,3);
+
+      const reasons=(v)=>{const r=[];
+        if(v.capacity.s<=g&&g<=v.capacity.st)r.push(`Comfortably fits ${g} guests (capacity ${v.capacity.s}–${v.capacity.st})`);
+        else if(g<=v.capacity.st)r.push(`Can accommodate ${g} guests (max ${v.capacity.st})`);
+        r.push(`${v.setting} setting with ${v.cuisine.join(" & ")} cuisine`);
+        if(v.managed)r.push("Managed by 1-Host with 6,500+ weddings of experience");
+        if(v.solemn)r.push("Licensed for ROM solemnisation on-site");
+        r.push(v.bestFor[0]);
+        return r.slice(0,3);};
+      const caveat=(v)=>{
+        if(g>v.capacity.s)return`May feel spacious for ${g} guests — consider a cosier setup`;
+        
+        if(v.setting==="Indoor")return"Indoor only — no outdoor ceremony option";
+        return"Book early — popular dates fill 12+ months in advance";};
+
+      sRes({recommendations:scored.map(v=>({name:v.name,matchScore:v.score,
+        reasons:reasons(v),consideration:caveat(v),
+        
+        capacity:`${v.capacity.s}–${v.capacity.st} guests`})),
+        tip:st==="Intimate"?"For intimate celebrations under 100 guests, restaurant venues like Monti and 1-Alfaro offer a more personal atmosphere than hotel ballrooms.":st==="Grand Hotel"?"Request a site visit during a non-event day to see the ballroom with natural lighting — it often looks very different from promotional photos.":"Start venue hunting 12–18 months before your preferred date, especially for auspicious weekends. Popular venues like Raffles and 1-Arden book out fast."
+      });sLd(false);
+    },800);
   };
 
-  const tools = [
-    { id:'matchmaker', icon:'💍', title:'AI Venue Matchmaker', desc:'Tell us your preferences and we\'ll recommend the perfect venues', color:'var(--coral)' },
-    { id:'budget', icon:'💰', title:'Budget Calculator', desc:'Get an AI-powered cost breakdown for your Singapore wedding', color:'var(--sage)' },
-    { id:'timeline', icon:'📅', title:'Timeline Generator', desc:'Create a custom day-of schedule with Singapore wedding customs', color:'var(--sky)' },
-    { id:'compare', icon:'⚖️', title:'Venue Comparison', desc:'Compare two venues side-by-side with AI analysis', color:'var(--gold-soft)' },
+  return(<div style={{background:"var(--w)",borderRadius:16,padding:28,boxShadow:"var(--sm)"}}>
+    <h2 style={{fontFamily:"var(--fh)",fontSize:26,fontWeight:400,marginBottom:20,display:"flex",alignItems:"center",gap:8}}><Sparkles size={20} style={{color:"var(--go)"}}/>AI Venue Matchmaker</h2>
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:20}}>
+      <div><label style={{fontSize:11,fontWeight:600,letterSpacing:".05em",textTransform:"uppercase",color:"var(--g)",marginBottom:6,display:"block"}}>Guests: {g}</label><input type="range" min={20} max={800} step={10} value={g} onChange={e=>sG(+e.target.value)} style={{width:"100%",accentColor:"var(--go)"}}/></div>
+      
+    </div>
+    <div style={{marginBottom:20}}><label style={{fontSize:11,fontWeight:600,letterSpacing:".05em",textTransform:"uppercase",color:"var(--g)",marginBottom:6,display:"block"}}>Wedding Style</label><div style={{display:"flex",flexWrap:"wrap",gap:6}}>{["Glamorous","Intimate","Garden","Sky-High","Waterfront","Heritage","Grand Hotel","Rustic"].map(s=><button key={s} className={`cp ${st===s?"a":""}`} onClick={()=>sSt(s)} style={{fontSize:12,padding:"6px 14px"}}>{s}</button>)}</div></div>
+    <button className="bg" onClick={run} disabled={ld} style={{fontSize:15,padding:"13px 28px"}}><Sparkles size={14}/>{ld?"Finding your perfect match…":"Match Me to My Venue"}</button>
+    {ld&&<div style={{marginTop:20}}>{[1,2,3].map(i=><div key={i} className="sk" style={{height:110,marginBottom:10,borderRadius:12}}/>)}</div>}
+    {res&&res.recommendations&&<div style={{marginTop:24}}>{res.recommendations.map((r,i)=><div key={i} style={{background:"var(--iv)",borderRadius:14,padding:20,marginBottom:12,animation:`cardEnter .6s ease ${i*150}ms both`,border:"1px solid var(--gpa)",boxShadow:"var(--ss)"}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}><h3 style={{fontFamily:"var(--fh)",fontSize:20,fontWeight:500}}>{r.name}</h3><span style={{background:"linear-gradient(135deg,var(--go),var(--gd))",color:"var(--w)",padding:"4px 12px",borderRadius:999,fontSize:13,fontWeight:700,boxShadow:"var(--sg)"}}>{r.matchScore}%</span></div>{r.reasons?.map((x,j)=><p key={j} style={{fontSize:14,color:"var(--cl)",lineHeight:1.6,paddingLeft:16,borderLeft:"2px solid var(--go)",marginBottom:6}}>✓ {x}</p>)}{r.consideration&&<p style={{fontSize:13,color:"var(--g)",marginTop:8,fontStyle:"italic",paddingLeft:16}}>⚠ {r.consideration}</p>}<p style={{fontSize:14,fontWeight:600,color:"var(--gd)",marginTop:10}}>{r.capacity}</p></div>)}{res.tip&&<div style={{background:"linear-gradient(135deg,var(--gp),var(--cw))",border:"1px solid var(--gl)",borderRadius:12,padding:16,marginTop:6}}><p style={{fontSize:14,lineHeight:1.5}}>💡 <strong>Pro Tip:</strong> {res.tip}</p></div>}</div>}
+  </div>);
+}
+
+
+
+function TimeT(){
+  const[ceremony,setCeremony]=useState("ROM Solemnisation");
+  const[reception,setReception]=useState("Dinner Banquet");
+  const[result,setResult]=useState(null);
+
+  const romDinner=[
+    {time:"06:00",event:"Hair & Makeup",notes:"Bride and bridesmaids begin preparation"},
+    {time:"08:30",event:"Gate Crash Games",notes:"Groomsmen challenges at bride's home"},
+    {time:"09:30",event:"Tea Ceremony (Bride's Side)",notes:"Serve tea to bride's parents and elders"},
+    {time:"10:30",event:"Travel to Groom's Home",notes:"Bridal car procession"},
+    {time:"11:00",event:"Tea Ceremony (Groom's Side)",notes:"Serve tea to groom's parents and elders"},
+    {time:"12:00",event:"Lunch Break",notes:"Rest and retouch before evening"},
+    {time:"14:00",event:"Pre-Wedding Photos",notes:"Outdoor shoot at venue or scenic location"},
+    {time:"16:30",event:"Arrive at Venue",notes:"Final preparations and venue walkthrough"},
+    {time:"17:30",event:"ROM Solemnisation Ceremony",notes:"Exchange of vows and rings"},
+    {time:"18:00",event:"Cocktail Reception",notes:"Drinks and guest photo wall"},
+    {time:"19:00",event:"Grand March-In",notes:"Couple's entrance with music and spotlight"},
+    {time:"19:15",event:"Yum Seng Toast",notes:"Champagne toast with guests"},
+    {time:"19:30",event:"Dinner Service Begins",notes:"8-10 course banquet or Western set menu"},
+    {time:"20:30",event:"Table Visits and Photos",notes:"Visit each table for photos with guests"},
+    {time:"21:00",event:"Second March-In and Speeches",notes:"Outfit change, parent speeches, best man"},
+    {time:"21:30",event:"Cake Cutting and Bouquet Toss",notes:"Traditional bouquet and garter toss"},
+    {time:"22:00",event:"After-Party or Send-Off",notes:"Sparkler send-off or continued celebrations"}
+  ];
+  const romLunch=[
+    {time:"05:30",event:"Hair & Makeup",notes:"Early start for bride preparation"},
+    {time:"07:30",event:"Gate Crash Games",notes:"Fun challenges for the groom's party"},
+    {time:"08:30",event:"Tea Ceremony (Bride's Side)",notes:"Serve tea to bride's family"},
+    {time:"09:30",event:"Tea Ceremony (Groom's Side)",notes:"Serve tea to groom's family"},
+    {time:"10:30",event:"ROM Solemnisation",notes:"Exchange of vows and ring ceremony"},
+    {time:"11:00",event:"Cocktail Reception",notes:"Welcome drinks and guest mingling"},
+    {time:"11:45",event:"Grand March-In",notes:"Couple's entrance to the ballroom"},
+    {time:"12:00",event:"Lunch Service Begins",notes:"8-course banquet or set lunch"},
+    {time:"13:00",event:"Speeches and Yum Seng",notes:"Toasts from parents and friends"},
+    {time:"13:30",event:"Table Visits",notes:"Greet all guests table by table"},
+    {time:"14:00",event:"Cake Cutting and Bouquet Toss",notes:"Traditional celebrations"},
+    {time:"14:30",event:"Send-Off",notes:"Thank guests at the door"}
+  ];
+  const romCocktail=[
+    {time:"06:00",event:"Hair & Makeup",notes:"Bride preparation begins"},
+    {time:"08:30",event:"Gate Crash and Tea Ceremony",notes:"Combined morning traditions"},
+    {time:"11:00",event:"Pre-Wedding Photos",notes:"Outdoor or studio shoot"},
+    {time:"15:00",event:"Arrive at Venue",notes:"Setup and preparation"},
+    {time:"16:00",event:"ROM Solemnisation",notes:"Garden or rooftop ceremony"},
+    {time:"16:30",event:"Cocktail Reception Begins",notes:"Passed canapes, drink stations, live music"},
+    {time:"17:30",event:"Speeches and Toasts",notes:"Intimate addresses from loved ones"},
+    {time:"18:00",event:"Sunset Golden Hour Photos",notes:"Couple photos during golden hour"},
+    {time:"19:00",event:"Dinner Stations Open",notes:"Buffet or live cooking stations"},
+    {time:"20:00",event:"Cake Cutting and Dancing",notes:"First dance and party"},
+    {time:"21:00",event:"Send-Off",notes:"Sparkler exit or farewell"}
   ];
 
-  return (
-    <section style={{ paddingTop:80, background:'var(--white)', minHeight:'100vh' }}>
-      <div style={{ background:'var(--blush)', padding:'40px 24px 32px', borderBottom:'1px solid var(--coral-pale)', textAlign:'center' }}>
-        <h1 style={{ fontFamily:'var(--font-heading)', fontSize:'clamp(2rem, 4vw, 2.8rem)', fontWeight:300, color:'var(--charcoal)' }}>AI Wedding Planning Tools</h1>
-        <p style={{ fontFamily:'var(--font-body)', fontSize:15, color:'var(--warm-grey)', marginTop:8 }}>Powered by Claude AI — get personalised recommendations in seconds</p>
-      </div>
-
-      <div style={{ maxWidth:900, margin:'0 auto', padding:'40px 24px 60px' }}>
-        {!activeTool ? (
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(240px, 1fr))', gap:20 }}>
-            {tools.map(t => (
-              <div key={t.id} onClick={() => { setActiveTool(t.id); setResult(''); }} style={{
-                background:'var(--white)', padding:28, borderRadius:'var(--card-radius)', textAlign:'center',
-                cursor:'pointer', boxShadow:'var(--shadow-sm)', transition:'all 0.3s', border:'1px solid var(--grey-pale)',
-              }}
-                onMouseEnter={e => { e.currentTarget.style.transform='translateY(-4px)'; e.currentTarget.style.boxShadow='var(--shadow-md)'; e.currentTarget.style.borderColor=t.color; }}
-                onMouseLeave={e => { e.currentTarget.style.transform='translateY(0)'; e.currentTarget.style.boxShadow='var(--shadow-sm)'; e.currentTarget.style.borderColor='var(--grey-pale)'; }}
-              >
-                <div style={{ fontSize:36, marginBottom:12 }}>{t.icon}</div>
-                <h3 style={{ fontFamily:'var(--font-heading)', fontSize:20, fontWeight:500, color:'var(--charcoal)', marginBottom:8 }}>{t.title}</h3>
-                <p style={{ fontFamily:'var(--font-body)', fontSize:13, color:'var(--warm-grey)', lineHeight:1.5 }}>{t.desc}</p>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div>
-            <button onClick={() => { setActiveTool(null); setResult(''); }} style={{
-              background:'none', border:'none', cursor:'pointer', fontFamily:'var(--font-body)',
-              fontSize:14, color:'var(--coral)', fontWeight:600, marginBottom:24, display:'flex', alignItems:'center', gap:6,
-            }}>
-              ← Back to Tools
-            </button>
-
-            {activeTool === 'matchmaker' && (
-              <div style={{ background:'var(--blush-light)', padding:32, borderRadius:12, border:'1px solid var(--coral-pale)' }}>
-                <h2 style={{ fontFamily:'var(--font-heading)', fontSize:28, fontWeight:400, color:'var(--charcoal)', marginBottom:20 }}>AI Venue Matchmaker</h2>
-                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:14, marginBottom:20 }}>
-                  <input placeholder="Number of guests" value={inputs.guests} onChange={e => setInputs({...inputs, guests:e.target.value})} style={{ padding:'12px 16px', borderRadius:'var(--btn-radius)', border:'1px solid var(--coral-pale)', fontFamily:'var(--font-body)', fontSize:14, outline:'none' }} />
-                  <select value={inputs.style} onChange={e => setInputs({...inputs, style:e.target.value})} style={{ padding:'12px 16px', borderRadius:'var(--btn-radius)', border:'1px solid var(--coral-pale)', fontFamily:'var(--font-body)', fontSize:14, outline:'none', background:'white' }}>
-                    <option value="">Preferred style</option>
-                    <option>Hotel Ballroom</option><option>Rooftop</option><option>Garden</option><option>Heritage</option><option>Intimate Restaurant</option>
-                  </select>
-                </div>
-                <button onClick={() => callClaude(
-                  `You are a Singapore wedding venue expert. Based on the couple's preferences, recommend 3 venues from this list: ${VENUES.map(v=>v.name).join(', ')}. For each, give a match score (1-100), 2-sentence reasoning, and a practical tip. Use Singapore wedding terminology (solemnisation, banquet tables, ang bao). Format with clear headings.`,
-                  `Looking for a wedding venue for ${inputs.guests||'100'} guests. Style: ${inputs.style||'any'}. Please recommend the best matches.`
-                )} disabled={loading} style={{
-                  width:'100%', padding:'14px', background:'var(--coral)', color:'var(--white)', border:'none',
-                  borderRadius:'var(--btn-radius)', cursor:'pointer', fontFamily:'var(--font-body)', fontSize:15, fontWeight:600,
-                  opacity:loading?0.7:1,
-                }}>
-                  {loading ? 'Finding your perfect venues…' : 'Find My Match'}
-                </button>
-              </div>
-            )}
-
-            {activeTool === 'budget' && (
-              <div style={{ background:'var(--blush-light)', padding:32, borderRadius:12, border:'1px solid var(--coral-pale)' }}>
-                <h2 style={{ fontFamily:'var(--font-heading)', fontSize:28, fontWeight:400, color:'var(--charcoal)', marginBottom:20 }}>AI Budget Calculator</h2>
-                <label style={{ fontFamily:'var(--font-body)', fontSize:14, color:'var(--warm-grey)', display:'block', marginBottom:8 }}>
-                  Total Budget: <strong style={{ color:'var(--coral)' }}>S${parseInt(inputs.budget).toLocaleString()}</strong>
-                </label>
-                <input type="range" min="15000" max="200000" step="5000" value={inputs.budget} onChange={e => setInputs({...inputs, budget:e.target.value})} style={{ width:'100%', marginBottom:20, accentColor:'var(--coral)' }} />
-                <button onClick={() => callClaude(
-                  'You are a Singapore wedding budget expert. Break down a wedding budget into categories: venue, catering, photography, decor, gown, stationery, music, transport, ang bao considerations. Use Singapore-specific costs (SGD). Provide percentage allocation and estimated costs. Format clearly with sections.',
-                  `Please break down a Singapore wedding budget of S$${parseInt(inputs.budget).toLocaleString()} into realistic categories with estimated costs.`
-                )} disabled={loading} style={{
-                  width:'100%', padding:'14px', background:'var(--coral)', color:'var(--white)', border:'none',
-                  borderRadius:'var(--btn-radius)', cursor:'pointer', fontFamily:'var(--font-body)', fontSize:15, fontWeight:600,
-                  opacity:loading?0.7:1,
-                }}>
-                  {loading ? 'Calculating your budget…' : 'Calculate Budget'}
-                </button>
-              </div>
-            )}
-
-            {activeTool === 'timeline' && (
-              <div style={{ background:'var(--blush-light)', padding:32, borderRadius:12, border:'1px solid var(--coral-pale)' }}>
-                <h2 style={{ fontFamily:'var(--font-heading)', fontSize:28, fontWeight:400, color:'var(--charcoal)', marginBottom:20 }}>Timeline Generator</h2>
-                <input type="date" value={inputs.date} onChange={e => setInputs({...inputs, date:e.target.value})} style={{ width:'100%', padding:'12px 16px', borderRadius:'var(--btn-radius)', border:'1px solid var(--coral-pale)', fontFamily:'var(--font-body)', fontSize:14, marginBottom:14, outline:'none' }} />
-                <button onClick={() => callClaude(
-                  'You are a Singapore wedding day coordinator. Create a detailed hour-by-hour timeline for a Singapore wedding day including: morning preparations, tea ceremony, ROM solemnisation, photo session, banquet march-in, yum seng toast, table visits, and after-party. Include realistic Singapore timings. Format as a clear timeline.',
-                  `Create a wedding day timeline for ${inputs.date || 'a Saturday wedding'}. Include traditional Chinese customs (tea ceremony, guo da li) and modern elements.`
-                )} disabled={loading} style={{
-                  width:'100%', padding:'14px', background:'var(--coral)', color:'var(--white)', border:'none',
-                  borderRadius:'var(--btn-radius)', cursor:'pointer', fontFamily:'var(--font-body)', fontSize:15, fontWeight:600,
-                  opacity:loading?0.7:1,
-                }}>
-                  {loading ? 'Building your timeline…' : 'Generate Timeline'}
-                </button>
-              </div>
-            )}
-
-            {activeTool === 'compare' && (
-              <div style={{ background:'var(--blush-light)', padding:32, borderRadius:12, border:'1px solid var(--coral-pale)' }}>
-                <h2 style={{ fontFamily:'var(--font-heading)', fontSize:28, fontWeight:400, color:'var(--charcoal)', marginBottom:20 }}>Venue Comparison</h2>
-                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:14, marginBottom:20 }}>
-                  {['venue1','venue2'].map(k => (
-                    <select key={k} value={inputs[k]} onChange={e => setInputs({...inputs, [k]:e.target.value})} style={{ padding:'12px 16px', borderRadius:'var(--btn-radius)', border:'1px solid var(--coral-pale)', fontFamily:'var(--font-body)', fontSize:14, outline:'none', background:'white' }}>
-                      <option value="">{k==='venue1'?'First venue':'Second venue'}</option>
-                      {VENUES.map(v => <option key={v.id} value={v.name}>{v.name}</option>)}
-                    </select>
-                  ))}
-                </div>
-                <button onClick={() => callClaude(
-                  `You are a Singapore wedding venue expert. Compare two venues in detail across: location, capacity, ambiance, cuisine, solemnisation options, unique features, and best suited for. Use a comparison format. Venues: ${VENUES.map(v=>`${v.name}: ${v.description}`).join('; ')}`,
-                  `Compare ${inputs.venue1 || 'Raffles Hotel'} vs ${inputs.venue2 || 'Capella Singapore'} for a wedding venue.`
-                )} disabled={loading} style={{
-                  width:'100%', padding:'14px', background:'var(--coral)', color:'var(--white)', border:'none',
-                  borderRadius:'var(--btn-radius)', cursor:'pointer', fontFamily:'var(--font-body)', fontSize:15, fontWeight:600,
-                  opacity:loading?0.7:1,
-                }}>
-                  {loading ? 'Comparing venues…' : 'Compare Venues'}
-                </button>
-              </div>
-            )}
-
-            {/* Results */}
-            {result && (
-              <div style={{ marginTop:24, background:'var(--white)', padding:28, borderRadius:12, border:'1px solid var(--coral-pale)', animation:'fadeUp 0.5s ease' }}>
-                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:16 }}>
-                  <h3 style={{ fontFamily:'var(--font-heading)', fontSize:22, fontWeight:500, color:'var(--charcoal)' }}>Results</h3>
-                  <button onClick={() => navigator.clipboard?.writeText(result)} style={{
-                    padding:'6px 14px', background:'var(--grey-ghost)', border:'none', borderRadius:'var(--btn-radius)',
-                    cursor:'pointer', fontFamily:'var(--font-body)', fontSize:12, fontWeight:600, color:'var(--warm-grey)',
-                  }}>
-                    Copy
-                  </button>
-                </div>
-                <div style={{ fontFamily:'var(--font-body)', fontSize:14, color:'var(--charcoal)', lineHeight:1.8, whiteSpace:'pre-wrap' }}>{result}</div>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-    </section>
-  );
-}
-
-/* ── Real Weddings ── */
-function RealWeddingsPage() {
-  return (
-    <section style={{ paddingTop:80, background:'var(--white)', minHeight:'100vh' }}>
-      <div style={{ background:'var(--blush)', padding:'40px 24px 32px', borderBottom:'1px solid var(--coral-pale)', textAlign:'center' }}>
-        <h1 style={{ fontFamily:'var(--font-heading)', fontSize:'clamp(2rem, 4vw, 2.8rem)', fontWeight:300, color:'var(--charcoal)' }}>Real Wedding Stories</h1>
-        <p style={{ fontFamily:'var(--font-body)', fontSize:15, color:'var(--warm-grey)', marginTop:8 }}>Be inspired by couples who celebrated their love at Singapore's finest venues</p>
-      </div>
-      <div style={{ maxWidth:900, margin:'0 auto', padding:'40px 24px 60px' }}>
-        {[
-          { couple:"Sarah & James", venue:"1-Arden", guests:120, style:"Modern Rooftop", story:"Sarah and James fell in love over their shared passion for fine dining and breathtaking views. When they discovered 1-Arden's spectacular 51st floor food forest, they knew they had found their dream venue. Their solemnisation ceremony at sunset, with 360-degree views of Marina Bay, left their 120 guests speechless." },
-          { couple:"Wei Lin & Darren", venue:"Raffles Hotel", guests:350, style:"Grand Heritage", story:"For Wei Lin and Darren, nothing less than Singapore's most iconic hotel would do. Their grand banquet in the Raffles Ballroom featured traditional Chinese tea ceremony in the morning, followed by an elegant 35-table dinner under crystal chandeliers. The couple's march-in was accompanied by a live string quartet." },
-          { couple:"Priya & Vikram", venue:"Capella Singapore", guests:80, style:"Intimate Tropical", story:"Priya and Vikram wanted an intimate celebration surrounded by nature. Capella's lush Sentosa gardens provided the perfect backdrop for their multicultural ceremony, blending Hindu traditions with modern touches. The reception at The Knolls under fairy lights was pure magic." },
-          { couple:"Mei & Jonathan", venue:"The Clifford Pier", guests:150, style:"Waterfront Heritage", story:"When Mei and Jonathan discovered the Art Deco splendour of The Clifford Pier, they knew it was the one. Their sunset solemnisation overlooking Marina Bay was followed by an exquisite modern Asian banquet that perfectly blended heritage charm with contemporary sophistication." },
-          { couple:"Amanda & Ryan", venue:"Flower Dome", guests:250, style:"Garden Spectacular", story:"Amanda had always dreamed of a garden wedding, and the Flower Dome at Gardens by the Bay exceeded every expectation. Surrounded by the world's most spectacular floral displays, their celebration was like something out of a fairytale — complete with a Supertree backdrop for photos." },
-          { couple:"Siti & Ahmad", venue:"Shangri-La Singapore", guests:400, style:"Malay Garden Wedding", story:"Siti and Ahmad's nikah ceremony in Shangri-La's tropical gardens was a beautiful blend of Malay tradition and modern elegance. The expansive Island Ballroom was transformed with kampung-inspired decor for their 40-table reception, featuring a spectacular kompang entrance." },
-        ].map((w, i) => {
-          const ref = useReveal();
-          return (
-            <div key={i} ref={ref} className="reveal" style={{
-              marginBottom:32, background:'var(--blush-light)', borderRadius:'var(--card-radius)',
-              padding:32, border:'1px solid var(--coral-pale)',
-            }}>
-              <span style={{ fontFamily:'var(--font-body)', fontSize:11, fontWeight:600, color:'var(--coral)', letterSpacing:'0.06em', textTransform:'uppercase' }}>{w.style} · {w.guests} guests</span>
-              <h2 style={{ fontFamily:'var(--font-heading)', fontSize:28, fontWeight:400, color:'var(--charcoal)', marginTop:6 }}>{w.couple}</h2>
-              <p style={{ fontFamily:'var(--font-body)', fontSize:13, color:'var(--coral-deep)', marginTop:4, fontWeight:500 }}>at {w.venue}</p>
-              <p style={{ fontFamily:'var(--font-body)', fontSize:15, color:'var(--warm-grey)', lineHeight:1.7, marginTop:16 }}>{w.story}</p>
-            </div>
-          );
-        })}
-      </div>
-    </section>
-  );
-}
-
-/* ── Blog ── */
-function BlogPage() {
-  return (
-    <section style={{ paddingTop:80, background:'var(--white)', minHeight:'100vh' }}>
-      <div style={{ background:'var(--blush)', padding:'40px 24px 32px', borderBottom:'1px solid var(--coral-pale)', textAlign:'center' }}>
-        <h1 style={{ fontFamily:'var(--font-heading)', fontSize:'clamp(2rem, 4vw, 2.8rem)', fontWeight:300, color:'var(--charcoal)' }}>Wedding Blog</h1>
-        <p style={{ fontFamily:'var(--font-body)', fontSize:15, color:'var(--warm-grey)', marginTop:8 }}>Guides, trends, and expert advice for your Singapore wedding</p>
-      </div>
-      <div style={{ maxWidth:900, margin:'0 auto', padding:'40px 24px 60px' }}>
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(280px, 1fr))', gap:24 }}>
-          {[...BLOG_POSTS, 
-            { id:5, title:"The Complete Guide to Ang Bao Etiquette in 2026", category:"Etiquette", excerpt:"How much to give, what denomination notes to use, and the latest market rates for hotel banquets and restaurant receptions." },
-            { id:6, title:"10 Questions to Ask Before Booking Your Wedding Venue", category:"Planning", excerpt:"From corkage fees to setup timing — don't sign that contract until you've asked these essential questions." },
-            { id:7, title:"Micro-Weddings: Singapore's Most Intimate Venues for 50 Guests", category:"Venues", excerpt:"Not every love story needs a 300-guest banquet. Discover the most charming venues for smaller celebrations." },
-            { id:8, title:"How AI is Changing Singapore Wedding Planning", category:"Trends", excerpt:"From venue matchmaking to budget calculators — how couples are using AI tools to plan their perfect day." },
-          ].map((post, i) => {
-            const ref = useReveal();
-            return (
-              <div key={post.id} ref={ref} className="reveal" style={{
-                background:'var(--white)', borderRadius:'var(--card-radius)', overflow:'hidden',
-                boxShadow:'var(--shadow-sm)', transition:'all 0.3s',
-              }}
-                onMouseEnter={e => { e.currentTarget.style.transform='translateY(-4px)'; e.currentTarget.style.boxShadow='var(--shadow-md)'; }}
-                onMouseLeave={e => { e.currentTarget.style.transform='translateY(0)'; e.currentTarget.style.boxShadow='var(--shadow-sm)'; }}
-              >
-                <div style={{ height:8, background: i%2===0 ? 'var(--coral)' : 'var(--coral-light)' }} />
-                <div style={{ padding:24 }}>
-                  <span style={{ fontFamily:'var(--font-body)', fontSize:11, fontWeight:600, color:'var(--coral)', letterSpacing:'0.06em', textTransform:'uppercase' }}>{post.category}</span>
-                  <h3 style={{ fontFamily:'var(--font-heading)', fontSize:20, fontWeight:500, color:'var(--charcoal)', marginTop:8, lineHeight:1.3 }}>{post.title}</h3>
-                  <p style={{ fontFamily:'var(--font-body)', fontSize:13, color:'var(--warm-grey)', marginTop:10, lineHeight:1.6 }}>{post.excerpt}</p>
-                  <button style={{
-                    marginTop:16, background:'none', border:'none', cursor:'pointer',
-                    fontFamily:'var(--font-body)', fontSize:13, fontWeight:600, color:'var(--coral)',
-                    padding:0,
-                  }}>
-                    Read Article →
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ── Footer ── */
-function Footer({ setActivePage }) {
-  return (
-    <footer style={{ background:'var(--dark)', color:'var(--white)', padding:'48px 24px 32px' }}>
-      <div style={{ maxWidth:1200, margin:'0 auto' }}>
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))', gap:32, marginBottom:40 }}>
-          <div>
-            <div style={{ fontFamily:'var(--font-heading)', fontSize:22, fontWeight:600, color:'var(--coral-light)', marginBottom:12 }}>SWV</div>
-            <p style={{ fontFamily:'var(--font-body)', fontSize:13, color:'rgba(255,255,255,0.6)', lineHeight:1.6 }}>
-              Singapore's most comprehensive wedding venue discovery platform with AI-powered planning tools.
-            </p>
-          </div>
-          {[
-            { title:'Explore', links:['All Venues','Hotels','Rooftops','Gardens','Heritage'] },
-            { title:'Plan', links:['AI Matchmaker','Budget Calculator','Timeline Generator','Venue Comparison'] },
-            { title:'Discover', links:['Real Weddings','Blog','Trends','Traditions'] },
-          ].map(col => (
-            <div key={col.title}>
-              <h4 style={{ fontFamily:'var(--font-body)', fontSize:12, fontWeight:600, color:'var(--coral-light)', letterSpacing:'0.06em', textTransform:'uppercase', marginBottom:12 }}>{col.title}</h4>
-              {col.links.map(l => (
-                <div key={l} style={{ fontFamily:'var(--font-body)', fontSize:13, color:'rgba(255,255,255,0.5)', marginBottom:8, cursor:'pointer', transition:'color 0.2s' }}
-                  onMouseEnter={e => e.target.style.color='var(--coral-light)'}
-                  onMouseLeave={e => e.target.style.color='rgba(255,255,255,0.5)'}
-                >{l}</div>
-              ))}
-            </div>
-          ))}
-        </div>
-        <div style={{ borderTop:'1px solid rgba(255,255,255,0.1)', paddingTop:24, display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:12 }}>
-          <span style={{ fontFamily:'var(--font-body)', fontSize:12, color:'rgba(255,255,255,0.4)' }}>© 2026 Singapore Wedding Venues. A 1-Group platform.</span>
-          <span style={{ fontFamily:'var(--font-body)', fontSize:11, color:'rgba(255,255,255,0.3)', display:'flex', alignItems:'center', gap:4 }}>Powered by Claude AI ✨</span>
-        </div>
-      </div>
-    </footer>
-  );
-}
-
-/* ═══════════════════ APP SHELL ═══════════════════ */
-export default function App() {
-  const [activePage, setActivePage] = useState('home');
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  useEffect(() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }, [activePage]);
-
-  const renderPage = () => {
-    switch(activePage) {
-      case 'venues': return <VenuesPage />;
-      case 'ai-tools': return <AIToolsPage />;
-      case 'real-weddings': return <RealWeddingsPage />;
-      case 'blog': return <BlogPage />;
-      default: return <HomePage setActivePage={setActivePage} />;
-    }
+  const getTimeline=()=>{
+    if(ceremony==="Church Wedding") return romDinner.map(e=>e.event==="ROM Solemnisation Ceremony"?{...e,time:"12:00",event:"Church Ceremony",notes:"Wedding service with hymns and vows"}:e);
+    if(ceremony==="Garden Ceremony") return romDinner.map(e=>e.event==="ROM Solemnisation Ceremony"?{...e,time:"17:00",event:"Garden Solemnisation",notes:"Outdoor ceremony under gazebo or arch"}:e);
+    if(reception==="Lunch Banquet") return romLunch;
+    if(reception==="Cocktail") return romCocktail;
+    return romDinner;
   };
 
-  return (
-    <div style={{ minHeight:'100vh', display:'flex', flexDirection:'column' }}>
-      <style>{STYLE}</style>
-      <Nav activePage={activePage} setActivePage={setActivePage} scrolled={scrolled} />
-      <main style={{ flex:1 }}>
-        {renderPage()}
-      </main>
-      <Footer setActivePage={setActivePage} />
+  const handleGenerate=()=>{
+    try{
+      const tl=getTimeline();
+      setResult({timeline:tl,tips:["Build in 30-minute buffers between key events.","Brief your photographer on the timeline so they can plan lighting.","Have a backup indoor option for any outdoor ceremony."]});
+    }catch(err){console.error("Timeline error:",err);setResult({timeline:romDinner,tips:["Error generating custom timeline. Showing default ROM + Dinner timeline."]})}
+  };
+
+  return(<div style={{background:"var(--w)",borderRadius:16,padding:28,boxShadow:"var(--sm)"}}>
+    <h2 style={{fontFamily:"var(--fh)",fontSize:26,fontWeight:400,marginBottom:20,display:"flex",alignItems:"center",gap:8}}><CalendarDays size={20} style={{color:"var(--go)"}}/>Timeline Generator</h2>
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:20}}>
+      <div><label style={{fontSize:11,fontWeight:600,letterSpacing:".05em",textTransform:"uppercase",color:"var(--g)",display:"block",marginBottom:6}}>Ceremony</label><select className="inp" value={ceremony} onChange={e=>setCeremony(e.target.value)}><option>ROM Solemnisation</option><option>Church Wedding</option><option>Garden Ceremony</option></select></div>
+      <div><label style={{fontSize:11,fontWeight:600,letterSpacing:".05em",textTransform:"uppercase",color:"var(--g)",display:"block",marginBottom:6}}>Reception</label><select className="inp" value={reception} onChange={e=>setReception(e.target.value)}><option>Dinner Banquet</option><option>Lunch Banquet</option><option>Cocktail</option></select></div>
     </div>
+    <button className="bg" onClick={handleGenerate} style={{fontSize:15,padding:"13px 28px"}}><CalendarDays size={14}/>Generate Timeline</button>
+    {result!==null&&<div style={{marginTop:22}}>
+      <div style={{paddingLeft:20,borderLeft:"2px solid var(--gl)"}}>{result.timeline.map((item,idx)=><div key={idx} style={{marginBottom:14,paddingLeft:16,position:"relative",animation:"fU .3s ease both",animationDelay:idx*40+"ms"}}><div style={{position:"absolute",left:-27,top:3,width:10,height:10,borderRadius:"50%",background:"var(--go)",border:"2px solid var(--w)"}}/><div style={{display:"flex",gap:10,alignItems:"baseline"}}><span style={{fontWeight:700,fontSize:14,color:"var(--gd)",minWidth:44}}>{item.time}</span><div><p style={{fontWeight:600,fontSize:14}}>{item.event}</p><p style={{fontSize:12,color:"var(--cl)"}}>{item.notes}</p></div></div></div>)}</div>
+      <div style={{background:"linear-gradient(135deg,var(--gp),var(--cw))",borderRadius:12,padding:16,marginTop:16}}><p style={{fontSize:13,fontWeight:600,color:"var(--gd)",marginBottom:6}}>Planning Tips</p>{result.tips.map((tip,idx)=><p key={idx} style={{fontSize:13,color:"var(--cl)",lineHeight:1.5,marginBottom:4}}>&#8226; {tip}</p>)}</div>
+    </div>}
+  </div>);
+}
+
+function CompT(){
+  const[selected,setSelected]=useState([]);
+  const[result,setResult]=useState(null);
+
+  const toggleVenue=(vid)=>setSelected(prev=>prev.includes(vid)?prev.filter(x=>x!==vid):prev.length<3?[...prev,vid]:prev);
+
+  const handleCompare=()=>{
+    if(selected.length<2)return;
+    try{
+      const compared=selected.map(vid=>{
+        const venue=VENUES.find(x=>x.id===vid);
+        if(!venue)return null;
+        const cap=Math.max(3,Math.min(10,Math.round(venue.capacity.s/80)));
+        const val=7;
+        const cui=Math.max(4,Math.min(10,(venue.cuisine||[]).length*2+4));
+        const amb=Math.max(5,Math.min(10,Math.round((venue.rating||4.5)*2)));
+        const central=["Orchard","City Hall","Marina Bay","Raffles Place","Bugis","Tanglin","Clarke Quay","Marina Centre"];
+        const acc=central.includes(venue.area)?9:venue.area==="Sentosa"?6:7;
+        const uniq=venue.managed?9:["heritage","garden","waterfront","beachfront","rooftop"].includes(venue.cat)?8:6;
+        return{
+          venue:venue.name,
+          scores:{capacity:cap,value:val,cuisine:cui,ambiance:amb,accessibility:acc,uniqueness:uniq},
+          bestFor:(venue.bestFor&&venue.bestFor[0])||"Unique celebration",
+          standout:venue.managed?"Managed by 1-Host with dedicated wedding coordination":venue.capacity.s>=500?"Grand scale for large celebrations":"Beautiful "+venue.catLabel+" setting"
+        };
+      }).filter(Boolean);
+
+      let winnerName="";let winnerTotal=0;
+      compared.forEach(item=>{const total=Object.values(item.scores).reduce((sum,val)=>sum+val,0);if(total>winnerTotal){winnerTotal=total;winnerName=item.venue;}});
+
+      setResult({comparison:compared,verdict:winnerName+" edges ahead overall, but the best choice depends on your priorities. Visit all shortlisted venues in person before deciding."});
+    }catch(err){console.error("Compare error:",err);}
+  };
+
+  return(<div style={{background:"var(--w)",borderRadius:16,padding:28,boxShadow:"var(--sm)"}}>
+    <h2 style={{fontFamily:"var(--fh)",fontSize:26,fontWeight:400,marginBottom:14,display:"flex",alignItems:"center",gap:8}}><GitCompareArrows size={20} style={{color:"var(--go)"}}/>Venue Comparison</h2>
+    <p style={{fontSize:13,color:"var(--g)",marginBottom:16}}>Select 2-3 venues to compare side by side.</p>
+    <div style={{display:"flex",flexWrap:"wrap",gap:6,marginBottom:20,maxHeight:150,overflowY:"auto"}}>{VENUES.map(venue=><button key={venue.id} className={"cp"+(selected.includes(venue.id)?" a":"")} onClick={()=>toggleVenue(venue.id)} style={{fontSize:12,padding:"5px 12px"}}>{venue.name}</button>)}</div>
+    <button className="bg" onClick={handleCompare} disabled={selected.length<2} style={{fontSize:15,padding:"13px 28px",opacity:selected.length<2?.5:1}}><GitCompareArrows size={14}/>Compare {selected.length} Venues</button>
+    {result!==null&&result.comparison&&<div style={{marginTop:22}}><div style={{display:"grid",gridTemplateColumns:"repeat("+result.comparison.length+",1fr)",gap:14}}>{result.comparison.map((item,idx)=><div key={idx} style={{background:"var(--iv)",borderRadius:14,padding:20,animation:"cardEnter .5s ease both",animationDelay:idx*120+"ms",border:"1px solid var(--gpa)"}}><h3 style={{fontFamily:"var(--fh)",fontSize:18,fontWeight:500,marginBottom:12}}>{item.venue}</h3>{Object.entries(item.scores).map(function(entry){var key=entry[0];var val=entry[1];return <div key={key} style={{marginBottom:8}}><div style={{display:"flex",justifyContent:"space-between",fontSize:12,marginBottom:2}}><span style={{textTransform:"capitalize"}}>{key}</span><span style={{fontWeight:600,color:"var(--gd)"}}>{val}/10</span></div><div style={{height:5,background:"var(--gg)",borderRadius:3}}><div style={{height:"100%",background:"var(--go)",borderRadius:3,width:val*10+"%",transition:"width .6s ease"}}/></div></div>})}<p style={{fontSize:12,color:"var(--cl)",marginTop:10,paddingTop:10,borderTop:"1px solid var(--gpa)"}}>Target: {item.bestFor}</p><p style={{fontSize:11,color:"var(--g)",marginTop:4}}>{item.standout}</p></div>)}</div>{result.verdict&&<div style={{background:"linear-gradient(135deg,var(--gp),var(--cw))",borderRadius:12,padding:16,marginTop:14}}><p style={{fontSize:14,lineHeight:1.5}}>Winner: {result.verdict}</p></div>}</div>}
+  </div>);
+}
+
+// ── ASK AI ────────────────────────────────────────────────────────────────
+function AskAI({show,toggle}){const[msgs,sMs]=useState([]);const[inp,sInp]=useState("");const[ld,sLd]=useState(false);
+  const send=async()=>{if(!inp.trim()||ld)return;const q=inp.trim();sInp("");sMs(m=>[...m,{r:"u",t:q}]);sLd(true);try{const text=await callAI(`AI wedding concierge for singaporeweddingvenues.net. ${VENUES.length} venues:\n${VK}\nWarm, concise (<150 words), specific. Singapore terms.`,q);sMs(m=>[...m,{r:"a",t:text}])}catch{sMs(m=>[...m,{r:"a",t:"Sorry, try again!"}])}sLd(false)};
+  if(!show)return<button onClick={toggle} style={{position:"fixed",bottom:24,right:24,width:52,height:52,borderRadius:"50%",background:"linear-gradient(135deg,var(--go),var(--gd))",border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",color:"var(--w)",boxShadow:"var(--sl)",zIndex:45,animation:"pu 3s infinite"}} aria-label="Ask AI"><MessageCircle size={21}/></button>;
+  return(<div style={{position:"fixed",bottom:24,right:24,width:350,maxWidth:"calc(100vw - 48px)",height:420,background:"var(--w)",borderRadius:14,boxShadow:"var(--sx)",display:"flex",flexDirection:"column",zIndex:50,overflow:"hidden",animation:"fU .3s ease"}}>
+    <div style={{background:"linear-gradient(135deg,var(--go),var(--gd))",padding:"12px 16px",display:"flex",justifyContent:"space-between",alignItems:"center",color:"var(--w)"}}><span style={{fontWeight:600,fontSize:14,display:"flex",alignItems:"center",gap:5}}><Sparkles size={15}/>Ask AI Concierge</span><button onClick={toggle} style={{background:"none",border:"none",color:"var(--w)",cursor:"pointer"}}><X size={15}/></button></div>
+    <div style={{flex:1,overflow:"auto",padding:12,display:"flex",flexDirection:"column",gap:8}}>
+      {msgs.length===0&&<p style={{fontSize:13,color:"var(--g)",textAlign:"center",marginTop:32}}>Ask about wedding venues! 💒</p>}
+      {msgs.map((m,i)=><div key={i} style={{alignSelf:m.r==="u"?"flex-end":"flex-start",maxWidth:"80%",background:m.r==="u"?"var(--go)":"var(--gg)",color:m.r==="u"?"var(--w)":"var(--c)",padding:"8px 12px",borderRadius:10,fontSize:13,lineHeight:1.5}}>{m.t}</div>)}
+      {ld&&<div style={{display:"flex",gap:3,padding:6}}>{[0,1,2].map(i=><div key={i} style={{width:6,height:6,borderRadius:"50%",background:"var(--ro)",animation:`fl 1s ease-in-out ${i*.15}s infinite`}}/>)}</div>}
+    </div>
+    <div style={{padding:"8px 12px",borderTop:"1px solid var(--gpa)",display:"flex",gap:6}}>
+      <input className="inp" value={inp} onChange={e=>sInp(e.target.value)} onKeyDown={e=>e.key==="Enter"&&send()} placeholder="Ask about venues..." style={{flex:1,fontSize:13,padding:"7px 10px"}}/>
+      <button onClick={send} className="bg" style={{padding:"7px 11px"}}><Send size={13}/></button>
+    </div>
+  </div>);
+}
+
+// ═════════════════════════════════════════════════════════════════════════
+// OTHER PAGES
+// ═════════════════════════════════════════════════════════════════════════
+function WeddingStory({s,go}){
+  const venue=VENUES.find(x=>x.id===s.vid);
+  const otherWeddings=WEDDINGS.filter(w=>w.couple!==s.couple).slice(0,3);
+  return(
+    <article style={{background:"var(--cr)"}}>
+      <div style={{maxWidth:900,margin:"0 auto",padding:"20px 24px 80px"}}>
+        <button onClick={()=>go("weddings")} className="nl" style={{marginBottom:20,fontSize:13}}><ChevronLeft size={14} style={{display:"inline",verticalAlign:"middle"}}/> All Real Weddings</button>
+
+        {/* Hero image */}
+        <div style={{borderRadius:16,overflow:"hidden",height:"clamp(300px,50vh,500px)",position:"relative",marginBottom:32}}>
+          <img src={s.coupleImg} alt={s.couple+" wedding at "+s.venue} style={{width:"100%",height:"100%",objectFit:"cover",objectPosition:"center 25%"}}/>
+          <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg,transparent 40%,rgba(45,45,45,.7) 100%)"}}/>
+          <div style={{position:"absolute",bottom:28,left:28,right:28,color:"var(--w)"}}>
+            <h1 style={{fontFamily:"var(--fh)",fontSize:"clamp(30px,5vw,48px)",fontWeight:400,marginBottom:6,animation:"heroTextIn .8s ease forwards"}}>{s.couple}</h1>
+            <p style={{fontSize:15,opacity:.9,animation:"fU .6s ease .2s both"}}>{s.venue} · {s.guests} Guests · {s.type}</p>
+          </div>
+        </div>
+
+        {/* Story content */}
+        <div style={{display:"grid",gridTemplateColumns:"1fr 280px",gap:32,alignItems:"start"}}>
+          <div>
+            <blockquote style={{fontFamily:"var(--fh)",fontSize:"clamp(20px,2.5vw,28px)",fontWeight:400,fontStyle:"italic",lineHeight:1.5,color:"var(--cl)",marginBottom:32,paddingLeft:20,borderLeft:"3px solid var(--go)",animation:"fU .5s ease .3s both"}}>"{s.quote}"</blockquote>
+
+            <h2 style={{fontFamily:"var(--fh)",fontSize:24,fontWeight:500,marginBottom:16}}>Their Story</h2>
+            <p style={{fontSize:15,lineHeight:1.9,color:"var(--cl)",marginBottom:28}}>{s.story}</p>
+
+            <div style={{background:"var(--w)",borderRadius:14,padding:24,boxShadow:"var(--ss)",marginBottom:28}}>
+              <h3 style={{fontFamily:"var(--fh)",fontSize:20,fontWeight:500,marginBottom:14}}>Wedding Details</h3>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+                {[
+                  {label:"Venue",val:s.venue},
+                  {label:"Guests",val:s.guests+" guests"},
+                  {label:"Celebration Style",val:s.type},
+                  {label:"Photography",val:s.photo}
+                ].map((d,i)=><div key={i}><p style={{fontSize:10,fontWeight:600,letterSpacing:".06em",textTransform:"uppercase",color:"var(--g)",marginBottom:2}}>{d.label}</p><p style={{fontSize:14,fontWeight:500}}>{d.val}</p></div>)}
+              </div>
+            </div>
+
+            {venue&&<div style={{background:"var(--w)",borderRadius:14,overflow:"hidden",boxShadow:"var(--ss)",cursor:"pointer"}} onClick={()=>go("venues",venue)}>
+              <div style={{height:180,overflow:"hidden"}}><VI src={venue.hero||venue.img} alt={venue.name} style={{width:"100%",height:"100%"}}/></div>
+              <div style={{padding:"16px 20px"}}>
+                <p style={{fontSize:11,fontWeight:600,letterSpacing:".05em",textTransform:"uppercase",color:"var(--gd)",marginBottom:4}}>The Venue</p>
+                <h3 style={{fontFamily:"var(--fh)",fontSize:22,fontWeight:500,marginBottom:4}}>{venue.name}</h3>
+                <p style={{fontSize:13,color:"var(--cl)",lineHeight:1.5,marginBottom:10}}>{venue.tagline} · {venue.area}</p>
+                <span style={{fontSize:13,fontWeight:600,color:"var(--gd)",display:"flex",alignItems:"center",gap:4}}>View Venue Details <ChevronRight size={13}/></span>
+              </div>
+            </div>}
+          </div>
+
+          <aside style={{position:"sticky",top:88}}>
+            <div style={{background:"var(--w)",borderRadius:14,padding:20,boxShadow:"var(--ss)",marginBottom:16}}>
+              <h3 style={{fontFamily:"var(--fh)",fontSize:18,fontWeight:500,marginBottom:14}}>More Real Weddings</h3>
+              {otherWeddings.map((w,i)=><div key={i} style={{display:"flex",gap:10,marginBottom:12,cursor:"pointer",padding:8,borderRadius:8,transition:"background .2s"}} onClick={()=>go("wedding-story",w)} onMouseOver={e=>e.currentTarget.style.background="var(--gg)"} onMouseOut={e=>e.currentTarget.style.background="transparent"}>
+                <img src={w.coupleImg} alt={w.couple} style={{width:52,height:52,borderRadius:8,objectFit:"cover",objectPosition:"center 25%",flexShrink:0}}/>
+                <div><p style={{fontWeight:600,fontSize:13}}>{w.couple}</p><p style={{fontSize:11,color:"var(--g)"}}>{w.venue} · {w.guests} guests</p></div>
+              </div>)}
+              <button onClick={()=>go("weddings")} className="nl" style={{fontSize:13,color:"var(--gd)",marginTop:4}}>View All Stories <ChevronRight size={13} style={{display:"inline",verticalAlign:"middle"}}/></button>
+            </div>
+            <button onClick={()=>go("ai-tools")} className="bg" style={{width:"100%",justifyContent:"center",fontSize:13}}><Sparkles size={14}/>Find Your Venue</button>
+          </aside>
+        </div>
+      </div>
+    </article>
   );
 }
+
+function RWPage({go}){return(<section style={{padding:"44px 24px 72px",background:"var(--cr)"}}><div style={{maxWidth:1200,margin:"0 auto"}}><h1 style={{fontFamily:"var(--fh)",fontSize:"clamp(28px,4vw,40px)",fontWeight:300,marginBottom:8}}>Real Weddings</h1><p style={{color:"var(--g)",fontSize:14,maxWidth:560,marginBottom:32}}>Be inspired by celebrations across Singapore's finest venues — luxury hotels, rooftop ceremonies, and heritage garden affairs.</p><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))",gap:18}}>{WEDDINGS.map((s,i)=>{const v=VENUES.find(x=>x.id===s.vid);return<RWCd key={i} s={s} v={v} go={go}/>})}</div></div></section>);}
+
+function BlogPage(){
+  const posts=[
+    {title:"Celestial Unions: Chinese Zodiac Compatibility 2026",excerpt:"Wedding planning in Singapore is becoming less about rules and more about resonance. A modern guide to Chinese zodiac compatibility, lucky colours, and wedding styling in the Year of the Fire Horse.",img:"https://www.1-host.sg/wp-content/uploads/2026/02/Chinese-restaurant-wedding-singapore.jpg",url:"https://www.1-host.sg/chinese_zodiac_compatibility_2026/",date:"March 2026",tag:"Planning"},
+    {title:"From First Visit to Final Vows: How a Singapore Wedding Planner Brings It All Together",excerpt:"After securing a venue, a Singapore wedding planner guides couples through planning, vendor curation, banquet coordination, and flawless execution. A complete journey with 1-Host.",img:"https://www.1-host.sg/wp-content/uploads/2026/03/Untitled-design.jpg",url:"https://www.1-host.sg/first-vist-to-final-vows-singapore-wedding-planner/",date:"March 2026",tag:"Planning"},
+    {title:"Beyond Ballrooms: Wedding Venues in Singapore That Redefine Celebrations",excerpt:"In 2026, couples are moving away from predictable formats and towards experiences that feel personal, immersive, and deeply meaningful. A new chapter in Singapore wedding planning.",img:"https://www.1-host.sg/wp-content/uploads/2026/02/garden-solemnisation-singapore.jpg",url:"https://www.1-host.sg/beyond_ballrooms_wedding_venues_in-_singapore/",date:"February 2026",tag:"Venues"},
+    {title:"Paws and Promises: Pet Friendly Wedding Venues in Singapore",excerpt:"You know the look. You pick up your keys, and suddenly your dog is sitting up, tail wagging, eyes wide with hope. Why pet friendly weddings are shaping Singapore wedding planning in 2026.",img:"https://www.1-host.sg/wp-content/uploads/2026/02/Untitled-design-4.jpg",url:"https://www.1-host.sg/paws-and-promises-pet-friendly-wedding-venues-in-singapore/",date:"February 2026",tag:"Venues"},
+    {title:"Newly Engaged in 2026? How Singapore Couples Are Kickstarting Their Wedding Planning",excerpt:"Newly engaged couples in 2026 are not rushing to book everything. They are rushing to book the right things. A transformational planning playbook for the modern Singapore couple.",img:"https://www.1-host.sg/wp-content/uploads/2026/03/blog-banner1.jpg",url:"https://www.1-host.sg/how-singapore-couples-are-planning-weddings/",date:"March 2026",tag:"Planning"},
+    {title:"What Does a Wedding Planner Actually Do? A Singapore Couple's Guide",excerpt:"Do we really need a wedding planner? And what exactly does a wedding planner do that we cannot do ourselves? A complete guide by 1-Host, Singapore wedding planners.",img:"https://www.1-host.sg/wp-content/uploads/2026/03/blog-banner2.jpg",url:"https://www.1-host.sg/a-complete-guide-by-1-host-singapore-wedding-planners/",date:"March 2026",tag:"Planning"},
+    {title:"Next Gen Bridal Glam Redefined!",excerpt:"For 2025 and beyond, bridal makeup trends are all about enhancing natural beauty while adding a modern touch. Natural radiance, glowing hydrated skin, and fresh dewy finishes.",img:"https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?w=800&q=80",url:"https://www.1-host.sg/next-gen-bridal-glam-redefined/",date:"January 2025",tag:"Style"},
+    {title:"Why 1-Host Venues Are Built to Weather-Proof Your Big Day",excerpt:"Rain or shine, we have got you covered. Singapore's weather has a flair for the dramatic. One moment, clear skies. The next? A surprise downpour just before your solemnisation.",img:"https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800&q=80",url:"https://www.1-host.sg/why-1-host-venues-are-built-to-weather-proof-your-big-day/",date:"December 2024",tag:"Venues"},
+    {title:"Food & Drink Trends for 2025 Weddings",excerpt:"Wedding food and drink trends are evolving to reflect more personalised, sustainable, and interactive experiences. From brunch weddings to live cooking stations and signature cocktails.",img:"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80",url:"https://www.1-host.sg/food-drink-trends-for-2025-weddings/",date:"November 2024",tag:"Food"},
+    {title:"Why Rooftop Weddings Remain The Most Loved Choice For Couples",excerpt:"Bringing you closer to the sky, offering unmatched views and a one-of-a-kind backdrop for your big day. The versatility and romance of rooftop wedding celebrations.",img:"https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=800&q=80",url:"https://www.1-host.sg/why-rooftop-weddings-remain-the-most-loved-choice-for-couples/",date:"October 2024",tag:"Venues"},
+  ];
+  const[filter,setFilter]=useState("All");
+  const tags=["All","Planning","Venues","Style","Food"];
+  const filtered=filter==="All"?posts:posts.filter(p=>p.tag===filter);
+
+  return(<section style={{padding:"48px 24px 80px",background:"var(--cr)"}}>
+    <div style={{maxWidth:1200,margin:"0 auto"}}>
+      <header style={{marginBottom:36}}>
+        <h1 style={{fontFamily:"var(--fh)",fontSize:"clamp(28px,4vw,42px)",fontWeight:300,marginBottom:10}}>Wedding Blog</h1>
+        <p style={{color:"var(--g)",fontSize:14,maxWidth:580}}>Expert advice, venue guides, and inspiration for planning your Singapore wedding. From zodiac compatibility to bridal trends, food innovations, and venue spotlights.</p>
+      </header>
+      <div style={{display:"flex",gap:8,marginBottom:28,flexWrap:"wrap"}}>{tags.map(t=><button key={t} className={"cp"+(filter===t?" a":"")} onClick={()=>setFilter(t)}>{t}</button>)}</div>
+
+      {/* Featured post - first one large */}
+      {filtered.length>0&&<article style={{display:"grid",gridTemplateColumns:"1.2fr 1fr",gap:0,borderRadius:16,overflow:"hidden",background:"var(--w)",boxShadow:"var(--sm)",marginBottom:28,cursor:"pointer",animation:"cardEnter .6s ease"}} onClick={()=>window.open(filtered[0].url,"_blank")}>
+        <div style={{minHeight:320}}><VI src={filtered[0].img} alt={filtered[0].title} style={{width:"100%",height:"100%"}}/></div>
+        <div style={{padding:"36px 32px",display:"flex",flexDirection:"column",justifyContent:"center"}}>
+          <div style={{display:"flex",gap:8,marginBottom:12}}><span style={{background:"var(--gp)",color:"var(--gd)",fontSize:11,fontWeight:600,padding:"3px 10px",borderRadius:999,letterSpacing:".04em"}}>{filtered[0].tag}</span><span style={{fontSize:12,color:"var(--g)"}}>{filtered[0].date}</span></div>
+          <h2 style={{fontFamily:"var(--fh)",fontSize:"clamp(22px,2.5vw,30px)",fontWeight:500,lineHeight:1.25,marginBottom:14}}>{filtered[0].title}</h2>
+          <p style={{fontSize:14,color:"var(--cl)",lineHeight:1.7,marginBottom:18}}>{filtered[0].excerpt}</p>
+          <span style={{fontSize:13,fontWeight:600,color:"var(--gd)",display:"flex",alignItems:"center",gap:4}}>Read Article <ChevronRight size={14}/></span>
+        </div>
+      </article>}
+
+      {/* Grid of remaining posts */}
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(320px,1fr))",gap:20}}>
+        {filtered.slice(1).map((post,idx)=><BlogCard key={idx} post={post} idx={idx}/>)}
+      </div>
+    </div>
+  </section>);
+}
+
+function BlogCard({post,idx}){const[ref,vis]=useSR();return(
+  <article ref={ref} key={idx} style={{borderRadius:14,overflow:"hidden",background:"var(--w)",boxShadow:"var(--ss)",cursor:"pointer",opacity:vis?1:0,transform:vis?"translateY(0) scale(1)":"translateY(30px) scale(.97)",transition:"all .6s var(--e) "+(idx*80)+"ms"}} onClick={()=>window.open(post.url,"_blank")} className="vc">
+    <div style={{paddingTop:"56.25%",position:"relative",overflow:"hidden"}}><VI src={post.img} alt={post.title} className="vi" style={{position:"absolute",inset:0,width:"100%",height:"100%"}}/><span style={{position:"absolute",top:10,left:10,background:"rgba(45,45,45,.85)",backdropFilter:"blur(4px)",color:"var(--w)",fontSize:10,fontWeight:600,letterSpacing:".05em",textTransform:"uppercase",padding:"3px 10px",borderRadius:999}}>{post.tag}</span></div>
+    <div style={{padding:"16px 18px 20px"}}>
+      <p style={{fontSize:11,color:"var(--g)",marginBottom:6}}>{post.date}</p>
+      <h3 style={{fontFamily:"var(--fh)",fontSize:19,fontWeight:500,lineHeight:1.3,marginBottom:8}}>{post.title}</h3>
+      <p style={{fontSize:13,color:"var(--cl)",lineHeight:1.6,display:"-webkit-box",WebkitLineClamp:3,WebkitBoxOrient:"vertical",overflow:"hidden"}}>{post.excerpt}</p>
+      <p style={{fontSize:13,fontWeight:600,color:"var(--gd)",marginTop:10,display:"flex",alignItems:"center",gap:4}}>Read More <ChevronRight size={13}/></p>
+    </div>
+  </article>
+);}
+
+function Shows(){return(<section style={{padding:"48px 24px 80px",background:"var(--cr)"}}><div style={{maxWidth:860,margin:"0 auto",textAlign:"center"}}>
+  <h1 style={{fontFamily:"var(--fh)",fontSize:"clamp(28px,4vw,40px)",fontWeight:300,marginBottom:12}}>Wedding Showcases</h1>
+  <p style={{color:"var(--g)",fontSize:14,maxWidth:520,margin:"0 auto 40px"}}>Visit venues in person, meet events teams, and enjoy exclusive showcase-only wedding packages.</p>
+  <div style={{background:"var(--w)",borderRadius:16,padding:"48px 32px",boxShadow:"var(--ss)",animation:"cardEnter .6s ease"}}>
+    <CalendarDays size={40} style={{color:"var(--go)",marginBottom:16}}/>
+    <h2 style={{fontFamily:"var(--fh)",fontSize:24,fontWeight:400,marginBottom:10}}>Coming Soon</h2>
+    <p style={{color:"var(--cl)",fontSize:14,lineHeight:1.7,maxWidth:400,margin:"0 auto 20px"}}>We're finalising our upcoming wedding showcase calendar for 2026. Check back soon for exclusive showcase events at our partner venues across Singapore.</p>
+    <p style={{fontSize:13,color:"var(--g)"}}>Interested in being notified? Drop us a line at <a href="mailto:hello@singaporeweddingvenues.net" style={{color:"var(--gd)",fontWeight:600}}>hello@singaporeweddingvenues.net</a></p>
+  </div>
+</div></section>);}
+
+function Abt(){return(<section style={{padding:"44px 24px 72px",background:"var(--cr)"}}><div style={{maxWidth:860,margin:"0 auto"}}><h1 style={{fontFamily:"var(--fh)",fontSize:"clamp(28px,4vw,40px)",fontWeight:300,marginBottom:18,textAlign:"center"}}>About Singapore Wedding Venues</h1><p style={{fontSize:15,lineHeight:1.8,color:"var(--cl)",textAlign:"center",maxWidth:660,margin:"0 auto 36px"}}>Singapore Wedding Venues is the city-state's premier AI-powered venue discovery platform. We feature {VENUES.length} of Singapore's most iconic wedding venues — from legendary five-star hotels to intimate rooftop restaurants and heritage garden estates.</p><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:18,marginBottom:44}}>{[{ic:Sparkles,t:"AI-Powered",d:`Match from ${VENUES.length} venues in seconds.`},{ic:Building2,t:`${VENUES.length} Iconic Venues`,d:"Hotels, rooftops, heritage, gardens — every style covered."},{ic:Crown,t:"1-Host Collection",d:"10 signature venues with 6,500+ weddings of dedicated experience."},{ic:Award,t:"Trusted Platform",d:"Real reviews, transparent pricing, AI-powered comparison tools."}].map((v,i)=><div key={i} style={{background:"var(--w)",borderRadius:12,padding:22,textAlign:"center",boxShadow:"var(--ss)"}}><v.ic size={26} style={{color:"var(--go)",marginBottom:10}}/><h3 style={{fontFamily:"var(--fh)",fontSize:18,fontWeight:500,marginBottom:6}}>{v.t}</h3><p style={{fontSize:13,color:"var(--cl)",lineHeight:1.5}}>{v.d}</p></div>)}</div><div style={{background:"var(--w)",borderRadius:14,padding:28,boxShadow:"var(--ss)",maxWidth:500,margin:"0 auto"}}><h2 style={{fontFamily:"var(--fh)",fontSize:24,fontWeight:400,marginBottom:16,textAlign:"center"}}>Get in Touch</h2><div style={{display:"flex",flexDirection:"column",gap:10}}><input className="inp" placeholder="Your Name"/><input className="inp" placeholder="Email" type="email"/><textarea className="inp" placeholder="Tell us about your dream wedding…" rows={3} style={{resize:"vertical"}}/><button className="bg" style={{alignSelf:"center",padding:"11px 28px"}}><Send size={13}/>Send</button></div></div></div></section>);}
+
+function Ftr({go}){return(<footer style={{background:"var(--c)",color:"var(--gi)",padding:"52px 24px 24px"}} role="contentinfo"><div style={{maxWidth:1200,margin:"0 auto",display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(170px,1fr))",gap:32,marginBottom:36}}><div><h4 style={{fontFamily:"var(--fh)",color:"var(--w)",fontSize:17,marginBottom:12}}>Singapore Wedding Venues</h4><p style={{fontSize:12,lineHeight:1.6}}>{VENUES.length} iconic venues — luxury hotels, rooftop restaurants, heritage mansions, garden estates.</p><div style={{display:"flex",gap:10,marginTop:12}}><a href="https://www.facebook.com/1Host/" target="_blank" rel="noopener noreferrer" style={{color:"var(--gi)"}}><Facebook size={15}/></a><a href="https://www.instagram.com/1_host/" target="_blank" rel="noopener noreferrer" style={{color:"var(--gi)"}}><Instagram size={15}/></a><a href="mailto:hello@singaporeweddingvenues.net" style={{color:"var(--gi)"}}><Mail size={15}/></a></div></div><div><h4 style={{color:"var(--w)",fontSize:12,fontWeight:600,letterSpacing:".04em",textTransform:"uppercase",marginBottom:12}}>1-Host Collection</h4>{VENUES.filter(v=>v.managed).slice(0,6).map(v=><p key={v.id} style={{fontSize:11,marginBottom:5,cursor:"pointer"}} onClick={()=>go("venues",v)}>{v.name}</p>)}</div><div><h4 style={{color:"var(--w)",fontSize:12,fontWeight:600,letterSpacing:".04em",textTransform:"uppercase",marginBottom:12}}>Hotels</h4>{VENUES.filter(v=>v.cat==="hotel"&&!v.managed).slice(0,6).map(v=><p key={v.id} style={{fontSize:11,marginBottom:5,cursor:"pointer"}} onClick={()=>go("venues",v)}>{v.name}</p>)}</div><div><h4 style={{color:"var(--w)",fontSize:12,fontWeight:600,letterSpacing:".04em",textTransform:"uppercase",marginBottom:12}}>AI Tools</h4>{["Venue Matchmaker","Timeline Generator","Venue Comparison","Ask AI"].map(t=><p key={t} style={{fontSize:11,marginBottom:5,cursor:"pointer"}} onClick={()=>go("ai-tools")}>{t}</p>)}</div></div><div style={{borderTop:"1px solid rgba(255,255,255,.1)",paddingTop:18,textAlign:"center",fontSize:11,color:"var(--g)"}}><p>© 2026 Singapore Wedding Venues · {VENUES.length} iconic venues · Made with <Sparkles size={10} style={{display:"inline",verticalAlign:"middle",color:"var(--go)"}}/> AI</p></div></footer>);}
