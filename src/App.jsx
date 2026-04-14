@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Heart, MapPin, Users, ChevronRight, ChevronLeft, Star, Sparkles, Calculator, CalendarDays, GitCompareArrows, MessageCircle, X, Menu, ArrowUp, Send, TreePine, Building2, Sunset, Landmark, Waves, UtensilsCrossed, Check, Instagram, Facebook, Mail, Crown, Award, Lock, Shield, UserPlus, LogOut, Eye, EyeOff, Trash2, Settings } from "lucide-react";
 
 /* Singapore Wedding Venues — singaporeweddingvenues.net
@@ -843,13 +843,13 @@ function Detail({v,go,shortlist,onToggleShortlist}){const managedSameCat=VENUES.
 // ═════════════════════════════════════════════════════════════════════════
 function ToolCard({t,i,onClick}){const[r,v]=useSR();return<button ref={r} onClick={onClick} style={{background:"var(--w)",borderRadius:12,padding:22,border:"1px solid var(--gpa)",cursor:"pointer",textAlign:"left",transition:`all .4s var(--e) ${i*80}ms`,opacity:v?1:0,transform:v?"translateY(0)":"translateY(14px)",boxShadow:"var(--ss)"}}><t.ic size={24} style={{color:"var(--go)",marginBottom:8}}/><h3 style={{fontFamily:"var(--fh)",fontSize:19,fontWeight:500,marginBottom:5}}>{t.n}</h3><p style={{fontSize:13,color:"var(--g)",lineHeight:1.4}}>{t.d}</p></button>}
 
-function AIHub(){const[ac,sAc]=useState(null);const tools=[{id:"match",ic:Sparkles,n:"AI Venue Matchmaker",d:`Match from ${VENUES.length} venues`},{id:"timeline",ic:CalendarDays,n:"Timeline Generator",d:"Day-of timeline with SG customs"},{id:"compare",ic:GitCompareArrows,n:"Venue Comparison",d:"Side-by-side AI analysis"}];return(
+function AIHub(){const[ac,sAc]=useState(null);const tools=[{id:"match",ic:Sparkles,n:"AI Venue Matchmaker",d:`Match from ${VENUES.length} venues`},{id:"style",ic:Heart,n:"Wedding Style Finder",d:"Discover your Style DNA in 60s"},{id:"timeline",ic:CalendarDays,n:"Timeline Generator",d:"Day-of timeline with SG customs"},{id:"compare",ic:GitCompareArrows,n:"Venue Comparison",d:"Side-by-side AI analysis"}];return(
   <section style={{padding:"44px 24px 72px",background:"var(--cr)"}}>
     <div style={{maxWidth:880,margin:"0 auto"}}>
       <div style={{textAlign:"center",marginBottom:36}}><h1 style={{fontFamily:"var(--fh)",fontSize:"clamp(28px,4vw,40px)",fontWeight:300,marginBottom:8}}>AI Wedding Planning Tools</h1><p style={{color:"var(--g)",fontSize:14,maxWidth:520,margin:"0 auto"}}>Powered by AI to simplify your venue search across {VENUES.length} iconic Singapore locations.</p></div>
       {!ac?<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>{tools.map((t,i)=><ToolCard key={t.id} t={t} i={i} onClick={()=>sAc(t.id)}/>)}</div>:
       <div><button onClick={()=>sAc(null)} className="nl" style={{marginBottom:18,fontSize:13}}><ChevronLeft size={13} style={{display:"inline",verticalAlign:"middle"}}/> Tools</button>
-        {ac==="match"&&<MatchT/>}{ac==="timeline"&&<TimeT/>}{ac==="compare"&&<CompT/>}
+        {ac==="match"&&<MatchT/>}{ac==="style"&&<StyleFinderT/>}{ac==="timeline"&&<TimeT/>}{ac==="compare"&&<CompT/>}
       </div>}
     </div>
   </section>
@@ -1092,6 +1092,148 @@ function CompT(){
       {result.similar?.length>0&&<div style={{marginTop:20}}><h3 style={{fontFamily:"var(--fh)",fontSize:18,fontWeight:400,marginBottom:10}}>You May Also Like</h3><div style={{display:"flex",gap:10,overflowX:"auto",paddingBottom:6}}>{result.similar.map((s,i)=><div key={i} style={{flex:"0 0 170px",background:"var(--gg)",borderRadius:10,padding:12}}><p style={{fontFamily:"var(--fh)",fontSize:14,fontWeight:500}}>{s.name}</p><p style={{fontSize:11,color:"var(--g)"}}>{s.area} · {s.cat}</p>{s.managed&&<span style={{fontSize:9,color:"var(--gd)",fontWeight:700}}>✧ Featured Partner</span>}</div>)}</div></div>}
     </div>}
   </div>);
+}
+
+// ── STYLE FINDER (Tool #6) ─────────────────────────────────────────────
+const SF_Q=[
+  {id:1,t:"Venue Vibe",q:"Where does your dream wedding take place?",ms:false,o:[
+    {l:"Grand Ballroom",d:"Crystal chandeliers, soaring ceilings, timeless elegance",tag:"classic-grand",g:"linear-gradient(135deg,#1a1a3e,#C9A96E)",ic:"✨"},
+    {l:"Tropical Garden",d:"Lush greenery, open skies, nature's embrace",tag:"garden-natural",g:"linear-gradient(135deg,#2D5A45,#B5C4B1)",ic:"🌿"},
+    {l:"Sky-High Rooftop",d:"City panoramas, sunset ceremonies, dramatic views",tag:"modern-dramatic",g:"linear-gradient(135deg,#E8837C,#1a1a3e)",ic:"🌆"},
+    {l:"Heritage Courtyard",d:"Colonial charm, storied walls, intimate warmth",tag:"heritage-intimate",g:"linear-gradient(135deg,#A8874A,#FFFCF7)",ic:"🏛️"}]},
+  {id:2,t:"Colour Palette",q:"Which palette makes your heart sing?",ms:false,o:[
+    {l:"Blush & Gold",d:"Soft romance meets warm opulence",tag:"romantic-luxe",g:"linear-gradient(135deg,#F5E0E0,#C9A96E)",ic:"🌸",sw:["#F5E0E0","#C9A96E","#FFFCF7","#D4A5A5","#E0CFA0"]},
+    {l:"Sage & White",d:"Earthy calm, organic elegance",tag:"natural-organic",g:"linear-gradient(135deg,#B5C4B1,#FFF)",ic:"🍃",sw:["#B5C4B1","#FFF","#D4DED1","#8FA88A","#FFF8F0"]},
+    {l:"Black & Champagne",d:"Bold sophistication, modern glamour",tag:"modern-glamour",g:"linear-gradient(135deg,#2D2D2D,#E0CFA0)",ic:"🖤",sw:["#2D2D2D","#E0CFA0","#F5F5F5","#C9A96E","#4A4A4A"]},
+    {l:"Coral & Teal",d:"Tropical energy, vibrant joy",tag:"tropical-vibrant",g:"linear-gradient(135deg,#E8837C,#5B9A8B)",ic:"🌺",sw:["#E8837C","#5B9A8B","#FFF0ED","#3D7A6B","#F5B7B1"]}]},
+  {id:3,t:"Table Setting",q:"Pick the table setting that feels like 'you'",ms:false,o:[
+    {l:"Crystal & Candlelight",d:"Fine china, gold chargers, cascading florals",tag:"opulent-traditional",g:"linear-gradient(135deg,#1F1147,#C9A96E)",ic:"🕯️"},
+    {l:"Farm-to-Table",d:"Wooden tables, herb centerpieces, linen runners",tag:"rustic-organic",g:"linear-gradient(135deg,#5D4037,#B5C4B1)",ic:"🌾"},
+    {l:"Sleek & Minimal",d:"Glass tables, single stems, geometric accents",tag:"contemporary-minimal",g:"linear-gradient(135deg,#2D2D2D,#F5F5F5)",ic:"◇"},
+    {l:"Tropical Lush",d:"Rattan, monstera leaves, colourful fruits as décor",tag:"tropical-festive",g:"linear-gradient(135deg,#2D5A45,#E8837C)",ic:"🌴"}]},
+  {id:4,t:"Floral Style",q:"Which bouquet would you carry?",ms:false,o:[
+    {l:"English Roses",d:"Cascading peonies, eucalyptus — lush and romantic",tag:"romantic-classic",g:"linear-gradient(135deg,#D4A5A5,#F5E0E0)",ic:"🌹"},
+    {l:"Wildflower Meadow",d:"Hand-gathered, dried grasses, lavender",tag:"boho-free-spirit",g:"linear-gradient(135deg,#8FA88A,#E0CFA0)",ic:"🌼"},
+    {l:"Orchid Statement",d:"Dramatic single-variety cascade, sculptural",tag:"modern-architectural",g:"linear-gradient(135deg,#4A1942,#E8C5C5)",ic:"🪻"},
+    {l:"Tropical Paradise",d:"Heliconias, bird of paradise — bold colour",tag:"tropical-bold",g:"linear-gradient(135deg,#1A535C,#E8837C)",ic:"🦜"}]},
+  {id:5,t:"First Dance",q:"What's the vibe of your first dance?",ms:false,o:[
+    {l:"Timeless Romance",d:"Slow waltz, classic ballad, all eyes on you",tag:"classic-romantic",g:"linear-gradient(135deg,#1F1147,#D4A5A5)",ic:"💃"},
+    {l:"Party Starter",d:"Upbeat choreography, confetti, crowd goes wild",tag:"fun-energetic",g:"linear-gradient(135deg,#E8837C,#C9A96E)",ic:"🎉"},
+    {l:"Intimate Moment",d:"Soft acoustic, barely swaying, lost in each other",tag:"intimate-understated",g:"linear-gradient(135deg,#B5C4B1,#FFF8F0)",ic:"💕"}]},
+  {id:6,t:"Fashion Sense",q:"Which outfit energy matches yours?",ms:false,o:[
+    {l:"Red Carpet Glamour",d:"Ball gown, dramatic train, crystals",tag:"glamour-maximal",g:"linear-gradient(135deg,#1a1a3e,#C9A96E)",ic:"👑"},
+    {l:"Effortless Elegance",d:"Slip dress, clean lines, statement earrings",tag:"modern-minimal",g:"linear-gradient(135deg,#F5F5F5,#E8E8E8)",ic:"✦"},
+    {l:"Cultural Couture",d:"Kua, cheongsam, saree or kebaya",tag:"cultural-proud",g:"linear-gradient(135deg,#8B0000,#C9A96E)",ic:"🎎"},
+    {l:"Bohemian Flow",d:"Lace, flutter sleeves, barefoot energy",tag:"boho-relaxed",g:"linear-gradient(135deg,#D4DED1,#E0CFA0)",ic:"🦋"}]},
+  {id:7,t:"Guest Experience",q:"How do your guests remember the night?",ms:false,o:[
+    {l:"The Grand Banquet",d:"10-course dinner, yum seng, march-in",tag:"traditional-feast",g:"linear-gradient(135deg,#8B0000,#1F1147)",ic:"🥢"},
+    {l:"Cocktail & Canapés",d:"Standing reception, live stations, cocktails",tag:"modern-social",g:"linear-gradient(135deg,#2D2D2D,#C9A96E)",ic:"🍸"},
+    {l:"Family-Style Feast",d:"Long communal tables, shared platters",tag:"intimate-gathering",g:"linear-gradient(135deg,#5D4037,#FFF8F0)",ic:"🍽️"},
+    {l:"Festival Vibes",d:"Food trucks, games, live band, dance floor",tag:"party-celebration",g:"linear-gradient(135deg,#E8837C,#5B9A8B)",ic:"🎶"}]},
+  {id:8,t:"Cultural Flavour",q:"Which traditions feel important to you?",ms:true,o:[
+    {l:"Tea Ceremony",d:"Morning tea to parents & elders, red and gold",tag:"chinese-traditional",g:"linear-gradient(135deg,#8B0000,#C9A96E)",ic:"🍵"},
+    {l:"Garden Solemnisation",d:"ROM under a floral arch, intimate vows",tag:"modern-western",g:"linear-gradient(135deg,#2D5A45,#F5E0E0)",ic:"💒"},
+    {l:"Multi-Cultural Blend",d:"Two or more traditions in one celebration",tag:"multicultural-fusion",g:"linear-gradient(135deg,#4A1942,#E8837C)",ic:"🌍"},
+    {l:"Non-Traditional",d:"Skip traditions, create your own moments",tag:"contemporary-personal",g:"linear-gradient(135deg,#1A535C,#F5F5F5)",ic:"⚡"}]}
+];
+const SF_W={"classic-grand":{timelessRomantic:2,glamourMaximalist:3},"garden-natural":{gardenNaturalist:3,freeSpiritCreative:1},"modern-dramatic":{modernMinimalist:3,glamourMaximalist:1},"heritage-intimate":{culturalStoryteller:3,timelessRomantic:1},"romantic-luxe":{timelessRomantic:3,glamourMaximalist:1},"natural-organic":{gardenNaturalist:3,freeSpiritCreative:1},"modern-glamour":{modernMinimalist:2,glamourMaximalist:2},"tropical-vibrant":{freeSpiritCreative:2,gardenNaturalist:2},"opulent-traditional":{glamourMaximalist:3,timelessRomantic:1},"rustic-organic":{gardenNaturalist:2,freeSpiritCreative:2},"contemporary-minimal":{modernMinimalist:3,glamourMaximalist:1},"tropical-festive":{freeSpiritCreative:3,gardenNaturalist:1},"romantic-classic":{timelessRomantic:3,glamourMaximalist:1},"boho-free-spirit":{freeSpiritCreative:3,gardenNaturalist:1},"modern-architectural":{modernMinimalist:3,glamourMaximalist:1},"tropical-bold":{freeSpiritCreative:2,gardenNaturalist:2},"classic-romantic":{timelessRomantic:3,culturalStoryteller:1},"fun-energetic":{freeSpiritCreative:3,glamourMaximalist:1},"intimate-understated":{gardenNaturalist:2,modernMinimalist:2},"glamour-maximal":{glamourMaximalist:3,timelessRomantic:1},"modern-minimal":{modernMinimalist:3},"cultural-proud":{culturalStoryteller:3,timelessRomantic:1},"boho-relaxed":{freeSpiritCreative:3,gardenNaturalist:1},"traditional-feast":{culturalStoryteller:2,timelessRomantic:2},"modern-social":{modernMinimalist:2,glamourMaximalist:2},"intimate-gathering":{gardenNaturalist:2,timelessRomantic:2},"party-celebration":{freeSpiritCreative:3,glamourMaximalist:1},"chinese-traditional":{culturalStoryteller:3,timelessRomantic:1},"modern-western":{modernMinimalist:2,gardenNaturalist:2},"multicultural-fusion":{culturalStoryteller:2,freeSpiritCreative:2},"contemporary-personal":{freeSpiritCreative:2,modernMinimalist:2}};
+const SF_T={
+  timelessRomantic:{sn:"The Candlelit Romantic",desc:"You dream in soft light and sweeping gestures. Your wedding is a love letter written in garden roses and candlelight — every detail whispers elegance, every moment is steeped in emotion.",cp:[{n:"Rose Petal",h:"#E8C5C5"},{n:"Champagne Gold",h:"#C9A96E"},{n:"Ivory Silk",h:"#FFFCF7"},{n:"Blush Whisper",h:"#F5E0E0"},{n:"Warm Linen",h:"#FDF5EC"}],dk:["candlelight","cascading roses","gold leaf","silk draping","crystal stemware","calligraphy"],sd:["A tea ceremony corner with heirloom porcelain and a custom red silk backdrop","Hand-calligraphed table cards on cotton paper, sealed with gold wax","A solemnisation under fairy lights at The Fullerton Hotel rooftop"],vm:[{n:"Raffles Hotel Singapore",r:"Timeless heritage elegance",s:"Palm Court + Raffles Ballroom"},{n:"The Fullerton Hotel",r:"Neoclassical grandeur with waterfront romance",s:"The Straits Room"},{n:"1-Arden",r:"Sky-high garden romance",s:"Sky Garden Terrace"}],cn:"Your ideal partner: a Cultural Storyteller who grounds your romantic flights in tradition.",em:"🌹"},
+  modernMinimalist:{sn:"The Sky-High Modernist",desc:"Less is more, but make it extraordinary. Clean lines, negative space, and the dramatic power of a single perfect orchid. Your wedding commands attention through restraint and impeccable taste.",cp:[{n:"Onyx",h:"#2D2D2D"},{n:"Champagne Satin",h:"#E0CFA0"},{n:"Pure White",h:"#FFFFFF"},{n:"Smoke",h:"#8A8A8A"},{n:"Frost",h:"#F5F5F5"}],dk:["geometric forms","single stems","acrylic","monochrome","negative space","architectural lighting"],sd:["A rooftop solemnisation with a minimalist acrylic arch — just you and the skyline","Monochrome tables with a single sculptural orchid and concrete place cards","Molecular gastronomy canapés with cocktails named after your love story"],vm:[{n:"1-Altitude",r:"Singapore's highest venue for elevated drama",s:"Rooftop Bar at 282m"},{n:"Oumi",r:"Japanese minimalism meets fine dining",s:"Full restaurant buyout"},{n:"National Gallery",r:"Modern art meets historical gravitas",s:"City Hall Chamber"}],cn:"Your ideal partner: a Glamour Maximalist — their sparkle softens your sharp edges.",em:"◇"},
+  gardenNaturalist:{sn:"The Botanical Dreamer",desc:"Your wedding grows from the earth up — barefoot vibes, farm-to-table feasting, and frangipani on a warm breeze. Nature is your co-host, your décor, and your mood board all at once.",cp:[{n:"Forest Sage",h:"#8FA88A"},{n:"Warm Cream",h:"#FFF8F0"},{n:"Eucalyptus",h:"#B5C4B1"},{n:"Sunlit Gold",h:"#E0CFA0"},{n:"Moss",h:"#6B8F71"}],dk:["potted herbs","linen runners","trailing greenery","wooden farm tables","beeswax candles","wildflower meadow"],sd:["A living herb wall as ceremony backdrop, doubling as take-home gifts in clay pots","Family-style seasonal platters on rustic boards with edible flowers","A barefoot solemnisation surrounded by rare orchids at the Botanic Gardens"],vm:[{n:"The Summerhouse",r:"European garden estate with edible gardens",s:"Garden gazebo ceremony"},{n:"The Garage",r:"Art Deco heritage in the UNESCO Botanic Gardens",s:"Forest-under-the-stars reception"},{n:"1-Arden",r:"Sky garden with 80,000 plants",s:"Sky Garden Terrace"}],cn:"Your ideal partner: a Free-Spirit Creative — together you'll be beautiful and unpredictable.",em:"🌿"},
+  culturalStoryteller:{sn:"The Heritage Storyteller",desc:"Your wedding is a living tapestry — threads of tradition, family, and cultural pride woven into every moment. You honour where you come from while celebrating where you're going.",cp:[{n:"Auspicious Red",h:"#8B2500"},{n:"Imperial Gold",h:"#C9A96E"},{n:"Silk Ivory",h:"#FFFCF7"},{n:"Rosewood",h:"#65000B"},{n:"Warm Blush",h:"#F5E0E0"}],dk:["red silk","gold accents","tea ceremony set","ancestral motifs","lantern light","double happiness"],sd:["A morning tea ceremony with a custom-painted silk screen at CHIJMES","Hand-painted porcelain ang bao trays as table keepsakes from Joo Chiat","A grand march-in with a Chinese drum troupe transitioning to jazz"],vm:[{n:"CHIJMES Hall",r:"Gothic chapel for dramatic cultural celebration",s:"Hall + Courtyard"},{n:"Raffles Hotel",r:"Heritage icon honouring tradition",s:"Raffles Ballroom"},{n:"The Alkaff Mansion",r:"Heritage hilltop for traditional garden ceremony",s:"The Verandah"}],cn:"Your ideal partner: a Timeless Romantic who adds softness to your bold narrative.",em:"🏮"},
+  glamourMaximalist:{sn:"The Golden Hour Maximalist",desc:"If it sparkles, you want it. Your wedding is a production — chandelier-lit entrances, showstopping fashion, and a guest experience that rivals a five-star gala. More is more.",cp:[{n:"Black Velvet",h:"#1a1a1a"},{n:"Liquid Gold",h:"#C9A96E"},{n:"Crystal White",h:"#FFFFFF"},{n:"Deep Amethyst",h:"#1F1147"},{n:"Champagne Fizz",h:"#F0E6CC"}],dk:["crystal chandeliers","gold candelabras","velvet draping","mirror tables","confetti cannons","spotlight march-in"],sd:["A choreographed march-in with strings transitioning to EDM as confetti falls","An 8-foot cascading floral installation above the dance floor in gold and crystal","Smoke-infused cocktails named after Crazy Rich Asians scenes at MBS SkyPark"],vm:[{n:"Marina Bay Sands",r:"Maximum wow factor at Asia's grandest stage",s:"Sands Grand Ballroom + SkyPark"},{n:"The St. Regis",r:"Butler service and Murano chandeliers",s:"John Jacob Ballroom"},{n:"1-Altitude",r:"Sky-high drama at 282 metres",s:"Gallery Level"}],cn:"Your ideal partner: a Modern Minimalist — they'll keep your sparkle focused.",em:"👑"},
+  freeSpiritCreative:{sn:"The Festival Heart",desc:"Rules? What rules? Your wedding is joyful curated chaos — food trucks alongside champagne, a band playing jazz to K-pop, and a dress code of 'wear what makes you happiest.'",cp:[{n:"Sunset Coral",h:"#E8837C"},{n:"Ocean Teal",h:"#5B9A8B"},{n:"Warm Sand",h:"#FFF0ED"},{n:"Tropical Green",h:"#3D7A6B"},{n:"Golden Hour",h:"#E0CFA0"}],dk:["festival lights","mismatched seating","food trucks","neon signs","tropical leaves","polaroid stations"],sd:["A no-seating-plan reception with themed food stations — laksa, satay, artisan ice cream","A neon sign of your couple hashtag above the dance floor with tropical flowers","An outdoor ceremony at Fort Canning under a macramé arch with fairy lights"],vm:[{n:"The Alkaff Mansion",r:"Heritage garden for creative free-flowing celebration",s:"The Lawn"},{n:"The Summerhouse",r:"Garden estate with fairy lights and farm-to-table",s:"Outdoor reception"},{n:"1-Arden",r:"Sky-high food forest — unconventional nature-meets-city",s:"Sky Garden Terrace"}],cn:"Your ideal partner: a Garden Naturalist — wild, beautiful, and uniquely yours.",em:"🎪"}
+};
+const sfGetResult=(tags)=>{const sc={timelessRomantic:0,modernMinimalist:0,gardenNaturalist:0,culturalStoryteller:0,glamourMaximalist:0,freeSpiritCreative:0};tags.forEach(tag=>{const w=SF_W[tag];if(w)Object.entries(w).forEach(([k,v])=>{sc[k]+=v})});const sorted=Object.entries(sc).sort((a,b)=>b[1]-a[1]);const t=SF_T[sorted[0][0]];return{styleName:t.sn,description:t.desc,colourPalette:t.cp.map(c=>({name:c.n,hex:c.h})),decorKeywords:t.dk,signatureDetails:t.sd,venueMatches:t.vm.map(v=>({name:v.n,reason:v.r,space:v.s})),compatibilityNote:t.cn,moodEmoji:t.em,_source:"fallback"}};
+
+function StyleFinderT(){
+  const[phase,setPhase]=useState("welcome");const[step,setStep]=useState(0);const[answers,setAnswers]=useState({});const[multiSel,setMultiSel]=useState([]);const[result,setResult]=useState(null);const[lmsg,setLmsg]=useState(0);const[anim,setAnim]=useState("right");const[copied,setCopied]=useState(false);
+  const loadMsgs=["Analysing your wedding vibe…","Matching your aesthetic to Singapore's most beautiful venues…","Crafting your personalised Style DNA…"];
+  useEffect(()=>{if(phase!=="loading")return;const iv=setInterval(()=>setLmsg(p=>(p+1)%3),2200);return()=>clearInterval(iv)},[phase]);
+
+  const handleSelect=useCallback((tag)=>{
+    const q=SF_Q[step];
+    if(q.ms){setMultiSel(prev=>prev.includes(tag)?prev.filter(t=>t!==tag):[...prev,tag]);return;}
+    setAnswers(prev=>({...prev,[step]:tag}));
+    setTimeout(()=>{if(step<SF_Q.length-1){setAnim("right");setStep(s=>s+1)}else{doSubmit({...answers,[step]:tag})}},450);
+  },[step,answers]);
+
+  const handleMultiSubmit=()=>{if(multiSel.length===0)return;const up={...answers,[step]:multiSel};setAnswers(up);doSubmit(up)};
+
+  const doSubmit=async(all)=>{
+    setPhase("loading");setLmsg(0);const tags=Object.values(all).flat();
+    // Try Claude API (works in artifact preview, not on Vercel)
+    try{const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,system:"You are the Wedding Style AI for singaporeweddingvenues.net. Generate a Wedding Style DNA profile as JSON: {styleName,description,colourPalette:[{name,hex}],decorKeywords:[],signatureDetails:[],venueMatches:[{name,reason,space}],compatibilityNote,moodEmoji}. Include at least one 1-Group venue. Use Singapore wedding terms.",messages:[{role:"user",content:`Style tags: ${tags.join(", ")}. Generate my Wedding Style DNA.`}]})});
+      if(!r.ok)throw new Error();const d=await r.json();const txt=d.content?.[0]?.text||"";const parsed=JSON.parse(txt.replace(/```json\n?/g,"").replace(/```\n?/g,"").trim());
+      if(parsed?.styleName){setResult({...parsed,_source:"ai"})}else{setResult(sfGetResult(tags))}
+    }catch{setResult(sfGetResult(tags))}
+    setPhase("result");
+  };
+
+  const retake=()=>{setPhase("welcome");setStep(0);setAnswers({});setMultiSel([]);setResult(null)};
+  const copyRes=()=>{if(!result)return;const t=`✧ My Wedding Style DNA ✧\n\n${result.moodEmoji||"✨"} ${result.styleName}\n\n${result.description}\n\nPalette: ${result.colourPalette?.map(c=>`${c.name} (${c.hex})`).join(", ")}\n\nDécor: ${result.decorKeywords?.join(", ")}\n\nDetails:\n${result.signatureDetails?.map(d=>`• ${d}`).join("\n")}\n\nVenues:\n${result.venueMatches?.map(v=>`• ${v.name} — ${v.reason}`).join("\n")}\n\n💕 ${result.compatibilityNote}\n\nDiscover yours at singaporeweddingvenues.net`;navigator.clipboard?.writeText(t).then(()=>{setCopied(true);setTimeout(()=>setCopied(false),2000)})};
+
+  if(phase==="welcome")return(<div style={{background:"var(--w)",borderRadius:16,padding:36,boxShadow:"var(--sm)",textAlign:"center"}}>
+    <div style={{fontSize:40,marginBottom:12}}>✧</div>
+    <h2 style={{fontFamily:"var(--fh)",fontSize:"clamp(24px,3.5vw,36px)",fontWeight:300,marginBottom:10}}>Discover Your <em style={{fontWeight:600}}>Wedding Style DNA</em></h2>
+    <p style={{fontSize:14,color:"var(--g)",lineHeight:1.7,maxWidth:440,margin:"0 auto 8px"}}>Answer 8 visual questions to reveal your unique wedding aesthetic — personalised colour palette, décor direction, and matched Singapore venues.</p>
+    <p style={{fontSize:12,color:"var(--gi)",marginBottom:28}}>60 seconds · No wrong answers · AI-powered results</p>
+    <button className="bg" onClick={()=>setPhase("quiz")} style={{fontSize:15,padding:"14px 36px"}}>✧ Begin the Quiz</button>
+  </div>);
+
+  if(phase==="quiz"){const q=SF_Q[step];return(<div style={{background:"var(--w)",borderRadius:16,padding:28,boxShadow:"var(--sm)"}} key={step}>
+    {/* Progress */}
+    <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:6,marginBottom:6}}>{SF_Q.map((_,i)=><div key={i} style={{width:i===step?10:6,height:i===step?10:6,borderRadius:"50%",background:i<step?"var(--go)":i===step?"var(--ro)":"var(--gpa)",transition:"all .3s",animation:i===step?"pu 1.2s infinite":"none"}}/>)}</div>
+    <p style={{textAlign:"center",fontSize:11,color:"var(--g)",letterSpacing:".05em",textTransform:"uppercase",fontWeight:600,marginBottom:24}}>Step {step+1} of {SF_Q.length} — {q.t}</p>
+    <h3 style={{fontFamily:"var(--fh)",fontSize:"clamp(20px,3vw,28px)",fontWeight:400,textAlign:"center",marginBottom:24,lineHeight:1.3}}>"{q.q}"</h3>
+    <div style={{display:"grid",gridTemplateColumns:q.o.length===3?"repeat(3,1fr)":"repeat(2,1fr)",gap:12}}>
+      {q.o.map((opt,i)=>{const sel=q.ms?multiSel.includes(opt.tag):answers[step]===opt.tag;return(
+        <div key={opt.tag} onClick={()=>handleSelect(opt.tag)} style={{aspectRatio:"16/10",borderRadius:14,background:opt.g,padding:16,cursor:"pointer",position:"relative",overflow:"hidden",display:"flex",flexDirection:"column",justifyContent:"flex-end",transition:"transform .3s,box-shadow .3s,outline .15s",outline:sel?"3px solid var(--go)":"3px solid transparent",transform:sel?"scale(1.02)":"scale(1)",boxShadow:sel?"var(--sg)":"var(--ss)",animation:`fU .35s ease ${i*70}ms both`}}>
+          {opt.sw&&<div style={{display:"flex",gap:3,marginBottom:6}}>{opt.sw.map((hex,j)=><div key={j} style={{width:18,height:18,borderRadius:5,background:hex,border:"2px solid rgba(255,255,255,.5)"}}/>)}</div>}
+          <div style={{fontSize:20,marginBottom:2}}>{opt.ic}</div>
+          <div style={{color:"#fff",fontFamily:"var(--fh)",fontSize:16,fontWeight:600,textShadow:"0 1px 4px rgba(0,0,0,.3)"}}>{opt.l}</div>
+          <div style={{color:"rgba(255,255,255,.8)",fontSize:11,lineHeight:1.3,marginTop:2,textShadow:"0 1px 3px rgba(0,0,0,.2)"}}>{opt.d}</div>
+          {sel&&<div style={{position:"absolute",top:8,right:8,width:22,height:22,borderRadius:"50%",background:"var(--go)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,color:"#fff"}}>✓</div>}
+        </div>)})}
+    </div>
+    {q.ms&&<div style={{textAlign:"center",marginTop:18}}><button className="bg" disabled={multiSel.length===0} onClick={handleMultiSubmit} style={{opacity:multiSel.length===0?.5:1}}>See My Style →</button><p style={{fontSize:11,color:"var(--g)",marginTop:6}}>Select one or more, then continue</p></div>}
+    {step>0&&<button onClick={()=>{setAnim("left");setStep(s=>s-1)}} style={{display:"block",margin:"18px auto 0",background:"none",border:"none",color:"var(--g)",fontFamily:"var(--fb)",fontSize:13,cursor:"pointer"}}>← Back</button>}
+  </div>);}
+
+  if(phase==="loading")return(<div style={{background:"var(--w)",borderRadius:16,padding:48,boxShadow:"var(--sm)",textAlign:"center"}}>
+    <div style={{fontSize:36,marginBottom:18}}>✧</div>
+    <h3 style={{fontFamily:"var(--fh)",fontSize:24,fontWeight:400,marginBottom:24}}>Discovering Your Style</h3>
+    <div className="sk" style={{width:"100%",maxWidth:340,height:6,margin:"0 auto 24px",borderRadius:999}}/>
+    <p style={{fontSize:14,color:"var(--g)",minHeight:40}} key={lmsg}>{loadMsgs[lmsg]}</p>
+    <div style={{display:"flex",justifyContent:"center",gap:6,marginTop:18}}>{[0,1,2].map(i=><div key={i} style={{width:6,height:6,borderRadius:"50%",background:"var(--ro)",animation:`fl 1s ease-in-out ${i*.2}s infinite`}}/>)}</div>
+  </div>);
+
+  if(phase==="result"&&result)return(<div style={{background:"var(--w)",borderRadius:16,padding:32,boxShadow:"var(--sm)"}}>
+    <div style={{textAlign:"center",marginBottom:32,animation:"fU .5s ease"}}>
+      <p style={{fontSize:11,color:"var(--go)",letterSpacing:".08em",textTransform:"uppercase",fontWeight:600,marginBottom:6}}>Your Wedding Style DNA</p>
+      <div style={{fontSize:36,marginBottom:8}}>{result.moodEmoji||"✧"}</div>
+      <h2 style={{fontFamily:"var(--fh)",fontSize:"clamp(22px,4vw,34px)",fontWeight:600,fontStyle:"italic",marginBottom:12}}>{result.styleName}</h2>
+      <p style={{fontSize:14,color:"var(--cl)",lineHeight:1.7,maxWidth:500,margin:"0 auto"}}>{result.description}</p>
+      {result._source==="ai"&&<span style={{display:"inline-block",marginTop:8,fontSize:10,color:"var(--go)",background:"var(--gp)",padding:"2px 8px",borderRadius:999,fontWeight:600}}>✨ AI-Personalised</span>}
+    </div>
+    {/* Palette */}
+    {result.colourPalette&&<div style={{marginBottom:28,animation:"fU .5s ease .2s both"}}><h4 style={{fontFamily:"var(--fh)",fontSize:18,fontWeight:500,textAlign:"center",marginBottom:12}}>Your Colour Palette</h4><div style={{display:"flex",justifyContent:"center",gap:10,flexWrap:"wrap"}}>{result.colourPalette.map((c,i)=><div key={i} style={{textAlign:"center",animation:`fU .3s ease ${.3+i*.08}s both`}}><div style={{width:42,height:42,borderRadius:8,background:c.hex,margin:"0 auto 4px",boxShadow:"var(--ss)"}}/><div style={{fontSize:10,color:"var(--g)",maxWidth:56}}>{c.name}</div></div>)}</div></div>}
+    {/* Keywords */}
+    {result.decorKeywords&&<div style={{marginBottom:28,textAlign:"center",animation:"fU .5s ease .5s both"}}><h4 style={{fontFamily:"var(--fh)",fontSize:18,fontWeight:500,marginBottom:10}}>Décor Keywords</h4><div style={{display:"flex",justifyContent:"center",gap:6,flexWrap:"wrap"}}>{result.decorKeywords.map((kw,i)=><span key={i} className="cp" style={{fontSize:11,padding:"4px 12px"}}>{kw}</span>)}</div></div>}
+    {/* Details */}
+    {result.signatureDetails&&<div style={{marginBottom:28,animation:"fU .5s ease .7s both"}}><h4 style={{fontFamily:"var(--fh)",fontSize:18,fontWeight:500,textAlign:"center",marginBottom:10}}>Signature Details</h4>{result.signatureDetails.map((d,i)=><div key={i} style={{background:"var(--gg)",borderRadius:10,padding:12,borderLeft:"3px solid var(--go)",marginBottom:8,fontSize:13,lineHeight:1.6,color:"var(--cl)"}}>✦ {d}</div>)}</div>}
+    {/* Venues */}
+    {result.venueMatches&&<div style={{marginBottom:28,animation:"fU .5s ease .9s both"}}><h4 style={{fontFamily:"var(--fh)",fontSize:18,fontWeight:500,textAlign:"center",marginBottom:10}}>Your Perfect Venues</h4>{result.venueMatches.map((v,i)=><div key={i} style={{background:"var(--iv)",borderRadius:10,padding:16,marginBottom:8,border:"1px solid var(--gpa)"}}><h5 style={{fontFamily:"var(--fh)",fontSize:17,fontWeight:600,marginBottom:2}}>{v.name}</h5><p style={{fontSize:13,color:"var(--cl)",marginBottom:4}}>{v.reason}</p><p style={{fontSize:11,color:"var(--gd)",fontWeight:600}}>📍 {v.space}</p></div>)}</div>}
+    {/* Compatibility */}
+    {result.compatibilityNote&&<div style={{textAlign:"center",marginBottom:24,animation:"fU .5s ease 1.1s both"}}><div style={{background:"var(--rp)",borderRadius:10,padding:14,display:"inline-block",maxWidth:440}}><p style={{fontSize:13,color:"var(--c)"}}>💕 {result.compatibilityNote}</p></div></div>}
+    {/* Actions */}
+    <div style={{display:"flex",justifyContent:"center",gap:10,flexWrap:"wrap",animation:"fU .5s ease 1.3s both"}}>
+      <button className="cp" onClick={retake} style={{fontSize:12}}>🔄 Retake</button>
+      <button className="bg" onClick={copyRes} style={{fontSize:12,padding:"8px 18px"}}>{copied?"✓ Copied!":"📋 Copy Results"}</button>
+    </div>
+  </div>);
+  return null;
 }
 
 // ── ASK AI (client-side knowledge base — no API calls) ──────────────────
